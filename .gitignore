@@ -1,0 +1,9 @@
+# Haskell & Cabal
+
+dist/
+dist-newstyle/
+
+
+# VS Code
+
+.vscode/
