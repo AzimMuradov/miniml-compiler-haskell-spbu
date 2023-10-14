@@ -45,6 +45,8 @@ data Expr
     ELetInV (Identifier, Maybe Type) [Expr] [Expr]
   | -- \| ( let x = 4 in ... )
     ELetInF Identifier Fun [Expr]
+    -- | ( let rec f x y = x + y in ... )
+  | ELetRecInF Identifier Fun [Expr]
   -- \| ( let f x y = x + y in ... )
   deriving (Show, Eq)
 

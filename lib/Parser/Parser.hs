@@ -61,8 +61,9 @@ exprTerm :: Parser Expr
 exprTerm =
   choice'
     [ parens exprP,
-      ELetInV <$ kLet <*> typedIdentifierP <* eq <*> blockP <* kIn <*> blockP,
+      ELetRecInF <$ kLet <* kRec <*> identifierP <*> (Fun <$> some typedIdentifierP <* eq <*> blockP) <* kIn <*> blockP,
       ELetInF <$ kLet <*> identifierP <*> (Fun <$> some typedIdentifierP <* eq <*> blockP) <* kIn <*> blockP,
+      ELetInV <$ kLet <*> typedIdentifierP <* eq <*> blockP <* kIn <*> blockP,
       EValue <$> valueP,
       EIf <$ kIf <*> exprP <* kThen <*> blockP <* kElse <*> blockP,
       EIdentifier <$> identifierP
