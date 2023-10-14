@@ -28,8 +28,7 @@ programP = Program <$> sepBy1 statementP (notFollowedBy (symbol ";;") >> semicol
 statementP :: Parser Statement
 statementP =
   choice'
-    [ SMeasureDecl <$> measureP,
-      SExpr <$> exprP,
+    [ SExpr <$> exprP,
       SRecFunDecl <$> recFunP,
       SFunDecl <$> funP,
       SVarDecl <$> varP
@@ -45,9 +44,6 @@ funP = FunDecl <$ kLet <*> identifierP <*> (Fun <$> some typedIdentifierP <* eq 
 
 recFunP :: Parser RecFunDecl
 recFunP = RecFunDecl <$ kLet <* kRec <*> identifierP <*> (Fun <$> some typedIdentifierP <* eq <*> blockP)
-
-measureP :: Parser MeasureDecl
-measureP = MeasureDecl <$ kMeasure <* kType <*> identifierP <*> (optional . try) (eq *> mExprP)
 
 -- * ExpressionSection
 
@@ -80,8 +76,7 @@ exprTerm =
 opsTable :: [[Operator Parser Expr]]
 opsTable =
   [ [applicationOp],
-    [arithmeticOp "**" ExpOp],
-    [arithmeticOp "*" MulOp, arithmeticOp "/" DivOp, arithmeticOp "%" ModOp],
+    [arithmeticOp "*" MulOp, arithmeticOp "/" DivOp],
     [arithmeticOp "+" PlusOp, arithmeticOp "-" MinusOp],
     [ comparisonOp "=" EqOp,
       comparisonOp "<>" NeOp,
@@ -116,26 +111,6 @@ notOp = Prefix $ EOperations . NotOp <$ symbol "not"
 applicationOp :: Operator Parser Expr
 applicationOp = InfixL $ return $ \a b -> EApplication a b
 
--- MeasureExprParser
-
-mExprP :: Parser MeasureTypeExpr
-mExprP = makeExprParser mExprTerm mOpsTable
-
-mExprTerm :: Parser MeasureTypeExpr
-mExprTerm = choice' [parens mExprP, MIdentifier <$> identifierP]
-
-mOpsTable :: [[Operator Parser MeasureTypeExpr]]
-mOpsTable =
-  [ [measureTypeExpOp],
-    [measureTypeOp "*" MTypesMul, measureTypeOp "/" MTypesDiv, measureTypeOp "" MTypesMul]
-  ]
-
-measureTypeExpOp :: Operator Parser MeasureTypeExpr
-measureTypeExpOp = Postfix $ flip MTypesExp <$ symbol "^" <*> signedIntP
-
-measureTypeOp :: Text -> (MeasureTypeExpr -> MeasureTypeExpr -> MeasureTypeExpr) -> Operator Parser MeasureTypeExpr
-measureTypeOp name fun = InfixL $ fun <$ symbol name
-
 -- * OtherParsersSection
 
 -- IdentifierParsers
@@ -158,11 +133,6 @@ typedIdentifierP = do
       (,) <$> identifierP <*> pure Nothing
     ]
 
--- MeasureTypeParser
-
-helpMeasureP :: Parser (Maybe MeasureTypeExpr)
-helpMeasureP = (optional . try) (mlparens mExprP)
-
 -- TypeParser
 
 typeP :: Parser Type
@@ -178,8 +148,7 @@ typeP' =
   choice'
     [ parens typeP,
       TBool <$ wBool,
-      TInt <$ wInt <*> helpMeasureP,
-      TDouble <$ wDouble <*> helpMeasureP
+      TInt <$ wInt
     ]
 
 -- ValueParsers
@@ -187,8 +156,7 @@ typeP' =
 valueP :: Parser Value
 valueP =
   choice'
-    [ VDouble <$> signedDoubleP <*> helpMeasureP,
-      VInt <$> signedIntP <*> helpMeasureP,
+    [ VInt <$> signedIntP,
       VBool <$> boolLitP,
       VFun <$> (Fun <$ kFun <*> many typedIdentifierP <* arrow <*> blockP)
     ]

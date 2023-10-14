@@ -40,12 +40,6 @@ choice' x = choice $ try <$> x
 parens :: Parser a -> Parser a
 parens = between (symbol "(") (symbol ")")
 
-mlparens :: Parser a -> Parser a
-mlparens = between (symbol "<") (symbol ">")
-
-brackets :: Parser a -> Parser a
-brackets = between (symbol "[") (symbol "]")
-
 block :: Parser a -> Parser a
 block = between kBegin kEnd
 
@@ -66,7 +60,7 @@ eq = symbol "="
 
 -- Reserved Parser
 reservedP :: Parser Text
-reservedP = choice [wTrue, wFalse, wBool, wInt, wDouble, kIf, kThen, kElse, kLet, kRec, kIn, kFun, kMeasure, kType, kBegin, kEnd]
+reservedP = choice [wTrue, wFalse, wBool, wInt, kIf, kThen, kElse, kLet, kRec, kIn, kFun, kType, kBegin, kEnd]
 
 -- Reserved Words
 
@@ -85,10 +79,6 @@ wBool = symbol "bool"
 -- Int Parser
 wInt :: Parser Text
 wInt = symbol "int"
-
--- Double Parser
-wDouble :: Parser Text
-wDouble = symbol "double"
 
 -- Keyword Parsers
 
@@ -119,10 +109,6 @@ kIn = symbol "in"
 -- inParser
 kFun :: Parser Text
 kFun = symbol "fun"
-
--- MeasureParser
-kMeasure :: Parser Text
-kMeasure = symbol "[<Measure>]"
 
 -- TypeParser
 kType :: Parser Text

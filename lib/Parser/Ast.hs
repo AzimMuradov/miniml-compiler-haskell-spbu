@@ -17,15 +17,11 @@ data FunDecl = FunDecl Identifier Fun deriving (Show, Eq)
 
 data RecFunDecl = RecFunDecl Identifier Fun deriving (Show, Eq)
 
-data MeasureDecl = MeasureDecl Identifier (Maybe MeasureTypeExpr) deriving (Show, Eq)
-
 -- * Statements
 
 data Statement
   = SExpr Expr
-  | SMeasureDecl MeasureDecl
-  | -- \| ( [<Measure>] type m )
-    SVarDecl VarDecl
+  | SVarDecl VarDecl
   | -- \| ( let x = 5 )
     SFunDecl FunDecl
   | -- \| ( let f x y = x + y )
@@ -58,26 +54,15 @@ data Expr
 
 data Type
   = TBool
-  | TInt (Maybe MeasureTypeExpr)
-  | TDouble (Maybe MeasureTypeExpr)
+  | TInt
   | TFun Type Type
-  deriving (Show, Eq)
-
--- ** MeasureType
-
-data MeasureTypeExpr
-  = MIdentifier Identifier
-  | MTypesMul MeasureTypeExpr MeasureTypeExpr
-  | MTypesDiv MeasureTypeExpr MeasureTypeExpr
-  | MTypesExp MeasureTypeExpr Integer
   deriving (Show, Eq)
 
 -- * Values
 
 data Value
   = VBool Bool
-  | VInt Integer (Maybe MeasureTypeExpr)
-  | VDouble Double (Maybe MeasureTypeExpr)
+  | VInt Integer
   | VFun Fun
   deriving (Show, Eq)
 
@@ -110,11 +95,7 @@ data ArithmeticOp
     MulOp {aL :: Expr, aR :: Expr}
   | -- \| ( * )
     DivOp {aL :: Expr, aR :: Expr}
-  | -- \| ( / )
-    ModOp {aL :: Expr, aR :: Expr}
-  | -- \| ( % )
-    ExpOp {aL :: Expr, aR :: Expr}
-  -- \| ( ** )
+  -- \| ( / )
   deriving (Show, Eq)
 
 data ComparisonOp
