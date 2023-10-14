@@ -48,24 +48,13 @@ library
     import: shared-properties
 
     exposed-modules:
-        Parser.Ast,
-        Parser.Lexer,
-        Parser.Parser,
-        -- TODO : Remove Greeter
-        Greeter,
-        MaybeVoid
+        Greeter
 
     other-modules:
 
     other-extensions:
 
     build-depends:
-        -- lens >=5.2,
-        -- mtl >=2.3.1,
-        -- either >=5.0.2,
-        containers >=0.6.6,
-        parser-combinators >=1.3.0,
-        megaparsec >=9.2.2
 
     hs-source-dirs: lib
 
