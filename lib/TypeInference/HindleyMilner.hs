@@ -107,13 +107,13 @@ checkForDuplicate :: LookUpType -> Infer UType
 checkForDuplicate (Var v) = do
   ctx <- ask
   case M.lookup v ctx of
-      (Just _) -> throwError $ DuplicateDifinition v
-      Nothing -> return $ UTyVar v
+    (Just _) -> throwError $ DuplicateDifinition v
+    Nothing -> return $ UTyVar v
 
-withBinding :: MonadReader Ctx m => Identifier -> UPolytype -> m a -> m a
+withBinding :: (MonadReader Ctx m) => Identifier -> UPolytype -> m a -> m a
 withBinding x ty = local (M.insert x ty)
 
-ucata :: Functor t => (v -> a) -> (t a -> a) -> UTerm t v -> a
+ucata :: (Functor t) => (v -> a) -> (t a -> a) -> UTerm t v -> a
 ucata f _ (UVar v) = f v
 ucata f g (UTerm t) = g (fmap (ucata f g) t)
 

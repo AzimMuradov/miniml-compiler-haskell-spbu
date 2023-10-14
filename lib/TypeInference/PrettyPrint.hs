@@ -25,10 +25,10 @@ class Pretty p where
   prettyPrec :: Prec -> p -> String
   prettyPrec _ = pretty
 
-instance Pretty (t (Fix t)) => Pretty (Fix t) where
+instance (Pretty (t (Fix t))) => Pretty (Fix t) where
   prettyPrec p = prettyPrec p . unFix
 
-instance Pretty t => Pretty (HType t) where
+instance (Pretty t) => Pretty (HType t) where
   prettyPrec _ (TyVarF x) = unpack x
   prettyPrec _ TyBoolF = "bool"
   prettyPrec _ TyIntF = "int"

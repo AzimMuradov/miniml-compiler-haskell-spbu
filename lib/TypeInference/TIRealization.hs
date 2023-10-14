@@ -54,7 +54,7 @@ inferBlock (x : xs) = inferSingle x >> inferBlock xs
 inferSingle :: Expr -> Infer UType
 inferSingle (EIdentifier x) = lookup (Var x)
 inferSingle (EValue (VBool _)) = return UTyBool
-inferSingle (EValue (VInt _ )) = return UTyInt
+inferSingle (EValue (VInt _)) = return UTyInt
 inferSingle (EValue (VFun (Fun xs body))) = inferFun xs body
 inferSingle (EIf e1 e2 e3) = do
   _ <- check e1 UTyBool
@@ -65,12 +65,10 @@ inferSingle (EOperations (NotOp x)) = do
   _ <- check x UTyBool
   return UTyBool
 inferSingle (EOperations (BooleanOp x)) = booleanOpInfer (bL x) (bR x)
-
 -- booleanOpHelper :: UType -> UType -> Infer UType
 -- booleanOpHelper t1 t2 = do
 --   _ <- t1 =:= t2
 --   return UTyBool
-
 
 inferSingle (EOperations (ComparisonOp x)) = comparationOpInfer (cL x) (cR x)
 inferSingle (EOperations (ArithmeticOp x)) =
