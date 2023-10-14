@@ -9,49 +9,62 @@ import Data.Text (Text)
 newtype Program = Program [Statement]
   deriving (Show)
 
--- * Declarations
-
-data VarDecl = VarDecl (Identifier, Maybe Type) [Expr] deriving (Show, Eq)
-
-data FunDecl = FunDecl Identifier Fun deriving (Show, Eq)
-
-data RecFunDecl = RecFunDecl Identifier Fun deriving (Show, Eq)
+-------------------------------------------------------Statements-------------------------------------------------------
 
 -- * Statements
 
+-- | Statement.
 data Statement
-  = SExpr Expr
-  | SVarDecl VarDecl
-  | -- \| ( let x = 5 )
+  = -- | Expression statement.
+    SExpr Expr
+  | -- | ( let x = 5 )
+    SVarDecl VarDecl
+  | -- | ( let f x y = x + y )
     SFunDecl FunDecl
-  | -- \| ( let f x y = x + y )
+  | -- | ( let rec f x y = f x 1 + f 1 y)
     SRecFunDecl RecFunDecl
-  -- ( let rec f x y = f x 1 + f 1 y)
   deriving (Show, Eq)
+
+-- ** Declarations
+
+-- TODO : Add docs
+data VarDecl = VarDecl (Identifier, Maybe Type) [Expr] deriving (Show, Eq)
+
+-- TODO : Add docs
+data FunDecl = FunDecl Identifier Fun deriving (Show, Eq)
+
+-- TODO : Add docs
+data RecFunDecl = RecFunDecl Identifier Fun deriving (Show, Eq)
+
+------------------------------------------------------Expressions-------------------------------------------------------
 
 -- * Expressions
 
+-- | Expression.
 data Expr
-  = EIdentifier Identifier
-  | -- \| ( "x", "y" )
+  = -- | ( "x", "y" )
+    EIdentifier Identifier
+  | -- | ( 5, 7.4, fun x y = x + y )
     EValue Value
-  | -- \| ( 5, 7.4, fun x y = x + y )
+  | -- | ( +, - )
     EOperations Operations
-  | -- \| ( +, - )
+  | -- | ( f 6, (fun x y = x + y) 5 6 )
     EApplication Expr Expr
-  | -- \| ( f 6, (fun x y = x + y) 5 6 )
+  | -- | ( if cond then e1 else e2 )
     EIf Expr [Expr] [Expr]
-  | -- \| ( if cond then e1 else e2 )
+  | -- | ( let x = 4 in ... )
     ELetInV (Identifier, Maybe Type) [Expr] [Expr]
-  | -- \| ( let x = 4 in ... )
+  | -- | ( let f x y = x + y in ... )
     ELetInF Identifier Fun [Expr]
-  -- \| ( let f x y = x + y in ... )
+  | -- | ( let rec f x y = x + y in ... )
+    ELetRecInF Identifier Fun [Expr]
   deriving (Show, Eq)
 
 -- * Types
 
 -- ** BasicTypes
 
+-- | Type.
 data Type
   = TBool
   | TInt
@@ -60,59 +73,65 @@ data Type
 
 -- * Values
 
+-- | Value.
 data Value
   = VBool Bool
   | VInt Integer
   | VFun Fun
   deriving (Show, Eq)
 
-data Fun = Fun [(Identifier, Maybe Type)] [Expr] deriving (Show, Eq)
-
 -- | ( fun x y -> x + y )
+data Fun = Fun [(Identifier, Maybe Type)] [Expr]
+  deriving (Show, Eq)
 
 -- * Operators
 
+-- TODO : Add docs
 data Operations
   = BooleanOp BooleanOp
-  | NotOp Expr
-  | -- \| ( not )
-    ArithmeticOp ArithmeticOp
+  | -- | ( not )
+    NotOp Expr
+  | ArithmeticOp ArithmeticOp
   | ComparisonOp ComparisonOp
   deriving (Show, Eq)
 
+-- TODO : Add docs
 data BooleanOp
-  = AndOp {bL :: Expr, bR :: Expr}
-  | -- \| ( && )
+  = -- | ( && )
+    AndOp {bL :: Expr, bR :: Expr}
+  | -- | ( || )
     OrOp {bL :: Expr, bR :: Expr}
-  -- \| ( || )
   deriving (Show, Eq)
 
+-- TODO : Add docs
 data ArithmeticOp
-  = PlusOp {aL :: Expr, aR :: Expr}
-  | -- \| ( + )
+  = -- | ( + )
+    PlusOp {aL :: Expr, aR :: Expr}
+  | -- | ( - )
     MinusOp {aL :: Expr, aR :: Expr}
-  | -- \| ( - )
+  | -- | ( * )
     MulOp {aL :: Expr, aR :: Expr}
-  | -- \| ( * )
+  | -- | ( / )
     DivOp {aL :: Expr, aR :: Expr}
-  -- \| ( / )
   deriving (Show, Eq)
 
+-- TODO : Add docs
 data ComparisonOp
-  = EqOp {cL :: Expr, cR :: Expr}
-  | -- \| ( = )
+  = -- | ( = )
+    EqOp {cL :: Expr, cR :: Expr}
+  | -- | ( <> )
     NeOp {cL :: Expr, cR :: Expr}
-  | -- \| ( <> )
+  | -- | ( < )
     LtOp {cL :: Expr, cR :: Expr}
-  | -- \| ( < )
+  | -- | ( <= )
     LeOp {cL :: Expr, cR :: Expr}
-  | -- \| ( <= )
+  | -- | ( > )
     MtOp {cL :: Expr, cR :: Expr}
-  | -- \| ( > )
+  | -- | ( >= )
     MeOp {cL :: Expr, cR :: Expr}
-  -- \| ( >= )
   deriving (Show, Eq)
 
 -- * Identifier
 
+-- | Any valid identifier.
 type Identifier = Text

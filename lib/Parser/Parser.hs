@@ -7,7 +7,7 @@ import Data.Maybe (fromMaybe)
 import Data.Text (Text, pack)
 import Parser.Ast
 import Parser.Lexer
-import Text.Megaparsec (MonadParsec (..), many, optional, parseMaybe, sepBy1, sepEndBy1, some, (<|>))
+import Text.Megaparsec (MonadParsec (..), many, optional, parseMaybe, sepEndBy1, some, (<|>))
 import Text.Megaparsec.Char (char, digitChar, letterChar)
 import qualified Text.Megaparsec.Char.Lexer as L
 
@@ -19,10 +19,10 @@ parse p = parseMaybe $ sc *> p <* eof
 
 -- | Main Parser
 fileP :: Parser [Program]
-fileP = sepEndBy1 programP (symbol ";;")
+fileP = sepEndBy1 programP semicolon2
 
 programP :: Parser Program
-programP = Program <$> sepBy1 statementP (notFollowedBy (symbol ";;") >> semicolon)
+programP = Program <$> some statementP
 
 -- | Global Statements Parser
 statementP :: Parser Statement
@@ -50,11 +50,7 @@ recFunP = RecFunDecl <$ kLet <* kRec <*> identifierP <*> (Fun <$> some typedIden
 -- BlockExprParser
 
 blockP :: Parser [Expr]
-blockP =
-  choice'
-    [ (: []) <$> exprP,
-      block (sepBy1 exprP semicolon)
-    ]
+blockP = some exprP
 
 -- MainExprParser
 
@@ -65,8 +61,9 @@ exprTerm :: Parser Expr
 exprTerm =
   choice'
     [ parens exprP,
-      ELetInV <$ kLet <*> typedIdentifierP <* eq <*> blockP <* kIn <*> blockP,
+      ELetRecInF <$ kLet <* kRec <*> identifierP <*> (Fun <$> some typedIdentifierP <* eq <*> blockP) <* kIn <*> blockP,
       ELetInF <$ kLet <*> identifierP <*> (Fun <$> some typedIdentifierP <* eq <*> blockP) <* kIn <*> blockP,
+      ELetInV <$ kLet <*> typedIdentifierP <* eq <*> blockP <* kIn <*> blockP,
       EValue <$> valueP,
       EIf <$ kIf <*> exprP <* kThen <*> blockP <* kElse <*> blockP,
       EIdentifier <$> identifierP
