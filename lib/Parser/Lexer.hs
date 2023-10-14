@@ -84,7 +84,7 @@ wBool = symbol "bool"
 
 -- Int Parser
 wInt :: Parser Text
-wInt= symbol "int"
+wInt = symbol "int"
 
 -- Double Parser
 wDouble :: Parser Text

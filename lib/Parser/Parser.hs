@@ -2,12 +2,12 @@
 
 module Parser.Parser where
 
-import Parser.Ast
 import Control.Monad.Combinators.Expr (Operator (..), makeExprParser)
 import Data.Maybe (fromMaybe)
 import Data.Text (Text, pack)
+import Parser.Ast
 import Parser.Lexer
-import Text.Megaparsec (MonadParsec (..), many, optional, parseMaybe, sepBy1, some, (<|>), sepEndBy1)
+import Text.Megaparsec (MonadParsec (..), many, optional, parseMaybe, sepBy1, sepEndBy1, some, (<|>))
 import Text.Megaparsec.Char (char, digitChar, letterChar)
 import qualified Text.Megaparsec.Char.Lexer as L
 
@@ -54,8 +54,11 @@ measureP = MeasureDecl <$ kMeasure <* kType <*> identifierP <*> (optional . try)
 -- BlockExprParser
 
 blockP :: Parser [Expr]
-blockP = choice' [(:[]) <$> exprP,
-                  block (sepBy1 exprP semicolon)]
+blockP =
+  choice'
+    [ (: []) <$> exprP,
+      block (sepBy1 exprP semicolon)
+    ]
 
 -- MainExprParser
 
