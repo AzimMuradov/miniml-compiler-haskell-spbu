@@ -51,7 +51,11 @@ library
         Greeter,
         Parser.Ast,
         Parser.Lexer,
-        Parser.Parser
+        Parser.Parser,
+        TypeInference.HindleyMilner,
+        TypeInference.PrettyPrint,
+        TypeInference.Runtime,
+        TypeInference.TIRealization
 
     other-modules:
 
