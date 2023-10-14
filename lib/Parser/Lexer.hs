@@ -43,8 +43,8 @@ parens = between (symbol "(") (symbol ")")
 colon :: Parser Text
 colon = symbol ":"
 
-semicolon :: Parser Text
-semicolon = symbol ";"
+semicolon2 :: Parser Text
+semicolon2 = symbol ";;"
 
 arrow :: Parser Text
 arrow = symbol "->"
@@ -57,7 +57,7 @@ eq = symbol "="
 
 -- Reserved Parser
 reservedP :: Parser Text
-reservedP = choice [wTrue, wFalse, wBool, wInt, kIf, kThen, kElse, kLet, kRec, kIn, kFun, kType]
+reservedP = choice [wTrue, wFalse, wBool, wInt, kIf, kThen, kElse, kLet, kRec, kIn, kFun]
 
 -- Reserved Words
 
@@ -106,7 +106,3 @@ kIn = symbol "in"
 -- inParser
 kFun :: Parser Text
 kFun = symbol "fun"
-
--- TypeParser
-kType :: Parser Text
-kType = symbol "type"

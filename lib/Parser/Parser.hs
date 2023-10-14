@@ -19,7 +19,7 @@ parse p = parseMaybe $ sc *> p <* eof
 
 -- | Main Parser
 fileP :: Parser [Program]
-fileP = sepEndBy1 programP (symbol ";;")
+fileP = sepEndBy1 programP semicolon2
 
 programP :: Parser Program
 programP = Program <$> some statementP
