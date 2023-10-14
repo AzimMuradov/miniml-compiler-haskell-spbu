@@ -65,11 +65,6 @@ inferSingle (EOperations (NotOp x)) = do
   _ <- check x UTyBool
   return UTyBool
 inferSingle (EOperations (BooleanOp x)) = booleanOpInfer (bL x) (bR x)
--- booleanOpHelper :: UType -> UType -> Infer UType
--- booleanOpHelper t1 t2 = do
---   _ <- t1 =:= t2
---   return UTyBool
-
 inferSingle (EOperations (ComparisonOp x)) = comparationOpInfer (cL x) (cR x)
 inferSingle (EOperations (ArithmeticOp x)) =
   case x of
@@ -81,7 +76,6 @@ inferSingle (EOperations (ArithmeticOp x)) =
       case (t1, t2) of
         -- TODO: Check this later
         (UTyInt, UTyInt) -> do
-          _ <- t1 =:= t2
           return UTyInt
         (UVar _, UVar _) -> t1 =:= t2
         (UTyInt, _) -> t1 =:= t2
@@ -92,7 +86,6 @@ inferSingle (EOperations (ArithmeticOp x)) =
       t2 <- inferSingle r
       case (t1, t2) of
         (UTyInt, UTyInt) -> do
-          _ <- t1 =:= t2
           return UTyInt
         (UVar _, UVar _) -> t1 =:= t2
         (UTyInt, _) -> t1 =:= t2
@@ -143,7 +136,8 @@ comparationOpInfer e1 e2 = do
   case (t1, t2) of
     (UTyInt, _) -> booleanOpHelper t1 t2
     (_, UTyInt) -> booleanOpHelper t1 t2
-    (UTyBool, UTyBool) -> return UTyBool
+    (UTyBool, _) -> booleanOpHelper t1 t2
+    (_, UTyBool) -> booleanOpHelper t1 t2
     _ -> throwError $ ImpossibleOpApplication t1 t2
 
 booleanOpHelper :: UType -> UType -> Infer UType
