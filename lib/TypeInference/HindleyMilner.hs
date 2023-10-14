@@ -37,10 +37,8 @@ type MeasureV = Map Identifier Integer
 data HType a
   = TyVarF Identifier
   | TyBoolF
-  | TyIntF a
-  | TyDoubleF a
+  | TyIntF
   | TyFunF a a
-  | TyMeasureF MeasureV
   deriving (Show, Eq, Functor, Foldable, Traversable, Generic1, Unifiable)
 
 type TypeF = Fix HType
@@ -57,14 +55,8 @@ type UPolytype = Poly UType
 pattern TyVar :: Identifier -> TypeF
 pattern TyVar v = Fix (TyVarF v)
 
-pattern TyMeasure :: MeasureV -> TypeF
-pattern TyMeasure m = Fix (TyMeasureF m)
-
-pattern TyInt :: TypeF -> TypeF
-pattern TyInt x = Fix (TyIntF x)
-
-pattern TyDouble :: TypeF -> TypeF
-pattern TyDouble x = Fix (TyDoubleF x)
+pattern TyInt :: TypeF
+pattern TyInt = Fix TyIntF
 
 pattern TyBool :: TypeF
 pattern TyBool = Fix TyBoolF
@@ -75,14 +67,8 @@ pattern TyFun t1 t2 = Fix (TyFunF t1 t2)
 pattern UTyVar :: Identifier -> UType
 pattern UTyVar v = UTerm (TyVarF v)
 
-pattern UTyMeasure :: MeasureV -> UType
-pattern UTyMeasure m = UTerm (TyMeasureF m)
-
-pattern UTyInt :: UType -> UType
-pattern UTyInt x = UTerm (TyIntF x)
-
-pattern UTyDouble :: UType -> UType
-pattern UTyDouble x = UTerm (TyDoubleF x)
+pattern UTyInt :: UType
+pattern UTyInt = UTerm TyIntF
 
 pattern UTyBool :: UType
 pattern UTyBool = UTerm TyBoolF
@@ -93,24 +79,8 @@ pattern UTyFun t1 t2 = UTerm (TyFunF t1 t2)
 toTypeF :: Type -> TypeF
 toTypeF x = case x of
   TBool -> Fix TyBoolF
-  (TInt measure) -> case measure of
-    Just m -> Fix (TyIntF $ fromMToF m)
-    Nothing -> Fix (TyIntF $ TyMeasure M.empty)
-  (TDouble measure) -> case measure of
-    Just m -> Fix (TyDoubleF $ fromMToF m)
-    Nothing -> Fix (TyDoubleF $ TyMeasure M.empty)
+  TInt -> Fix TyIntF
   (TFun t1 t2) -> Fix $ TyFunF (toTypeF t1) (toTypeF t2)
-
-fromMToF :: MeasureTypeExpr -> TypeF
-fromMToF = TyMeasure . convertMeasure
-
-convertMeasure :: MeasureTypeExpr -> MeasureV
-convertMeasure =
-  M.filter (/= 0) . \case
-    (MIdentifier ident) -> M.singleton ident 1
-    (MTypesMul e1 e2) -> (sumMaps (convertMeasure e1) (convertMeasure e2))
-    (MTypesExp e1 c) -> (* c) <$> convertMeasure e1
-    (MTypesDiv e1 e2) -> (sumMaps (convertMeasure e1) ((* (-1)) <$> convertMeasure e2))
 
 sumMaps :: (Ord k, Num a) => Map k a -> Map k a -> Map k a
 sumMaps a b =
@@ -118,26 +88,10 @@ sumMaps a b =
       partB = M.intersection b a
    in M.foldlWithKey (\acc k v -> M.insert k (acc M.! k + v) acc) partA partB
 
-fromMToUM :: MeasureTypeExpr -> UType
-fromMToUM = UTyMeasure . convertMeasure
-
-mulM :: UType -> UType -> Infer UType
-mulM (UTyMeasure m1) (UTyMeasure m2) = return $ UTyMeasure $ M.filter (/= 0) $ sumMaps m1 m2
-mulM _ _ = throwError Unreachable
-
-divM :: UType -> UType -> Infer UType
-divM (UTyMeasure m1) (UTyMeasure m2) = return $ UTyMeasure $ M.filter (/= 0) $ sumMaps m1 ((* (-1)) <$> m2)
-divM _ _ = throwError Unreachable
-
 fromTypeToUType :: Type -> UType
 fromTypeToUType x = case x of
   TBool -> UTerm TyBoolF
-  (TInt measure) -> case measure of
-    Just m -> UTerm (TyIntF $ fromMToUM m)
-    Nothing -> UTerm (TyIntF $ UTyMeasure M.empty)
-  (TDouble measure) -> case measure of
-    Just m -> UTerm (TyDoubleF $ fromMToUM m)
-    Nothing -> UTerm (TyDoubleF $ UTyMeasure M.empty)
+  TInt -> UTerm TyIntF
   (TFun t1 t2) -> UTerm $ TyFunF (fromTypeToUType t1) (fromTypeToUType t2)
 
 type Infer = ReaderT Ctx (ExceptT TypeError (IntBindingT HType Identity))
@@ -145,24 +99,16 @@ type Infer = ReaderT Ctx (ExceptT TypeError (IntBindingT HType Identity))
 type Ctx = Map Identifier UPolytype
 
 lookup :: LookUpType -> Infer UType
-lookup x = do
+lookup (Var v) = do
   ctx <- ask
-  case x of
-    (Var v) -> maybe (throwError $ UnboundVar v) instantiate (M.lookup v ctx)
-    (Measure m) -> maybe (throwError $ UnboundMeasure m) instantiate (M.lookup m ctx)
+  maybe (throwError $ UnboundVar v) instantiate (M.lookup v ctx)
 
 checkForDuplicate :: LookUpType -> Infer UType
-checkForDuplicate x = do
+checkForDuplicate (Var v) = do
   ctx <- ask
-  case x of
-    (Var v) ->
-      case M.lookup v ctx of
-        (Just _) -> throwError $ DuplicateDifinition v
-        Nothing -> return $ UTyVar v
-    (Measure m) ->
-      case M.lookup m ctx of
-        (Just _) -> throwError $ DuplicateMeasureDifinition m
-        Nothing -> return $ UTyVar m
+  case M.lookup v ctx of
+      (Just _) -> throwError $ DuplicateDifinition v
+      Nothing -> return $ UTyVar v
 
 withBinding :: MonadReader Ctx m => Identifier -> UPolytype -> m a -> m a
 withBinding x ty = local (M.insert x ty)
@@ -192,17 +138,13 @@ instance FreeVars UPolytype where
 instance FreeVars Ctx where
   freeVars = fmap S.unions . mapM freeVars . M.elems
 
-data LookUpType
-  = Var Identifier
-  | Measure Identifier
+newtype LookUpType = Var Identifier
 
 data TypeError where
   EmptyList :: TypeError
   Unreachable :: TypeError
   DuplicateDifinition :: Identifier -> TypeError
-  DuplicateMeasureDifinition :: Identifier -> TypeError
   UnboundVar :: Identifier -> TypeError
-  UnboundMeasure :: Identifier -> TypeError
   Infinite :: IntVar -> UType -> TypeError
   ImpossibleOpApplication :: UType -> UType -> TypeError
   Mismatch :: HType UType -> HType UType -> TypeError
