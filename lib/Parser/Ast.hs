@@ -7,7 +7,7 @@ import Data.Text (Text)
 -- * Main program
 
 newtype Program = Program [Statement]
-  deriving (Show)
+  deriving (Show, Eq)
 
 -------------------------------------------------------Statements-------------------------------------------------------
 
