@@ -43,8 +43,7 @@ helpInferStatements ((SExpr e) : xs) _ = do
   helpInferStatements xs (return res)
 
 inferStatement :: [Statement] -> Infer UType
-inferStatement x = do
-  helpInferStatements x (throwError EmptyList)
+inferStatement x = helpInferStatements x (throwError EmptyList)
 
 inferBlock :: [Expr] -> Infer UType
 inferBlock [] = throwError EmptyList

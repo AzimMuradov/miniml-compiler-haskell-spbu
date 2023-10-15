@@ -82,12 +82,6 @@ toTypeF x = case x of
   TInt -> Fix TyIntF
   (TFun t1 t2) -> Fix $ TyFunF (toTypeF t1) (toTypeF t2)
 
-sumMaps :: (Ord k, Num a) => Map k a -> Map k a -> Map k a
-sumMaps a b =
-  let partA = M.union a b
-      partB = M.intersection b a
-   in M.foldlWithKey (\acc k v -> M.insert k (acc M.! k + v) acc) partA partB
-
 fromTypeToUType :: Type -> UType
 fromTypeToUType x = case x of
   TBool -> UTerm TyBoolF
