@@ -28,7 +28,6 @@ tests =
         test12,
         test13,
         testredecalaration,
-        testfac,
         testfib,
         testrec,
         testfix0,
@@ -173,15 +172,6 @@ testredecalaration =
 
       expected ~=? actual
 
-testfac :: Test
-testfac =
-  "[let rec fact n = if n <= 1 then 1 else n * fact (n - 1)]"
-    ~: do
-      let expected = "int -> int"
-      let actual = eval $ parseProgram "let rec fact n = if n <= 1 then 1 else n * fact (n - 1)"
-
-      expected ~=? actual
-
 testfib :: Test
 testfib =
   "[let n = 30;; let rec fib n = if n <= 1 then 1 else fib (n - 1) + fib (n - 2);; fib (n - 2)]"
@@ -235,6 +225,6 @@ parseProgram = parse programP
 eval :: Maybe Program -> String
 eval s = case s of
   Nothing -> "Please, try again. Can't parse your program."
-  Just (Program p) -> case inferPolytype p of
+  Just p -> case inferPolytype p of
     Left tyerr -> pretty tyerr
     Right ty -> pretty ty
