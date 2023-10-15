@@ -1,8 +1,6 @@
 module Main where
 
-import Greeter (hello)
-
 -- * Main
 
 main :: IO ()
-main = hello "MiniML"
+main = putStrLn "MiniML"

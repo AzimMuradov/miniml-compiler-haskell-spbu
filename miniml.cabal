@@ -29,7 +29,6 @@ common shared-properties
 library
     import:           shared-properties
     exposed-modules:
-        Greeter
         Parser.Ast
         Parser.Lexer
         Parser.Parser
