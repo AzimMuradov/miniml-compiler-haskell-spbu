@@ -2,107 +2,134 @@
 
 module Parser.Lexer where
 
-import Control.Applicative.Combinators (between)
-import Data.Text (Text)
+import Data.Text (Text, pack)
 import Data.Void (Void)
-import Text.Megaparsec (MonadParsec (..), Parsec, choice)
-import Text.Megaparsec.Char (space1)
+import Parser.Ast (Identifier)
+import Text.Megaparsec (MonadParsec (..), Parsec, between, choice, many, (<|>))
+import Text.Megaparsec.Char (char, digitChar, letterChar, space1, string)
 import qualified Text.Megaparsec.Char.Lexer as L
 
+-- * Basic lexer parts
+
+-- | Parser monad.
 type Parser = Parsec Void Text
 
--- Comments
-lineComment :: Parser ()
-lineComment = L.skipLineComment "//"
-
-blockComment :: Parser ()
-blockComment = L.skipBlockComment "(*" "*)"
-
--- Space Consumers
+-- | Space consumer, parses whitespace and comments.
 sc :: Parser ()
-sc = L.space space1 lineComment blockComment
+sc = L.space space1 (L.skipLineComment "//") (L.skipBlockComment "(*" "*)")
 
--- Text Parsing Helpers
-
+-- | Lexeme, automatically parses trailing whitespace and comments.
 lexeme :: Parser a -> Parser a
 lexeme = L.lexeme sc
 
+-- | Symbol, automatically parses trailing whitespace and comments.
 symbol :: Text -> Parser Text
 symbol = L.symbol sc
+
+-- * Symbols
+
+-- | Wraps the given parser with parenthesis.
+parens :: Parser a -> Parser a
+parens = between (symbol "(") (symbol ")")
+
+-- | Colon parser.
+colon :: Parser Text
+colon = symbol ":"
+
+-- | Double semicolon parser.
+semicolon2 :: Parser Text
+semicolon2 = symbol ";;"
+
+-- | Arrow parser.
+arrow :: Parser Text
+arrow = symbol "->"
+
+-- | Equality parser.
+eq :: Parser Text
+eq = symbol "="
 
 -- Smart Choice
 
 choice' :: (Foldable f, MonadParsec e s m, Functor f) => f (m a) -> m a
 choice' x = choice $ try <$> x
 
--- Symbols
+-- * Literals
 
-parens :: Parser a -> Parser a
-parens = between (symbol "(") (symbol ")")
+-- | Boolean literal parser.
+boolLitP :: Parser Bool
+boolLitP = True <$ idTrue <|> False <$ idFalse
 
-colon :: Parser Text
-colon = symbol ":"
+-- | Signed decimal integer literal parser.
+signedIntP :: Parser Integer
+signedIntP = L.signed (return ()) intP
+  where
+    intP = lexeme L.decimal
 
-semicolon2 :: Parser Text
-semicolon2 = symbol ";;"
+-- * Identifiers and reserved
 
-arrow :: Parser Text
-arrow = symbol "->"
+-- ** Identifier
 
-comma :: Parser Text
-comma = symbol ","
+identifierP :: Parser Identifier
+identifierP =
+  lexeme $
+    notFollowedBy reservedP *> do
+      first <- firstP
+      other <- many otherP
+      return $ pack $ first : other
+  where
+    firstP = letterChar <|> char '_'
+    otherP = firstP <|> digitChar
 
-eq :: Parser Text
-eq = symbol "="
-
--- Reserved Parser
 reservedP :: Parser Text
-reservedP = choice [wTrue, wFalse, wBool, wInt, kIf, kThen, kElse, kLet, kRec, kIn, kFun]
+reservedP = choice [kwLet, kwRec, kwIn, kwIf, kwThen, kwElse, kwFun, idBool, idInt, idTrue, idFalse]
 
--- Reserved Words
+reservedP' :: Text -> Parser Text
+reservedP' ident = lexeme $ string ident <* notFollowedBy (letterChar <|> char '_' <|> digitChar)
 
--- True Parser
-wTrue :: Parser Text
-wTrue = symbol "true"
+-- ** Keywords
 
--- False Parser
-wFalse :: Parser Text
-wFalse = symbol "false"
+-- @let@ keyword parser.
+kwLet :: Parser Text
+kwLet = reservedP' "let"
 
--- Bool Parser
-wBool :: Parser Text
-wBool = symbol "bool"
+-- @rec@ keyword parser.
+kwRec :: Parser Text
+kwRec = reservedP' "rec"
 
--- Int Parser
-wInt :: Parser Text
-wInt = symbol "int"
+-- @in@ keyword parser.
+kwIn :: Parser Text
+kwIn = reservedP' "in"
 
--- Keyword Parsers
+-- @if@ keyword parser.
+kwIf :: Parser Text
+kwIf = reservedP' "if"
 
--- ifParser
-kIf :: Parser Text
-kIf = symbol "if"
+-- @then@ keyword parser.
+kwThen :: Parser Text
+kwThen = reservedP' "then"
 
--- thenParser
-kThen :: Parser Text
-kThen = symbol "then"
+-- @else@ keyword parser.
+kwElse :: Parser Text
+kwElse = reservedP' "else"
 
--- elseParser
-kElse :: Parser Text
-kElse = symbol "else"
+-- @fun@ keyword parser.
+kwFun :: Parser Text
+kwFun = reservedP' "fun"
 
--- letParser
-kLet :: Parser Text
-kLet = symbol "let"
+-- ** Predeclared identifiers
 
--- recParser
-kRec :: Parser Text
-kRec = symbol "rec"
+-- | @bool@ identifier parser.
+idBool :: Parser Text
+idBool = reservedP' "bool"
 
--- inParser
-kIn :: Parser Text
-kIn = symbol "in"
+-- | @int@ identifier parser.
+idInt :: Parser Text
+idInt = reservedP' "int"
 
--- inParser
-kFun :: Parser Text
-kFun = symbol "fun"
+-- | @true@ identifier parser.
+idTrue :: Parser Text
+idTrue = reservedP' "true"
+
+-- | @false@ identifier parser.
+idFalse :: Parser Text
+idFalse = reservedP' "false"
