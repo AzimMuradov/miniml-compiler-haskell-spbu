@@ -90,7 +90,9 @@ test-suite tests
     import:         shared-properties
     type:           exitcode-stdio-1.0
     main-is:        Main.hs
-    other-modules:  Parser.ParserTest
+    other-modules:
+        , Parser.ParserTest
+        , TypeInference.TypeInferenceTest
     build-depends:
         , HUnit    >=1.6.2.0
         , mini-ml
