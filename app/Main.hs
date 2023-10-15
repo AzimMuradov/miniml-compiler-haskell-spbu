@@ -53,12 +53,14 @@ appP = App <$> inputP
 -- ** Command line options parsing
 
 inputP :: Parser Input
-inputP =
-  FileInput
-    <$> strOption
-      ( long "file"
-          <> short 'f'
-          <> metavar "FILENAME"
-          <> help "Read from the file (optional)"
-      )
-      <|> pure StdInput
+inputP = fileInputP <|> stdInputP
+  where
+    fileInputP =
+      FileInput
+        <$> strOption
+          ( long "file"
+              <> short 'f'
+              <> metavar "FILENAME"
+              <> help "Read from the file (optional)"
+          )
+    stdInputP = pure StdInput
