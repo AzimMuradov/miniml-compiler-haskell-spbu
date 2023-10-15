@@ -61,7 +61,7 @@ test2 =
   "[false = 1]"
     ~: do
       let expected = "The type 'bool' does not match the type 'int'"
-      let actual = eval $ parseProgram "false = true"
+      let actual = eval $ parseProgram "false = 1"
 
       expected ~=? actual
 
