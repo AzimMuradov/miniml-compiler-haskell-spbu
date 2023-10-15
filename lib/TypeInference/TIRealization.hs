@@ -57,7 +57,7 @@ inferSingle (EValue (VBool _)) = return UTyBool
 inferSingle (EValue (VInt _)) = return UTyInt
 inferSingle (EValue (VFun (Fun xs body))) = inferFun xs body
 inferSingle (EIf e1 e2 e3) = do
-  _ <- check e1 UTyBool -- TODO: MB error here with invalid i > n
+  _ <- check e1 UTyBool
   e2' <- inferBlock e2
   e3' <- inferBlock e3
   e2' =:= e3'

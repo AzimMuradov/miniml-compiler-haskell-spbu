@@ -57,6 +57,4 @@ instance Pretty TypeError where
   pretty (DuplicateDifinition x) = printf "Duplicate definition of value '%s'" (unpack x)
   pretty (UnboundVar x) = printf "Unbound variable '%s'" (unpack x)
   pretty (Infinite x ty) = printf "Infinite type %s = %s" (pretty x) (pretty ty)
-  pretty (Mismatch ty1 ty2) = printf "The type '%s' does not match the type '%s'" (pphelper $ pretty ty1) (pphelper $ pretty ty2)
-    where
-      pphelper s = if s /= "" then s else "non measure"
+  pretty (Mismatch ty1 ty2) = printf "The type '%s' does not match the type '%s'" (pretty ty1) (pretty ty2)
