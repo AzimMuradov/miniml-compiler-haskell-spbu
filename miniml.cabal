@@ -1,90 +1,61 @@
-cabal-version: 3.8
+cabal-version:      3.8
+name:               mini-ml
+version:            0.1.0.0
+synopsis:           MiniML compiler
+description:        MiniML compiler
+homepage:           https://github.com/AzimMuradov/miniml-compiler-haskell-spbu
+bug-reports:
+    https://github.com/AzimMuradov/miniml-compiler-haskell-spbu/issues
 
-name: mini-ml
-
-version: 0.1.0.0
-
-synopsis: MiniML compiler
-
-description:
-    MiniML compiler
-
-homepage: https://github.com/AzimMuradov/miniml-compiler-haskell-spbu
-
-bug-reports: https://github.com/AzimMuradov/miniml-compiler-haskell-spbu/issues
-
-license: MIT
-
-license-file: LICENSE
-
-author: Azim Muradov, Alexander Zadorozhnyy
-
-maintainer: azim.muradov.dev@gmail.com, alexander.zadorozhnyy@yandex.ru
-
-copyright: Copyright © 2023 Azim Muradov, Alexander Zadorozhnyy
-
-category: Language
-
+license:            MIT
+license-file:       LICENSE
+author:             Azim Muradov, Alexander Zadorozhnyy
+maintainer:         azim.muradov.dev@gmail.com, alexander.zadorozhnyy@yandex.ru
+copyright:          Copyright © 2023 Azim Muradov, Alexander Zadorozhnyy
+category:           Language
 extra-source-files: README.md
 
 common shared-properties
     default-language: Haskell2010
-
     build-depends:
-        base >=4.16.3.0,
-        extra >=1.7.12,
-        text >=2.0.1
+        , base   >=4.16.3.0
+        , extra  >=1.7.12
+        , text   >=2.0.1
 
     ghc-options:
-        -Wall
-        -Wcompat
-        -Widentities
-        -Wincomplete-uni-patterns
-        -Wmissing-home-modules
-        -Wpartial-fields
-        -Wredundant-constraints
+        -Wall -Wcompat -Widentities -Wincomplete-uni-patterns
+        -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
 
 library
-    import: shared-properties
-
+    import:           shared-properties
     exposed-modules:
-        Greeter,
-        Parser.Ast,
-        Parser.Lexer,
-        Parser.Parser,
-        TypeInference.HindleyMilner,
-        TypeInference.PrettyPrint,
-        TypeInference.Runtime,
+        Greeter
+        Parser.Ast
+        Parser.Lexer
+        Parser.Parser
+        TypeInference.HindleyMilner
+        TypeInference.PrettyPrint
+        TypeInference.Runtime
         TypeInference.TypeInference
 
     other-modules:
-
     other-extensions:
-
     build-depends:
-        -- lens >=5.2,
-        mtl >=2.3.1,
-        -- either >=5.0.2,
-        containers >=0.6.6,
-        parser-combinators >=1.3.0,
-        megaparsec >=9.2.2,
-        unification-fd >= 0.5.0
+        , containers          >=0.6.6
+        , megaparsec          >=9.2.2
+        , mtl                 >=2.3.1
+        , parser-combinators  >=1.3.0
+        , unification-fd      >=0.5.0
 
-    hs-source-dirs: lib
+    hs-source-dirs:   lib
 
 executable miniml
-    import: shared-properties
-
-    main-is: Main.hs
-
+    import:           shared-properties
+    main-is:          Main.hs
     other-modules:
-
     other-extensions:
-
-    build-depends:
-        mini-ml
-
-    hs-source-dirs: app
+    build-depends:    mini-ml
+    hs-source-dirs:   app
 
 test-suite tests
     import:         shared-properties
