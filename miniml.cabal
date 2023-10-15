@@ -53,7 +53,10 @@ executable miniml
     main-is:          Main.hs
     other-modules:
     other-extensions:
-    build-depends:    mini-ml
+    build-depends:
+        , mini-ml
+        , optparse-applicative  >=0.18
+
     hs-source-dirs:   app
 
 test-suite tests
