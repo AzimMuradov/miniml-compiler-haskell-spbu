@@ -1,9 +1,9 @@
 module Main where
 
 import qualified Parser.ParserTest as ParserTest
-import qualified TypeInference.TypeInferenceTest as TypeInferenceTest
 import qualified System.Exit as Exit
-import Test.HUnit (Counts (failures), runTestTT, Test (TestList))
+import Test.HUnit (Counts (failures), Test (TestList), runTestTT)
+import qualified TypeInference.TypeInferenceTest as TypeInferenceTest
 
 main :: IO ()
 main = do
