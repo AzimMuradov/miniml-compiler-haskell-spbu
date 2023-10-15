@@ -66,26 +66,7 @@ inferSingle (EOperations (NotOp x)) = do
   return UTyBool
 inferSingle (EOperations (BooleanOp x)) = booleanOpInfer (bL x) (bR x)
 inferSingle (EOperations (ComparisonOp x)) = comparationOpInfer (cL x) (cR x)
-inferSingle (EOperations (ArithmeticOp x)) =
-  case x of
-    (PlusOp l r) -> simpleArithmeticOpInfer l r
-    (MinusOp l r) -> simpleArithmeticOpInfer l r
-    (MulOp l r) -> do
-      t1 <- inferSingle l
-      t2 <- inferSingle r
-      case (t1, t2) of
-        (UVar _, UVar _) -> t1 =:= t2
-        (UTyInt, _) -> t1 =:= t2
-        (_, UTyInt) -> t1 =:= t2
-        _ -> throwError $ ImpossibleOpApplication t1 t2
-    (DivOp l r) -> do
-      t1 <- inferSingle l
-      t2 <- inferSingle r
-      case (t1, t2) of
-        (UVar _, UVar _) -> t1 =:= t2
-        (UTyInt, _) -> t1 =:= t2
-        (_, UTyInt) -> t1 =:= t2
-        _ -> throwError $ ImpossibleOpApplication t1 t2
+inferSingle (EOperations (ArithmeticOp x)) = arithmeticOperationInfer (aL x) (aR x)
 inferSingle (ELetInV (x, Just pty) xdef body) = do
   let upty = toUPolytype (Forall [] $ toTypeF pty)
   upty' <- skolemize upty
@@ -114,14 +95,15 @@ inferSingle (ELetRecInF f (Fun args fbody) lbody) = do
   pfdef <- generalize after
   withBinding f pfdef (return inferedBlock)
 
-simpleArithmeticOpInfer :: Expr -> Expr -> Infer UType
-simpleArithmeticOpInfer e1 e2 = do
+arithmeticOperationInfer :: Expr -> Expr -> Infer UType
+arithmeticOperationInfer e1 e2 = do
   t1 <- inferSingle e1
   t2 <- inferSingle e2
   case (t1, t2) of
+    (UVar _, UVar _) -> t1 =:= t2
     (UTyInt, _) -> t1 =:= t2
     (_, UTyInt) -> t1 =:= t2
-    _ -> t1 =:= t2
+    _ -> throwError $ ImpossibleOpApplication t1 t2
 
 booleanOpInfer :: Expr -> Expr -> Infer UType
 booleanOpInfer e1 e2 = do
@@ -135,10 +117,6 @@ comparationOpInfer :: Expr -> Expr -> Infer UType
 comparationOpInfer e1 e2 = do
   t1 <- inferSingle e1
   t2 <- inferSingle e2
-  booleanOpHelper t1 t2
-
-booleanOpHelper :: UType -> UType -> Infer UType
-booleanOpHelper t1 t2 = do
   _ <- t1 =:= t2
   return UTyBool
 
