@@ -1,5 +1,3 @@
-{-# LANGUAGE DuplicateRecordFields #-}
-
 -- | Contains all AST elements, all of these produced by the [Parser]("Parser.Parser") module.
 module Parser.Ast where
 
