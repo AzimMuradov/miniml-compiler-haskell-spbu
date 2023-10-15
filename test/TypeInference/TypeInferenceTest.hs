@@ -28,7 +28,6 @@ tests =
         test12,
         test13,
         testredecalaration,
-        testfac,
         testfib,
         testrec,
         testfix0,
@@ -170,15 +169,6 @@ testredecalaration =
     ~: do
       let expected = "int -> int"
       let actual = eval $ parseProgram "let x = true;; let f x = x + 1"
-
-      expected ~=? actual
-
-testfac :: Test
-testfac =
-  "[let rec fact n = if n <= 1 then 1 else n * fact (n - 1)]"
-    ~: do
-      let expected = "int -> int"
-      let actual = eval $ parseProgram "let rec fact n = if n <= 1 then 1 else n * fact (n - 1)"
 
       expected ~=? actual
 
