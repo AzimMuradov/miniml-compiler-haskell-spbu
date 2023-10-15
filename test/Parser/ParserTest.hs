@@ -114,6 +114,7 @@ test7 =
                         "f"
                         ( Fun
                             [("a", Nothing)]
+                            Nothing
                             ( ExprOperations
                                 ( ArithmeticOp
                                     ( MulOp
@@ -145,6 +146,7 @@ test8 =
                         "f"
                         ( Fun
                             [("a", Nothing)]
+                            Nothing
                             (ExprOperations (ArithmeticOp (MulOp {aL = ExprIdentifier "a", aR = ExprIdentifier "a"})))
                         )
                     ),

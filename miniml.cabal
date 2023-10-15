@@ -66,6 +66,7 @@ test-suite tests
     other-modules:
         FactorialTest
         Parser.ParserTest
+        TypeInference.TypeInferenceTest
 
     build-depends:
         , HUnit    >=1.6.2.0

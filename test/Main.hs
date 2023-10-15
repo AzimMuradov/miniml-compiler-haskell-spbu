@@ -4,6 +4,7 @@ import qualified FactorialTest
 import qualified Parser.ParserTest as ParserTest
 import qualified System.Exit as Exit
 import Test.HUnit (Counts (failures), Test (TestList), runTestTT)
+import qualified TypeInference.TypeInferenceTest as TypeInferenceTest
 
 main :: IO ()
 main = do
@@ -11,7 +12,8 @@ main = do
     runTestTT $
       TestList
         [ FactorialTest.tests,
-          ParserTest.tests
+          ParserTest.tests,
+          TypeInferenceTest.tests
         ]
   if failures result > 0
     then Exit.exitFailure
