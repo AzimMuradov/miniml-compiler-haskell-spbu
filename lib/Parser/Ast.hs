@@ -97,12 +97,12 @@ data Value
 
 -- | Function representation without name.
 --
--- It contains the result of the function, its parameters, and its body.
+-- It contains its parameters, returned type and body.
 --
 -- > fun x -> true
 --
 -- > fun x y -> x + y
-data Fun = Fun [(Identifier, Maybe Type)] Expression
+data Fun = Fun [(Identifier, Maybe Type)] (Maybe Type) Expression
   deriving (Show, Eq)
 
 -- ** Operations
