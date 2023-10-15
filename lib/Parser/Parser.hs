@@ -22,10 +22,10 @@ programP = Program <$> some statementP
 statementP :: Parser Statement
 statementP =
   choice'
-    [ SExpr <$> exprP,
-      SRecFunDecl <$> recFunP,
-      SFunDecl <$> funP,
-      SVarDecl <$> varP
+    [ StmtExpr <$> exprP,
+      StmtRecFunDecl <$> recFunP,
+      StmtFunDecl <$> funP,
+      StmtVarDecl <$> varP
     ]
     <* optional' semicolon2
 
@@ -44,28 +44,28 @@ recFunP = RecFunDecl <$ kwLet <* kwRec <*> identifierP <*> (Fun <$> some typedId
 
 -- BlockExprParser
 
-blockP :: Parser [Expr]
+blockP :: Parser [Expression]
 blockP = some exprP
 
 -- MainExprParser
 
-exprP :: Parser Expr
+exprP :: Parser Expression
 exprP = makeExprParser exprTerm opsTable
 
-exprTerm :: Parser Expr
+exprTerm :: Parser Expression
 exprTerm =
   choice'
     [ parens exprP,
-      ELetRecInF <$ kwLet <* kwRec <*> identifierP <*> (Fun <$> some typedIdentifierP <* eq <*> blockP) <* kwIn <*> blockP,
-      ELetInF <$ kwLet <*> identifierP <*> (Fun <$> some typedIdentifierP <* eq <*> blockP) <* kwIn <*> blockP,
-      ELetInV <$ kwLet <*> typedIdentifierP <* eq <*> blockP <* kwIn <*> blockP,
-      EValue <$> valueP,
-      EIf <$ kwIf <*> exprP <* kwThen <*> blockP <* kwElse <*> blockP,
-      EIdentifier <$> identifierP
+      ExprLetRecInF <$ kwLet <* kwRec <*> identifierP <*> (Fun <$> some typedIdentifierP <* eq <*> blockP) <* kwIn <*> blockP,
+      ExprLetInF <$ kwLet <*> identifierP <*> (Fun <$> some typedIdentifierP <* eq <*> blockP) <* kwIn <*> blockP,
+      ExprLetInV <$ kwLet <*> typedIdentifierP <* eq <*> blockP <* kwIn <*> blockP,
+      ExprValue <$> valueP,
+      ExprIf <$ kwIf <*> exprP <* kwThen <*> blockP <* kwElse <*> blockP,
+      ExprIdentifier <$> identifierP
     ]
 
 -- OperationsExprTable
-opsTable :: [[Operator Parser Expr]]
+opsTable :: [[Operator Parser Expression]]
 opsTable =
   [ [applicationOp],
     [arithmeticOp "*" MulOp, arithmeticOp "/" DivOp],
@@ -82,23 +82,23 @@ opsTable =
     [notOp]
   ]
 
-binaryL :: Text -> (Expr -> Expr -> Operations) -> Operator Parser Expr
-binaryL name fun = InfixL $ (\e' e'' -> EOperations $ fun e' e'') <$ symbol name
+binaryL :: Text -> (Expression -> Expression -> Operations) -> Operator Parser Expression
+binaryL name fun = InfixL $ (\e' e'' -> ExprOperations $ fun e' e'') <$ symbol name
 
-booleanOp :: Text -> (Expr -> Expr -> BooleanOp) -> Operator Parser Expr
+booleanOp :: Text -> (Expression -> Expression -> BooleanOp) -> Operator Parser Expression
 booleanOp name fun = binaryL name (\e' e'' -> BooleanOp $ fun e' e'')
 
-comparisonOp :: Text -> (Expr -> Expr -> ComparisonOp) -> Operator Parser Expr
+comparisonOp :: Text -> (Expression -> Expression -> ComparisonOp) -> Operator Parser Expression
 comparisonOp name fun = binaryL name (\e' e'' -> ComparisonOp $ fun e' e'')
 
-arithmeticOp :: Text -> (Expr -> Expr -> ArithmeticOp) -> Operator Parser Expr
+arithmeticOp :: Text -> (Expression -> Expression -> ArithmeticOp) -> Operator Parser Expression
 arithmeticOp name fun = binaryL name (\e' e'' -> ArithmeticOp $ fun e' e'')
 
-notOp :: Operator Parser Expr
-notOp = Prefix $ EOperations . NotOp <$ symbol "not"
+notOp :: Operator Parser Expression
+notOp = Prefix $ ExprOperations . NotOp <$ symbol "not"
 
-applicationOp :: Operator Parser Expr
-applicationOp = InfixL $ return $ \a b -> EApplication a b
+applicationOp :: Operator Parser Expression
+applicationOp = InfixL $ return $ \a b -> ExprApplication a b
 
 -- * OtherParsersSection
 
@@ -133,7 +133,7 @@ typeP' =
 valueP :: Parser Value
 valueP =
   choice'
-    [ VBool <$> boolLitP,
-      VInt <$> signedIntP,
-      VFun <$> (Fun <$ kwFun <*> many typedIdentifierP <* arrow <*> blockP)
+    [ ValBool <$> boolLitP,
+      ValInt <$> signedIntP,
+      ValFun <$> (Fun <$ kwFun <*> many typedIdentifierP <* arrow <*> blockP)
     ]

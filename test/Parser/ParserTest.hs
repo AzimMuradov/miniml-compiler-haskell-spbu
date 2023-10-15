@@ -28,7 +28,7 @@ test0 :: Test
 test0 =
   "[let a = 7]"
     ~: do
-      let expected = Just $ Program [SVarDecl (VarDecl ("a", Nothing) [EValue (VInt 7)])]
+      let expected = Just $ Program [StmtVarDecl (VarDecl ("a", Nothing) [ExprValue (ValInt 7)])]
       let actual = parseProgram "let a = 7"
 
       expected ~=? actual
@@ -55,7 +55,7 @@ test3 :: Test
 test3 =
   "[leta = 7]"
     ~: do
-      let expected = Just $ Program [SExpr (EOperations (ComparisonOp (EqOp {cL = EIdentifier "leta", cR = EValue (VInt 7)})))]
+      let expected = Just $ Program [StmtExpr (ExprOperations (ComparisonOp (EqOp {cL = ExprIdentifier "leta", cR = ExprValue (ValInt 7)})))]
       let actual = parseProgram "leta = 7"
 
       expected ~=? actual
@@ -67,8 +67,8 @@ test4 =
       let expected =
             Just $
               Program
-                [ SVarDecl (VarDecl ("a", Nothing) [EValue (VInt 4)]),
-                  SVarDecl (VarDecl ("b", Nothing) [EValue (VInt 8)])
+                [ StmtVarDecl (VarDecl ("a", Nothing) [ExprValue (ValInt 4)]),
+                  StmtVarDecl (VarDecl ("b", Nothing) [ExprValue (ValInt 8)])
                 ]
       let actual = parseProgram "let a = 4 let b = 8"
 
@@ -81,8 +81,8 @@ test5 =
       let expected =
             Just $
               Program
-                [ SVarDecl (VarDecl ("a", Nothing) [EValue (VInt 4)]),
-                  SVarDecl (VarDecl ("b", Nothing) [EValue (VInt 8)])
+                [ StmtVarDecl (VarDecl ("a", Nothing) [ExprValue (ValInt 4)]),
+                  StmtVarDecl (VarDecl ("b", Nothing) [ExprValue (ValInt 8)])
                 ]
       let actual = parseProgram "let a = 4\nlet b = 8"
 
@@ -95,8 +95,8 @@ test6 =
       let expected =
             Just $
               Program
-                [ SVarDecl (VarDecl ("a", Nothing) [EValue (VInt 4)]),
-                  SVarDecl (VarDecl ("b", Nothing) [EValue (VInt 8)])
+                [ StmtVarDecl (VarDecl ("a", Nothing) [ExprValue (ValInt 4)]),
+                  StmtVarDecl (VarDecl ("b", Nothing) [ExprValue (ValInt 8)])
                 ]
       let actual = parseProgram "let a = 4;;let b = 8"
 
@@ -109,19 +109,19 @@ test7 =
       let expected =
             Just $
               Program
-                [ SFunDecl
+                [ StmtFunDecl
                     ( FunDecl
                         "f"
                         ( Fun
                             [("a", Nothing)]
-                            [ EOperations
+                            [ ExprOperations
                                 ( ArithmeticOp
                                     ( MulOp
-                                        { aL = EIdentifier "a",
+                                        { aL = ExprIdentifier "a",
                                           aR =
-                                            EApplication
-                                              (EApplication (EIdentifier "a") (EIdentifier "f"))
-                                              (EValue (VInt 4))
+                                            ExprApplication
+                                              (ExprApplication (ExprIdentifier "a") (ExprIdentifier "f"))
+                                              (ExprValue (ValInt 4))
                                         }
                                     )
                                 )
@@ -140,15 +140,15 @@ test8 =
       let expected =
             Just $
               Program
-                [ SFunDecl
+                [ StmtFunDecl
                     ( FunDecl
                         "f"
                         ( Fun
                             [("a", Nothing)]
-                            [EOperations (ArithmeticOp (MulOp {aL = EIdentifier "a", aR = EIdentifier "a"}))]
+                            [ExprOperations (ArithmeticOp (MulOp {aL = ExprIdentifier "a", aR = ExprIdentifier "a"}))]
                         )
                     ),
-                  SExpr (EApplication (EIdentifier "f") (EValue (VInt 4)))
+                  StmtExpr (ExprApplication (ExprIdentifier "f") (ExprValue (ValInt 4)))
                 ]
       let actual = parseProgram "let f a = a * a;;f 4"
 
