@@ -6,7 +6,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module TypeInference.TIRealization where
+module TypeInference.TypeInference where
 
 import Control.Monad.Except
 import Control.Unification (UTerm (UVar))

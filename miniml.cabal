@@ -55,7 +55,7 @@ library
         TypeInference.HindleyMilner,
         TypeInference.PrettyPrint,
         TypeInference.Runtime,
-        TypeInference.TIRealization
+        TypeInference.TypeInference
 
     other-modules:
 

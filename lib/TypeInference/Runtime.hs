@@ -24,7 +24,7 @@ import TypeInference.HindleyMilner
     fromUPolytype,
     generalize,
   )
-import TypeInference.TIRealization (inferStatement)
+import TypeInference.TypeInference (inferStatement)
 
 runInfer :: Infer UType -> Either TypeError Polytype
 runInfer =
