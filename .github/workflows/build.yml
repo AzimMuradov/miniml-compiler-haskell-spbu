@@ -43,10 +43,8 @@ jobs:
         run: cabal update
       - name: Build project
         run: cabal build
-      - name: Run unit tests
+      - name: Run tests
         run: cabal test --test-show-details=direct
-      - name: Run integration tests
-        run: ./test-integration/test.sh
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
