@@ -24,6 +24,30 @@ tests =
 
 -- Tests
 
+-- "let a = 7"
+-- "let a"
+-- "let a = let b = 7 in b * b"
+-- "let a = 7 let b = 8"
+-- "let a = 7 ;;let b = 8"
+-- "let a = 7 ;;let b = 8;;"
+-- "let rec factorial n =\nif n <= 0 then 1\nelse n * factorial (n-1)"
+-- "let factorial n =\nlet rec loop i accum =\nif i > n then accum\nelse loop (i + 1) (accum * i)\nin loop 1 1"
+-- "leta = 7"
+-- "let = 7"
+-- "let rec a = 7"
+-- "let rec a b = 7"
+-- "let reca a b = 7"
+-- "leta rec a b = 7"
+-- "letaa rec a b = 7"
+-- "let reca = 7"
+-- "let recaa = 7"
+-- "let let a = 7"
+-- "let let = 7"
+-- "let a = 7"
+-- "let leta = 7"
+-- "let rec a b = 7"
+-- "letrec a b = 7"
+
 test0 :: Test
 test0 =
   "[let a = 7]"
