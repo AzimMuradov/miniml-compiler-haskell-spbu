@@ -57,7 +57,7 @@ inferSingle (EValue (VBool _)) = return UTyBool
 inferSingle (EValue (VInt _)) = return UTyInt
 inferSingle (EValue (VFun (Fun xs body))) = inferFun xs body
 inferSingle (EIf e1 e2 e3) = do
-  _ <- check e1 UTyBool
+  _ <- check e1 UTyBool -- TODO: MB error here with invalid i > n
   e2' <- inferBlock e2
   e3' <- inferBlock e3
   e2' =:= e3'
@@ -74,9 +74,6 @@ inferSingle (EOperations (ArithmeticOp x)) =
       t1 <- inferSingle l
       t2 <- inferSingle r
       case (t1, t2) of
-        -- TODO: Check this later
-        (UTyInt, UTyInt) -> do
-          return UTyInt
         (UVar _, UVar _) -> t1 =:= t2
         (UTyInt, _) -> t1 =:= t2
         (_, UTyInt) -> t1 =:= t2
@@ -85,8 +82,6 @@ inferSingle (EOperations (ArithmeticOp x)) =
       t1 <- inferSingle l
       t2 <- inferSingle r
       case (t1, t2) of
-        (UTyInt, UTyInt) -> do
-          return UTyInt
         (UVar _, UVar _) -> t1 =:= t2
         (UTyInt, _) -> t1 =:= t2
         (_, UTyInt) -> t1 =:= t2
@@ -111,6 +106,13 @@ inferSingle (EApplication e1 e2) = do
   resTy <- fresh
   _ <- funTy =:= UTyFun argTy resTy
   return resTy
+inferSingle (ELetRecInF f (Fun args fbody) lbody) = do
+  preT <- fresh
+  next <- withBinding f (Forall [] preT) $ inferFun args fbody
+  after <- withBinding f (Forall [] next) $ inferFun args fbody
+  inferedBlock <- withBinding f (Forall [] next) (inferBlock lbody)
+  pfdef <- generalize after
+  withBinding f pfdef (return inferedBlock)
 
 simpleArithmeticOpInfer :: Expr -> Expr -> Infer UType
 simpleArithmeticOpInfer e1 e2 = do
@@ -133,12 +135,7 @@ comparationOpInfer :: Expr -> Expr -> Infer UType
 comparationOpInfer e1 e2 = do
   t1 <- inferSingle e1
   t2 <- inferSingle e2
-  case (t1, t2) of
-    (UTyInt, _) -> booleanOpHelper t1 t2
-    (_, UTyInt) -> booleanOpHelper t1 t2
-    (UTyBool, _) -> booleanOpHelper t1 t2
-    (_, UTyBool) -> booleanOpHelper t1 t2
-    _ -> throwError $ ImpossibleOpApplication t1 t2
+  booleanOpHelper t1 t2
 
 booleanOpHelper :: UType -> UType -> Infer UType
 booleanOpHelper t1 t2 = do
