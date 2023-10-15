@@ -5,7 +5,7 @@ module Parser.Lexer where
 import Data.Text (Text, pack)
 import Data.Void (Void)
 import Parser.Ast (Identifier)
-import Text.Megaparsec (MonadParsec (..), Parsec, between, choice, many, (<|>))
+import Text.Megaparsec (MonadParsec (..), Parsec, between, choice, many, optional, (<|>))
 import Text.Megaparsec.Char (char, digitChar, letterChar, space1, string)
 import qualified Text.Megaparsec.Char.Lexer as L
 
@@ -47,11 +47,6 @@ arrow = symbol "->"
 -- | Equality parser.
 eq :: Parser Text
 eq = symbol "="
-
--- Smart Choice
-
-choice' :: (Foldable f, MonadParsec e s m, Functor f) => f (m a) -> m a
-choice' x = choice $ try <$> x
 
 -- * Literals
 
@@ -133,3 +128,13 @@ idTrue = reservedP' "true"
 -- | @false@ identifier parser.
 idFalse :: Parser Text
 idFalse = reservedP' "false"
+
+-- * Utilities
+
+-- ** Backtracking support
+
+choice' :: (Foldable f, MonadParsec e s m, Functor f) => f (m a) -> m a
+choice' x = choice $ try <$> x
+
+optional' :: (MonadParsec e s f) => f a -> f (Maybe a)
+optional' = optional . try

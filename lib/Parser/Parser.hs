@@ -1,12 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Parser.Parser (parse, fileP) where
+module Parser.Parser (parse, programP) where
 
 import Control.Monad.Combinators.Expr (Operator (..), makeExprParser)
 import Data.Text (Text)
 import Parser.Ast
 import Parser.Lexer
-import Text.Megaparsec (MonadParsec (..), many, optional, parseMaybe, sepEndBy1, some)
+import Text.Megaparsec (MonadParsec (..), many, optional, parseMaybe, some)
 
 -- * MainSection
 
@@ -15,9 +15,6 @@ parse :: Parser a -> Text -> Maybe a
 parse p = parseMaybe $ sc *> p <* eof
 
 -- | Main Parser
-fileP :: Parser [Program]
-fileP = sepEndBy1 programP semicolon2
-
 programP :: Parser Program
 programP = Program <$> some statementP
 
@@ -30,6 +27,7 @@ statementP =
       SFunDecl <$> funP,
       SVarDecl <$> varP
     ]
+    <* optional' semicolon2
 
 -- ** DeclarationSection
 
