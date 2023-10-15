@@ -91,8 +91,6 @@ data Value
 
 -- | Function representation without name.
 --
--- It contains the result of the function, its parameters, and its body.
---
 -- > fun x -> true
 --
 -- > fun x y -> x + y
