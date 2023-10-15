@@ -1,15 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Parser.Parser where
+module Parser.Parser (parse, programP) where
 
 import Control.Monad.Combinators.Expr (Operator (..), makeExprParser)
-import Data.Maybe (fromMaybe)
-import Data.Text (Text, pack)
+import Data.Text (Text)
 import Parser.Ast
 import Parser.Lexer
-import Text.Megaparsec (MonadParsec (..), many, optional, parseMaybe, sepEndBy1, some, (<|>))
-import Text.Megaparsec.Char (char, digitChar, letterChar)
-import qualified Text.Megaparsec.Char.Lexer as L
+import Text.Megaparsec (MonadParsec (..), many, optional, parseMaybe, some)
 
 -- * MainSection
 
@@ -18,9 +15,6 @@ parse :: Parser a -> Text -> Maybe a
 parse p = parseMaybe $ sc *> p <* eof
 
 -- | Main Parser
-fileP :: Parser [Program]
-fileP = sepEndBy1 programP semicolon2
-
 programP :: Parser Program
 programP = Program <$> some statementP
 
@@ -28,49 +22,45 @@ programP = Program <$> some statementP
 statementP :: Parser Statement
 statementP =
   choice'
-    [ SExpr <$> exprP,
-      SRecFunDecl <$> recFunP,
-      SFunDecl <$> funP,
-      SVarDecl <$> varP
+    [ StmtExpr <$> exprP,
+      StmtRecFunDecl <$> recFunP,
+      StmtFunDecl <$> funP,
+      StmtVarDecl <$> varP
     ]
+    <* optional' semicolon2
 
 -- ** DeclarationSection
 
 varP :: Parser VarDecl
-varP = VarDecl <$ kLet <*> typedIdentifierP <* eq <*> blockP <* try (notFollowedBy kIn)
+varP = VarDecl <$ kwLet <*> typedIdentifierP <* eq <*> exprP <* try (notFollowedBy kwIn)
 
 funP :: Parser FunDecl
-funP = FunDecl <$ kLet <*> identifierP <*> (Fun <$> some typedIdentifierP <* eq <*> blockP)
+funP = FunDecl <$ kwLet <*> identifierP <*> (Fun <$> some typedIdentifierP <* eq <*> exprP)
 
 recFunP :: Parser RecFunDecl
-recFunP = RecFunDecl <$ kLet <* kRec <*> identifierP <*> (Fun <$> some typedIdentifierP <* eq <*> blockP)
+recFunP = RecFunDecl <$ kwLet <* kwRec <*> identifierP <*> (Fun <$> some typedIdentifierP <* eq <*> exprP)
 
 -- * ExpressionSection
 
--- BlockExprParser
-
-blockP :: Parser [Expr]
-blockP = some exprP
-
 -- MainExprParser
 
-exprP :: Parser Expr
+exprP :: Parser Expression
 exprP = makeExprParser exprTerm opsTable
 
-exprTerm :: Parser Expr
+exprTerm :: Parser Expression
 exprTerm =
   choice'
     [ parens exprP,
-      ELetRecInF <$ kLet <* kRec <*> identifierP <*> (Fun <$> some typedIdentifierP <* eq <*> blockP) <* kIn <*> blockP,
-      ELetInF <$ kLet <*> identifierP <*> (Fun <$> some typedIdentifierP <* eq <*> blockP) <* kIn <*> blockP,
-      ELetInV <$ kLet <*> typedIdentifierP <* eq <*> blockP <* kIn <*> blockP,
-      EValue <$> valueP,
-      EIf <$ kIf <*> exprP <* kThen <*> blockP <* kElse <*> blockP,
-      EIdentifier <$> identifierP
+      ExprLetRecInF <$ kwLet <* kwRec <*> identifierP <*> (Fun <$> some typedIdentifierP <* eq <*> exprP) <* kwIn <*> exprP,
+      ExprLetInF <$ kwLet <*> identifierP <*> (Fun <$> some typedIdentifierP <* eq <*> exprP) <* kwIn <*> exprP,
+      ExprLetInV <$ kwLet <*> typedIdentifierP <* eq <*> exprP <* kwIn <*> exprP,
+      ExprValue <$> valueP,
+      ExprIf <$ kwIf <*> exprP <* kwThen <*> exprP <* kwElse <*> exprP,
+      ExprIdentifier <$> identifierP
     ]
 
 -- OperationsExprTable
-opsTable :: [[Operator Parser Expr]]
+opsTable :: [[Operator Parser Expression]]
 opsTable =
   [ [applicationOp],
     [arithmeticOp "*" MulOp, arithmeticOp "/" DivOp],
@@ -87,41 +77,27 @@ opsTable =
     [notOp]
   ]
 
-binaryL :: Text -> (Expr -> Expr -> Operations) -> Operator Parser Expr
-binaryL name fun = InfixL $ (\e' e'' -> EOperations $ fun e' e'') <$ symbol name
+binaryL :: Text -> (Expression -> Expression -> Operations) -> Operator Parser Expression
+binaryL name fun = InfixL $ (\e' e'' -> ExprOperations $ fun e' e'') <$ symbol name
 
-binaryR :: Text -> (Expr -> Expr -> Operations) -> Operator Parser Expr
-binaryR name fun = InfixR $ (\e' e'' -> EOperations $ fun e' e'') <$ symbol name
-
-booleanOp :: Text -> (Expr -> Expr -> BooleanOp) -> Operator Parser Expr
+booleanOp :: Text -> (Expression -> Expression -> BooleanOp) -> Operator Parser Expression
 booleanOp name fun = binaryL name (\e' e'' -> BooleanOp $ fun e' e'')
 
-comparisonOp :: Text -> (Expr -> Expr -> ComparisonOp) -> Operator Parser Expr
+comparisonOp :: Text -> (Expression -> Expression -> ComparisonOp) -> Operator Parser Expression
 comparisonOp name fun = binaryL name (\e' e'' -> ComparisonOp $ fun e' e'')
 
-arithmeticOp :: Text -> (Expr -> Expr -> ArithmeticOp) -> Operator Parser Expr
+arithmeticOp :: Text -> (Expression -> Expression -> ArithmeticOp) -> Operator Parser Expression
 arithmeticOp name fun = binaryL name (\e' e'' -> ArithmeticOp $ fun e' e'')
 
-notOp :: Operator Parser Expr
-notOp = Prefix $ EOperations . NotOp <$ symbol "not"
+notOp :: Operator Parser Expression
+notOp = Prefix $ ExprOperations . NotOp <$ symbol "not"
 
-applicationOp :: Operator Parser Expr
-applicationOp = InfixL $ return $ \a b -> EApplication a b
+applicationOp :: Operator Parser Expression
+applicationOp = InfixL $ return $ \a b -> ExprApplication a b
 
 -- * OtherParsersSection
 
 -- IdentifierParsers
-
-identifierP :: Parser Identifier
-identifierP =
-  lexeme
-    ( notFollowedBy reservedP *> do
-        first <- letterP
-        other <- many $ letterP <|> digitChar
-        return $ pack $ first : other
-    )
-  where
-    letterP = letterChar <|> char '_'
 
 typedIdentifierP :: Parser (Identifier, Maybe Type)
 typedIdentifierP = do
@@ -136,7 +112,6 @@ typeP :: Parser Type
 typeP =
   choice'
     [ TFun <$> typeP' <* arrow <*> typeP,
-      parens typeP,
       typeP'
     ]
 
@@ -144,8 +119,8 @@ typeP' :: Parser Type
 typeP' =
   choice'
     [ parens typeP,
-      TBool <$ wBool,
-      TInt <$ wInt
+      TBool <$ idBool,
+      TInt <$ idInt
     ]
 
 -- ValueParsers
@@ -153,22 +128,7 @@ typeP' =
 valueP :: Parser Value
 valueP =
   choice'
-    [ VInt <$> signedIntP,
-      VBool <$> boolLitP,
-      VFun <$> (Fun <$ kFun <*> many typedIdentifierP <* arrow <*> blockP)
+    [ ValBool <$> boolLitP,
+      ValInt <$> signedIntP,
+      ValFun <$> (Fun <$ kwFun <*> many typedIdentifierP <* arrow <*> exprP)
     ]
-
-signedDoubleP :: Parser Double
-signedDoubleP = lexeme $ do
-  sign <- optional (choice' [1 <$ char '+', -1 <$ char '-'])
-  num <- L.float
-  return $ fromMaybe 1 sign * num
-
-signedIntP :: Parser Integer
-signedIntP = lexeme $ do
-  sign <- optional (choice' [1 <$ char '+', -1 <$ char '-'])
-  num <- L.decimal
-  return $ fromMaybe 1 sign * num
-
-boolLitP :: Parser Bool
-boolLitP = True <$ wTrue <|> False <$ wFalse
