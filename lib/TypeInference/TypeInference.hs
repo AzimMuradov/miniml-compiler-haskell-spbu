@@ -24,19 +24,19 @@ helpInferStatements :: [Statement] -> Infer UType -> Infer UType
 helpInferStatements [] pr = pr
 helpInferStatements ((StmtVarDecl (VarDecl (ident, t) body)) : xs) _ = do
   _ <- checkForDuplicate (Var ident)
-  res <- inferBlock body
+  res <- inferSingle body
   vType <- maybe (return res) ((=:=) res <$> fromTypeToUType) t
   pvType <- generalize vType
   withBinding ident pvType (helpInferStatements xs $ return vType)
-helpInferStatements ((StmtFunDecl (FunDecl ident (Fun args body))) : xs) _ = do
+helpInferStatements ((StmtFunDecl (FunDecl ident (Fun args restype body))) : xs) _ = do
   _ <- checkForDuplicate (Var ident)
-  res <- inferFun args body
+  res <- inferFun args restype body
   withBinding ident (Forall [] res) (helpInferStatements xs $ return res)
-helpInferStatements ((StmtRecFunDecl (RecFunDecl ident (Fun args body))) : xs) _ = do
+helpInferStatements ((StmtRecFunDecl (RecFunDecl ident (Fun args restype body))) : xs) _ = do
   _ <- checkForDuplicate (Var ident)
   preT <- fresh
-  next <- withBinding ident (Forall [] preT) $ inferFun args body
-  after <- withBinding ident (Forall [] next) $ inferFun args body
+  next <- withBinding ident (Forall [] preT) $ inferFun args restype body
+  after <- withBinding ident (Forall [] next) $ inferFun args restype body
   withBinding ident (Forall [] after) (helpInferStatements xs $ return next)
 helpInferStatements ((StmtExpr e) : xs) _ = do
   res <- inferSingle e
@@ -45,18 +45,15 @@ helpInferStatements ((StmtExpr e) : xs) _ = do
 inferStatement :: [Statement] -> Infer UType
 inferStatement x = helpInferStatements x (throwError EmptyList)
 
-inferBlock :: Expression -> Infer UType
-inferBlock = inferSingle
-
 inferSingle :: Expression -> Infer UType
 inferSingle (ExprIdentifier x) = lookup (Var x)
 inferSingle (ExprValue (ValBool _)) = return UTyBool
 inferSingle (ExprValue (ValInt _)) = return UTyInt
-inferSingle (ExprValue (ValFun (Fun xs body))) = inferFun xs body
+inferSingle (ExprValue (ValFun (Fun xs restype body))) = inferFun xs restype body
 inferSingle (ExprIf e1 e2 e3) = do
   _ <- check e1 UTyBool
-  e2' <- inferBlock e2
-  e3' <- inferBlock e3
+  e2' <- inferSingle e2
+  e3' <- inferSingle e3
   e2' =:= e3'
 inferSingle (ExprOperations (NotOp x)) = do
   _ <- check x UTyBool
@@ -67,28 +64,28 @@ inferSingle (ExprOperations (ArithmeticOp x)) = arithmeticOperationInfer (aL x) 
 inferSingle (ExprLetInV (x, Just pty) xdef body) = do
   let upty = toUPolytype (Forall [] $ toTypeF pty)
   upty' <- skolemize upty
-  bl <- inferBlock xdef
+  bl <- inferSingle xdef
   _ <- bl =:= upty'
-  withBinding x upty $ inferBlock body
+  withBinding x upty $ inferSingle body
 inferSingle (ExprLetInV (x, Nothing) xdef body) = do
-  ty <- inferBlock xdef
+  ty <- inferSingle xdef
   pty <- generalize ty
-  withBinding x pty $ inferBlock body
-inferSingle (ExprLetInF f (Fun args fbody) lbody) = do
-  fdef <- inferFun args fbody
+  withBinding x pty $ inferSingle body
+inferSingle (ExprLetInF f (Fun args restype fbody) lbody) = do
+  fdef <- inferFun args restype fbody
   pfdef <- generalize fdef
-  withBinding f pfdef $ inferBlock lbody
+  withBinding f pfdef $ inferSingle lbody
 inferSingle (ExprApplication e1 e2) = do
   funTy <- inferSingle e1
   argTy <- inferSingle e2
   resTy <- fresh
   _ <- funTy =:= UTyFun argTy resTy
   return resTy
-inferSingle (ExprLetRecInF f (Fun args fbody) lbody) = do
+inferSingle (ExprLetRecInF f (Fun args restype fbody) lbody) = do
   preT <- fresh
-  next <- withBinding f (Forall [] preT) $ inferFun args fbody
-  after <- withBinding f (Forall [] next) $ inferFun args fbody
-  inferedBlock <- withBinding f (Forall [] next) (inferBlock lbody)
+  next <- withBinding f (Forall [] preT) $ inferFun args restype fbody
+  after <- withBinding f (Forall [] next) $ inferFun args restype fbody
+  inferedBlock <- withBinding f (Forall [] next) (inferSingle lbody)
   pfdef <- generalize after
   withBinding f pfdef (return inferedBlock)
 
@@ -97,7 +94,7 @@ arithmeticOperationInfer e1 e2 = do
   t1 <- inferSingle e1
   t2 <- inferSingle e2
   case (t1, t2) of
-    (UVar _, UVar _) -> t1 =:= t2
+    (UVar _, UVar _) -> (t1 =:= UTyInt) <* (t2 =:= UTyInt)
     (UTyInt, _) -> t1 =:= t2
     (_, UTyInt) -> t1 =:= t2
     _ -> throwError $ ImpossibleOpApplication t1 t2
@@ -117,12 +114,16 @@ comparationOpInfer e1 e2 = do
   _ <- t1 =:= t2
   return UTyBool
 
-inferFun :: [(Identifier, Maybe Type)] -> Expression -> Infer UType
-inferFun args body = case args of
-  [] -> inferBlock body
+inferFun :: [(Identifier, Maybe Type)] -> Maybe Type -> Expression -> Infer UType
+inferFun args restype body = case args of
+  [] -> do
+    inferedBody <- inferSingle body
+    case restype of
+      (Just x) -> fromTypeToUType x =:= inferedBody
+      Nothing -> return inferedBody
   ((ident, Just t) : ys) ->
     let ut = fromTypeToUType t
-     in withBinding ident (Forall [] ut) $ UTyFun ut <$> inferFun ys body
+     in withBinding ident (Forall [] ut) $ UTyFun ut <$> inferFun ys restype body
   ((ident, Nothing) : ys) -> do
     argTy <- fresh
-    withBinding ident (Forall [] argTy) $ UTyFun argTy <$> inferFun ys body
+    withBinding ident (Forall [] argTy) $ UTyFun argTy <$> inferFun ys restype body
