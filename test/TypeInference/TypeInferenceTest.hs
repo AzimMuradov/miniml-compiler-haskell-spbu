@@ -235,6 +235,6 @@ parseProgram = parse programP
 eval :: Maybe Program -> String
 eval s = case s of
   Nothing -> "Please, try again. Can't parse your program."
-  Just (Program p) -> case inferPolytype p of
+  Just p -> case inferPolytype p of
     Left tyerr -> pretty tyerr
     Right ty -> pretty ty

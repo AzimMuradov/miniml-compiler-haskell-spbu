@@ -24,6 +24,7 @@ testFacRec =
                       "factorial"
                       ( Fun
                           [("n", Nothing)]
+                          Nothing
                           ( ExprIf
                               (ExprOperations (ComparisonOp (LeOp {cL = ExprIdentifier "n", cR = ExprValue (ValInt 0)})))
                               (ExprValue (ValInt 1))
@@ -55,10 +56,12 @@ testFacRecLoop =
                       "factorial"
                       ( Fun
                           [("n", Nothing)]
+                          Nothing
                           ( ExprLetRecInF
                               "loop"
                               ( Fun
                                   [("i", Nothing), ("accum", Nothing)]
+                                  Nothing
                                   ( ExprIf
                                       (ExprOperations (ComparisonOp (MtOp {cL = ExprIdentifier "i", cR = ExprIdentifier "n"})))
                                       (ExprIdentifier "accum")
