@@ -32,13 +32,16 @@ data Statement
 -- ** Declarations
 
 -- TODO : Add docs
-data VarDecl = VarDecl (Identifier, Maybe Type) [Expression] deriving (Show, Eq)
+data VarDecl = VarDecl (Identifier, Maybe Type) Expression
+  deriving (Show, Eq)
 
 -- TODO : Add docs
-data FunDecl = FunDecl Identifier Fun deriving (Show, Eq)
+data FunDecl = FunDecl Identifier Fun
+  deriving (Show, Eq)
 
 -- TODO : Add docs
-data RecFunDecl = RecFunDecl Identifier Fun deriving (Show, Eq)
+data RecFunDecl = RecFunDecl Identifier Fun
+  deriving (Show, Eq)
 
 ---------------------------------------------------------Types----------------------------------------------------------
 
@@ -68,13 +71,13 @@ data Expression
   | -- | If-else expression.
     --
     -- > if condition then expr1 else expr2
-    ExprIf Expression [Expression] [Expression]
+    ExprIf Expression Expression Expression
   | -- | ( let x = 4 in ... )
-    ExprLetInV (Identifier, Maybe Type) [Expression] [Expression]
+    ExprLetInV (Identifier, Maybe Type) Expression Expression
   | -- | ( let f x y = x + y in ... )
-    ExprLetInF Identifier Fun [Expression]
+    ExprLetInF Identifier Fun Expression
   | -- | ( let rec f x y = x + y in ... )
-    ExprLetRecInF Identifier Fun [Expression]
+    ExprLetRecInF Identifier Fun Expression
   deriving (Show, Eq)
 
 -- ** Values
@@ -94,7 +97,7 @@ data Value
 -- > fun x -> true
 --
 -- > fun x y -> x + y
-data Fun = Fun [(Identifier, Maybe Type)] [Expression]
+data Fun = Fun [(Identifier, Maybe Type)] Expression
   deriving (Show, Eq)
 
 -- ** Operations

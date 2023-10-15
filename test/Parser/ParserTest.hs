@@ -28,7 +28,7 @@ test0 :: Test
 test0 =
   "[let a = 7]"
     ~: do
-      let expected = Just $ Program [StmtVarDecl (VarDecl ("a", Nothing) [ExprValue (ValInt 7)])]
+      let expected = Just $ Program [StmtVarDecl (VarDecl ("a", Nothing) (ExprValue (ValInt 7)))]
       let actual = parseProgram "let a = 7"
 
       expected ~=? actual
@@ -67,8 +67,8 @@ test4 =
       let expected =
             Just $
               Program
-                [ StmtVarDecl (VarDecl ("a", Nothing) [ExprValue (ValInt 4)]),
-                  StmtVarDecl (VarDecl ("b", Nothing) [ExprValue (ValInt 8)])
+                [ StmtVarDecl (VarDecl ("a", Nothing) (ExprValue (ValInt 4))),
+                  StmtVarDecl (VarDecl ("b", Nothing) (ExprValue (ValInt 8)))
                 ]
       let actual = parseProgram "let a = 4 let b = 8"
 
@@ -81,8 +81,8 @@ test5 =
       let expected =
             Just $
               Program
-                [ StmtVarDecl (VarDecl ("a", Nothing) [ExprValue (ValInt 4)]),
-                  StmtVarDecl (VarDecl ("b", Nothing) [ExprValue (ValInt 8)])
+                [ StmtVarDecl (VarDecl ("a", Nothing) (ExprValue (ValInt 4))),
+                  StmtVarDecl (VarDecl ("b", Nothing) (ExprValue (ValInt 8)))
                 ]
       let actual = parseProgram "let a = 4\nlet b = 8"
 
@@ -95,8 +95,8 @@ test6 =
       let expected =
             Just $
               Program
-                [ StmtVarDecl (VarDecl ("a", Nothing) [ExprValue (ValInt 4)]),
-                  StmtVarDecl (VarDecl ("b", Nothing) [ExprValue (ValInt 8)])
+                [ StmtVarDecl (VarDecl ("a", Nothing) (ExprValue (ValInt 4))),
+                  StmtVarDecl (VarDecl ("b", Nothing) (ExprValue (ValInt 8)))
                 ]
       let actual = parseProgram "let a = 4;;let b = 8"
 
@@ -114,7 +114,7 @@ test7 =
                         "f"
                         ( Fun
                             [("a", Nothing)]
-                            [ ExprOperations
+                            ( ExprOperations
                                 ( ArithmeticOp
                                     ( MulOp
                                         { aL = ExprIdentifier "a",
@@ -125,7 +125,7 @@ test7 =
                                         }
                                     )
                                 )
-                            ]
+                            )
                         )
                     )
                 ]
@@ -145,7 +145,7 @@ test8 =
                         "f"
                         ( Fun
                             [("a", Nothing)]
-                            [ExprOperations (ArithmeticOp (MulOp {aL = ExprIdentifier "a", aR = ExprIdentifier "a"}))]
+                            (ExprOperations (ArithmeticOp (MulOp {aL = ExprIdentifier "a", aR = ExprIdentifier "a"})))
                         )
                     ),
                   StmtExpr (ExprApplication (ExprIdentifier "f") (ExprValue (ValInt 4)))

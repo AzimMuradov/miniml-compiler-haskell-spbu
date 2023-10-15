@@ -45,10 +45,8 @@ helpInferStatements ((StmtExpr e) : xs) _ = do
 inferStatement :: [Statement] -> Infer UType
 inferStatement x = helpInferStatements x (throwError EmptyList)
 
-inferBlock :: [Expression] -> Infer UType
-inferBlock [] = throwError EmptyList
-inferBlock [x] = inferSingle x
-inferBlock (x : xs) = inferSingle x >> inferBlock xs
+inferBlock :: Expression -> Infer UType
+inferBlock = inferSingle
 
 inferSingle :: Expression -> Infer UType
 inferSingle (ExprIdentifier x) = lookup (Var x)
@@ -119,7 +117,7 @@ comparationOpInfer e1 e2 = do
   _ <- t1 =:= t2
   return UTyBool
 
-inferFun :: [(Identifier, Maybe Type)] -> [Expression] -> Infer UType
+inferFun :: [(Identifier, Maybe Type)] -> Expression -> Infer UType
 inferFun args body = case args of
   [] -> inferBlock body
   ((ident, Just t) : ys) ->
