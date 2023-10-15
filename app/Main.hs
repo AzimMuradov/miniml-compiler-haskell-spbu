@@ -16,7 +16,7 @@ main = runApp =<< execParser opts
         (appP <**> helper)
         ( fullDesc
             <> header "-- MiniML Compiler --"
-            <> progDesc "MiniML is a minimal dialect of ML (Meta Language)"
+            <> progDesc "MiniML is a minimal dialect of ML (Meta Language)."
         )
 
 -- ** Run app
