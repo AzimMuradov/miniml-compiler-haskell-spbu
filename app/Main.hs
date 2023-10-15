@@ -55,6 +55,7 @@ appP = App <$> inputP
 inputP :: Parser Input
 inputP = fileInputP <|> stdInputP
   where
+    stdInputP = pure StdInput
     fileInputP =
       FileInput
         <$> strOption
@@ -63,4 +64,3 @@ inputP = fileInputP <|> stdInputP
               <> metavar "FILENAME"
               <> help "Read from the file (optional)"
           )
-    stdInputP = pure StdInput
