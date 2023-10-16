@@ -8,6 +8,6 @@ At the end of each sprint, the task will be reviewed by the [dungeon master](htt
 
 `some-feature`, `other-feature`, `important-bug-fix` --> `task-<N>` --> `master`
 
-1 feature/dedicated bug-fix/etc. = 1 PR into `task-<N>` = 1 Commit in `task-<N>` = 1 Commit in `master` branch (PRs must be squashed)
+1 feature/dedicated bug-fix/etc. = 1 PR into `task-<N>` = 1 commit in `task-<N>` = 1 commit in `master` branch (PRs must be squashed)
 
-1 `task-<N>` = 1 PR into the `master` = several commits in the `master` branch (PRs must be rebased to ensure linear history)
+1 `task-<N>` = 1 PR into `master` = several commits in the `master` branch (PRs must be rebased)

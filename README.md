@@ -2,7 +2,7 @@
 
 MiniML is a minimal dialect of ML (Meta Language).
 
-**work in progress (see [implemented modules](#implemented-modules))**
+**work in progress (see [supported features](#supported-features) and [implemented modules](#implemented-modules))**
 
 ## Supported Features
 
