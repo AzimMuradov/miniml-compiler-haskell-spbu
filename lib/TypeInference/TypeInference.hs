@@ -116,9 +116,9 @@ comparationOpInfer e1 e2 = do
   return UTyBool
 
 inferFun :: NonEmpty (Identifier, Maybe Type) -> Maybe Type -> Expression -> Infer UType
-inferFun args restype body = inferFunWithArgs $ toList args
+inferFun args restype body = inferFun' $ toList args
   where
-    inferFunWithArgs args' = case args' of
+    inferFun' args' = case args' of
       [] -> do
         inferredBody <- inferSingle body
         case restype of
@@ -126,4 +126,4 @@ inferFun args restype body = inferFunWithArgs $ toList args
           Nothing -> return inferredBody
       (ident, t) : ys -> do
         t' <- maybe fresh (return . fromTypeToUType) t
-        withBinding ident (Forall [] t') $ UTyFun t' <$> inferFunWithArgs ys
+        withBinding ident (Forall [] t') $ UTyFun t' <$> inferFun' ys
