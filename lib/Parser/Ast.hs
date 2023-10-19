@@ -76,7 +76,7 @@ data Expression
     ExprApplication Expression Expression
   | -- | If-else expression.
     --
-    -- > if condition then thenExpr else elseExpr
+    -- > if condition then expr1 else expr2
     ExprIf Expression Expression Expression
   | -- | ( let x = 4 in ... )
     ExprLetInV (Identifier, Maybe Type) Expression Expression

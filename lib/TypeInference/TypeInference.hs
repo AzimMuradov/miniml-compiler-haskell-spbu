@@ -50,11 +50,11 @@ inferSingle (ExprIdentifier x) = lookup (Var x)
 inferSingle (ExprValue (ValBool _)) = return UTyBool
 inferSingle (ExprValue (ValInt _)) = return UTyInt
 inferSingle (ExprValue (ValFun (Fun xs restype body))) = inferFun xs restype body
-inferSingle (ExprIf conditionExpr thenExpr elseExpr) = do
-  _ <- check conditionExpr UTyBool
-  thenExpr' <- inferSingle thenExpr
-  elseExpr' <- inferSingle elseExpr
-  thenExpr' =:= elseExpr'
+inferSingle (ExprIf e1 e2 e3) = do
+  _ <- check e1 UTyBool
+  e2' <- inferSingle e2
+  e3' <- inferSingle e3
+  e2' =:= e3'
 inferSingle (ExprBinaryOperation op lhs rhs) = do
   lhs' <- inferSingle lhs
   rhs' <- inferSingle rhs
