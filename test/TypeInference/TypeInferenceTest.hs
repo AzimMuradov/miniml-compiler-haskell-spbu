@@ -86,7 +86,7 @@ test5 :: Test
 test5 =
   "[let f x = x + true]"
     ~: do
-      let expected = "It is not possible to apply this operation between 'u0' and 'bool'"
+      let expected = "The type 'bool' does not match the type 'int'"
       let actual = eval $ parseProgram "let f x = x + true"
 
       expected ~=? actual
@@ -158,7 +158,7 @@ test13 :: Test
 test13 =
   "[1 && (false || true)]"
     ~: do
-      let expected = "It is not possible to apply this operation between 'int' and 'bool'"
+      let expected = "The type 'int' does not match the type 'bool'"
       let actual = eval $ parseProgram "1 && (false || true)"
 
       expected ~=? actual
