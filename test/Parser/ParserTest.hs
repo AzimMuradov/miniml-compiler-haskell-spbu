@@ -56,7 +56,7 @@ test3 :: Test
 test3 =
   "[leta = 7]"
     ~: do
-      let expected = Just $ Program [StmtExpr (ExprOperations (ComparisonOp (EqOp {cL = ExprIdentifier "leta", cR = ExprValue (ValInt 7)})))]
+      let expected = Just $ Program [StmtExpr (ExprBinaryOperation (ComparisonOp EqOp) (ExprIdentifier "leta") (ExprValue (ValInt 7)))]
       let actual = parseProgram "leta = 7"
 
       expected ~=? actual
@@ -116,16 +116,12 @@ test7 =
                         ( Fun
                             (NonEmpty.singleton ("a", Nothing))
                             Nothing
-                            ( ExprOperations
-                                ( ArithmeticOp
-                                    ( MulOp
-                                        { aL = ExprIdentifier "a",
-                                          aR =
-                                            ExprApplication
-                                              (ExprApplication (ExprIdentifier "a") (ExprIdentifier "f"))
-                                              (ExprValue (ValInt 4))
-                                        }
-                                    )
+                            ( ExprBinaryOperation
+                                (ArithmeticOp MulOp)
+                                (ExprIdentifier "a")
+                                ( ExprApplication
+                                    (ExprApplication (ExprIdentifier "a") (ExprIdentifier "f"))
+                                    (ExprValue (ValInt 4))
                                 )
                             )
                         )
@@ -148,7 +144,7 @@ test8 =
                         ( Fun
                             (NonEmpty.singleton ("a", Nothing))
                             Nothing
-                            (ExprOperations (ArithmeticOp (MulOp {aL = ExprIdentifier "a", aR = ExprIdentifier "a"})))
+                            (ExprBinaryOperation (ArithmeticOp MulOp) (ExprIdentifier "a") (ExprIdentifier "a"))
                         )
                     ),
                   StmtExpr (ExprApplication (ExprIdentifier "f") (ExprValue (ValInt 4)))

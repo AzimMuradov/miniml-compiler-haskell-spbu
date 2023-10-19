@@ -36,16 +36,12 @@ testFacRecParsing =
                           (NonEmpty.singleton ("n", Nothing))
                           Nothing
                           ( ExprIf
-                              (ExprOperations (ComparisonOp (LeOp {cL = ExprIdentifier "n", cR = ExprValue (ValInt 0)})))
+                              (ExprBinaryOperation (ComparisonOp LeOp) (ExprIdentifier "n") (ExprValue (ValInt 0)))
                               (ExprValue (ValInt 1))
-                              ( ExprOperations
-                                  ( ArithmeticOp
-                                      ( MulOp
-                                          { aL = ExprIdentifier "n",
-                                            aR = ExprApplication (ExprIdentifier "factorial") (ExprOperations (ArithmeticOp (MinusOp {aL = ExprIdentifier "n", aR = ExprValue (ValInt 1)})))
-                                          }
-                                      )
-                                  )
+                              ( ExprBinaryOperation
+                                  (ArithmeticOp MulOp)
+                                  (ExprIdentifier "n")
+                                  (ExprApplication (ExprIdentifier "factorial") (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprIdentifier "n") (ExprValue (ValInt 1))))
                               )
                           )
                       )
@@ -82,11 +78,11 @@ testFacRecLoopParsing =
                                   (NonEmpty.fromList [("i", Nothing), ("accum", Nothing)])
                                   Nothing
                                   ( ExprIf
-                                      (ExprOperations (ComparisonOp (MtOp {cL = ExprIdentifier "i", cR = ExprIdentifier "n"})))
+                                      (ExprBinaryOperation (ComparisonOp MtOp) (ExprIdentifier "i") (ExprIdentifier "n"))
                                       (ExprIdentifier "accum")
                                       ( ExprApplication
-                                          (ExprApplication (ExprIdentifier "loop") (ExprOperations (ArithmeticOp (PlusOp {aL = ExprIdentifier "i", aR = ExprValue (ValInt 1)}))))
-                                          (ExprOperations (ArithmeticOp (MulOp {aL = ExprIdentifier "accum", aR = ExprIdentifier "i"})))
+                                          (ExprApplication (ExprIdentifier "loop") (ExprBinaryOperation (ArithmeticOp PlusOp) (ExprIdentifier "i") (ExprValue (ValInt 1))))
+                                          (ExprBinaryOperation (ArithmeticOp MulOp) (ExprIdentifier "accum") (ExprIdentifier "i"))
                                       )
                                   )
                               )
