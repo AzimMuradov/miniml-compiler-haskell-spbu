@@ -54,11 +54,9 @@ eq = symbol "="
 boolLitP :: Parser Bool
 boolLitP = True <$ idTrue <|> False <$ idFalse
 
--- | Signed decimal integer literal parser.
-signedIntP :: Parser Integer
-signedIntP = L.signed (return ()) intP
-  where
-    intP = lexeme L.decimal
+-- | Decimal integer literal parser.
+intLitP :: Parser Integer
+intLitP = lexeme L.decimal
 
 -- * Identifiers and reserved
 

@@ -60,7 +60,8 @@ exprTerm =
       ExprIdentifier <$> identifierP
     ]
 
--- OperationsExprTable
+-- ** Operation parsers
+
 opsTable :: [[Operator Parser Expression]]
 opsTable =
   [ [applicationOp],
@@ -75,28 +76,26 @@ opsTable =
     ],
     [booleanOp "&&" AndOp],
     [booleanOp "||" OrOp],
-    [notOp]
+    [unaryOp "not" NotOp]
   ]
 
-binaryL :: Text -> (Expression -> Expression -> Operations) -> Operator Parser Expression
-binaryL name fun = InfixL $ (\e' e'' -> ExprOperations $ fun e' e'') <$ symbol name
-
-booleanOp :: Text -> (Expression -> Expression -> BooleanOp) -> Operator Parser Expression
-booleanOp name fun = binaryL name (\e' e'' -> BooleanOp $ fun e' e'')
-
-comparisonOp :: Text -> (Expression -> Expression -> ComparisonOp) -> Operator Parser Expression
-comparisonOp name fun = binaryL name (\e' e'' -> ComparisonOp $ fun e' e'')
-
-arithmeticOp :: Text -> (Expression -> Expression -> ArithmeticOp) -> Operator Parser Expression
-arithmeticOp name fun = binaryL name (\e' e'' -> ArithmeticOp $ fun e' e'')
-
-notOp :: Operator Parser Expression
-notOp = Prefix $ ExprOperations . NotOp <$ symbol "not"
-
 applicationOp :: Operator Parser Expression
-applicationOp = InfixL $ return $ \a b -> ExprApplication a b
+applicationOp = InfixL $ return ExprApplication
 
--- * OtherParsersSection
+binaryLeftOp :: Text -> BinaryOperator -> Operator Parser Expression
+binaryLeftOp name op = InfixL $ ExprBinaryOperation op <$ symbol name
+
+booleanOp :: Text -> BooleanOperator -> Operator Parser Expression
+booleanOp name op = binaryLeftOp name $ BooleanOp op
+
+arithmeticOp :: Text -> ArithmeticOperator -> Operator Parser Expression
+arithmeticOp name op = binaryLeftOp name $ ArithmeticOp op
+
+comparisonOp :: Text -> ComparisonOperator -> Operator Parser Expression
+comparisonOp name op = binaryLeftOp name $ ComparisonOp op
+
+unaryOp :: Text -> UnaryOperator -> Operator Parser Expression
+unaryOp name op = Prefix $ ExprUnaryOperation op <$ symbol name
 
 -- IdentifierParsers
 
@@ -133,7 +132,7 @@ valueP :: Parser Value
 valueP =
   choice'
     [ ValBool <$> boolLitP,
-      ValInt <$> signedIntP,
+      ValInt <$> intLitP,
       ValFun <$ kwFun <*> funP arrow
     ]
 
