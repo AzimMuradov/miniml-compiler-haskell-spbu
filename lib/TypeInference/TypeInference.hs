@@ -58,14 +58,20 @@ inferSingle (ExprIf conditionExpr thenExpr elseExpr) = do
 inferSingle (ExprBinaryOperation op lhs rhs) = do
   lhs' <- inferSingle lhs
   rhs' <- inferSingle rhs
-  ut <- lhs' =:= rhs'
-  case op of
+  let opErr = ImpossibleBinOpApplication lhs' rhs'
+  ut <- case (lhs', rhs') of
+    (UTyFun _ _, _) -> throwError opErr
+    (_, UTyFun _ _) -> throwError opErr
+    (UTyVar _, _) -> lhs' =:= rhs'
+    (_, UTyVar _) -> lhs' =:= rhs'
+    _ -> withError (const opErr) (lhs' =:= rhs')
+  withError (const opErr) $ case op of
     BooleanOp _ -> ut =:= UTyBool
     ArithmeticOp _ -> ut =:= UTyInt
     ComparisonOp _ -> return UTyBool
 inferSingle (ExprUnaryOperation op x) = do
   x' <- inferSingle x
-  case op of
+  withError (const $ ImpossibleUnOpApplication x') $ case op of
     NotOp -> x' =:= UTyBool
 inferSingle (ExprLetInV (x, Just pty) xdef body) = do
   let upty = toUPolytype (Forall [] $ toTypeF pty)
