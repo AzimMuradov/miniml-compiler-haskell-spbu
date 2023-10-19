@@ -76,7 +76,10 @@ opsTable =
     ],
     [booleanOp "&&" AndOp],
     [booleanOp "||" OrOp],
-    [unaryOp "not" NotOp]
+    [ unaryOp "not" NotOp,
+      unaryOp "+" UnaryPlusOp,
+      unaryOp "-" UnaryMinusOp
+    ]
   ]
 
 applicationOp :: Operator Parser Expression
