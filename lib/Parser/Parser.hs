@@ -3,10 +3,11 @@
 module Parser.Parser (parse, programP) where
 
 import Control.Monad.Combinators.Expr (Operator (..), makeExprParser)
+import Data.List.NonEmpty (some1)
 import Data.Text (Text)
 import Parser.Ast
 import Parser.Lexer
-import Text.Megaparsec (MonadParsec (..), many, parseMaybe, some)
+import Text.Megaparsec (MonadParsec (..), parseMaybe, some)
 
 -- * MainSection
 
@@ -23,22 +24,22 @@ statementP :: Parser Statement
 statementP =
   choice'
     [ StmtExpr <$> exprP,
-      StmtRecFunDecl <$> recFunP,
-      StmtFunDecl <$> funP,
-      StmtVarDecl <$> varP
+      StmtRecFunDecl <$> recFunDeclP,
+      StmtFunDecl <$> funDeclP,
+      StmtVarDecl <$> varDeclP
     ]
     <* optional' semicolon2
 
 -- ** DeclarationSection
 
-varP :: Parser VarDecl
-varP = VarDecl <$ kwLet <*> typedIdentifierP <* eq <*> exprP <* try (notFollowedBy kwIn)
+varDeclP :: Parser VarDecl
+varDeclP = VarDecl <$ kwLet <*> typedIdentifierP <* eq <*> exprP
 
-funP :: Parser FunDecl
-funP = FunDecl <$ kwLet <*> identifierP <*> (Fun <$> some typedIdentifierP <*> optionalTypeP <* eq <*> exprP)
+funDeclP :: Parser FunDecl
+funDeclP = FunDecl <$ kwLet <*> identifierP <*> funP eq
 
-recFunP :: Parser RecFunDecl
-recFunP = RecFunDecl <$ kwLet <* kwRec <*> identifierP <*> (Fun <$> some typedIdentifierP <*> optionalTypeP <* eq <*> exprP)
+recFunDeclP :: Parser RecFunDecl
+recFunDeclP = RecFunDecl <$ kwLet <* kwRec <*> identifierP <*> funP eq
 
 -- * ExpressionSection
 
@@ -51,8 +52,8 @@ exprTerm :: Parser Expression
 exprTerm =
   choice'
     [ parens exprP,
-      ExprLetRecInF <$ kwLet <* kwRec <*> identifierP <*> (Fun <$> some typedIdentifierP <*> optionalTypeP <* eq <*> exprP) <* kwIn <*> exprP,
-      ExprLetInF <$ kwLet <*> identifierP <*> (Fun <$> some typedIdentifierP <*> optionalTypeP <* eq <*> exprP) <* kwIn <*> exprP,
+      ExprLetRecInF <$ kwLet <* kwRec <*> identifierP <*> funP eq <* kwIn <*> exprP,
+      ExprLetInF <$ kwLet <*> identifierP <*> funP eq <* kwIn <*> exprP,
       ExprLetInV <$ kwLet <*> typedIdentifierP <* eq <*> exprP <* kwIn <*> exprP,
       ExprValue <$> valueP,
       ExprIf <$ kwIf <*> exprP <* kwThen <*> exprP <* kwElse <*> exprP,
@@ -133,5 +134,8 @@ valueP =
   choice'
     [ ValBool <$> boolLitP,
       ValInt <$> signedIntP,
-      ValFun <$> (Fun <$ kwFun <*> many typedIdentifierP <*> optionalTypeP <* arrow <*> exprP)
+      ValFun <$ kwFun <*> funP arrow
     ]
+
+funP :: Parser Text -> Parser Fun
+funP sepSymbolP = Fun <$> some1 typedIdentifierP <*> optionalTypeP <* sepSymbolP <*> exprP

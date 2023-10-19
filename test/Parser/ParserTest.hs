@@ -2,6 +2,7 @@
 
 module Parser.ParserTest (tests) where
 
+import qualified Data.List.NonEmpty as NonEmpty
 import Data.Text (Text)
 import Parser.Ast
 import Parser.Parser (parse, programP)
@@ -113,7 +114,7 @@ test7 =
                     ( FunDecl
                         "f"
                         ( Fun
-                            [("a", Nothing)]
+                            (NonEmpty.singleton ("a", Nothing))
                             Nothing
                             ( ExprOperations
                                 ( ArithmeticOp
@@ -145,7 +146,7 @@ test8 =
                     ( FunDecl
                         "f"
                         ( Fun
-                            [("a", Nothing)]
+                            (NonEmpty.singleton ("a", Nothing))
                             Nothing
                             (ExprOperations (ArithmeticOp (MulOp {aL = ExprIdentifier "a", aR = ExprIdentifier "a"})))
                         )

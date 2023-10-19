@@ -10,6 +10,7 @@ module TypeInference.TypeInference where
 
 import Control.Monad.Except
 import Control.Unification (UTerm (UVar))
+import Data.List.NonEmpty (NonEmpty, toList)
 import Data.Maybe
 import Parser.Ast
 import TypeInference.HindleyMilner
@@ -114,16 +115,15 @@ comparationOpInfer e1 e2 = do
   _ <- t1 =:= t2
   return UTyBool
 
-inferFun :: [(Identifier, Maybe Type)] -> Maybe Type -> Expression -> Infer UType
-inferFun args restype body = case args of
-  [] -> do
-    inferedBody <- inferSingle body
-    case restype of
-      (Just x) -> fromTypeToUType x =:= inferedBody
-      Nothing -> return inferedBody
-  ((ident, Just t) : ys) ->
-    let ut = fromTypeToUType t
-     in withBinding ident (Forall [] ut) $ UTyFun ut <$> inferFun ys restype body
-  ((ident, Nothing) : ys) -> do
-    argTy <- fresh
-    withBinding ident (Forall [] argTy) $ UTyFun argTy <$> inferFun ys restype body
+inferFun :: NonEmpty (Identifier, Maybe Type) -> Maybe Type -> Expression -> Infer UType
+inferFun args restype body = inferFun' $ toList args
+  where
+    inferFun' args' = case args' of
+      [] -> do
+        inferredBody <- inferSingle body
+        case restype of
+          Just t -> fromTypeToUType t =:= inferredBody
+          Nothing -> return inferredBody
+      (ident, t) : ys -> do
+        t' <- maybe fresh (return . fromTypeToUType) t
+        withBinding ident (Forall [] t') $ UTyFun t' <$> inferFun' ys
