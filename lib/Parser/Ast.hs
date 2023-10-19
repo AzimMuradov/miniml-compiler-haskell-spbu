@@ -1,6 +1,7 @@
 -- | Contains all AST elements, all of these produced by the [Parser]("Parser.Parser") module.
 module Parser.Ast where
 
+import Data.List.NonEmpty (NonEmpty)
 import Data.Text (Text)
 
 --------------------------------------------------------Program---------------------------------------------------------
@@ -102,7 +103,7 @@ data Value
 -- > fun x -> true
 --
 -- > fun x y -> x + y
-data Fun = Fun [(Identifier, Maybe Type)] (Maybe Type) Expression
+data Fun = Fun (NonEmpty (Identifier, Maybe Type)) (Maybe Type) Expression
   deriving (Show, Eq)
 
 -- ** Operations

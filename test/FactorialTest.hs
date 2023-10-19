@@ -2,6 +2,7 @@
 
 module FactorialTest (tests) where
 
+import qualified Data.List.NonEmpty as NonEmpty
 import Data.Text (Text)
 import Parser.Ast
 import Parser.Parser (parse, programP)
@@ -32,7 +33,7 @@ testFacRecParsing =
                     RecFunDecl
                       "factorial"
                       ( Fun
-                          [("n", Nothing)]
+                          (NonEmpty.singleton ("n", Nothing))
                           Nothing
                           ( ExprIf
                               (ExprOperations (ComparisonOp (LeOp {cL = ExprIdentifier "n", cR = ExprValue (ValInt 0)})))
@@ -73,12 +74,12 @@ testFacRecLoopParsing =
                     FunDecl
                       "factorial"
                       ( Fun
-                          [("n", Nothing)]
+                          (NonEmpty.singleton ("n", Nothing))
                           Nothing
                           ( ExprLetRecInF
                               "loop"
                               ( Fun
-                                  [("i", Nothing), ("accum", Nothing)]
+                                  (NonEmpty.fromList [("i", Nothing), ("accum", Nothing)])
                                   Nothing
                                   ( ExprIf
                                       (ExprOperations (ComparisonOp (MtOp {cL = ExprIdentifier "i", cR = ExprIdentifier "n"})))
