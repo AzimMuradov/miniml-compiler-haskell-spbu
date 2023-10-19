@@ -68,13 +68,15 @@ data Expression
     ExprIdentifier Identifier
   | -- | Value expression, see 'Value'.
     ExprValue Value
-  | -- | Operation expression, see 'Operations'.
-    ExprOperations Operations
+  | -- | Binary operation, see 'BinaryOperator'.
+    ExprBinaryOperation BinaryOperator Expression Expression
+  | -- | Value expression, see 'UnaryOperator'.
+    ExprUnaryOperation UnaryOperator Expression
   | -- | ( f 6, (fun x y = x + y) 5 6 )
     ExprApplication Expression Expression
   | -- | If-else expression.
     --
-    -- > if condition then expr1 else expr2
+    -- > if condition then thenExpr else elseExpr
     ExprIf Expression Expression Expression
   | -- | ( let x = 4 in ... )
     ExprLetInV (Identifier, Maybe Type) Expression Expression
@@ -106,54 +108,58 @@ data Value
 data Fun = Fun (NonEmpty (Identifier, Maybe Type)) (Maybe Type) Expression
   deriving (Show, Eq)
 
--- ** Operations
+-- ** Operators
 
--- | Operation.
-data Operations
-  = -- | Boolean operation, see 'BooleanOp'.
-    BooleanOp BooleanOp
-  | -- | Negation operation (@not a@), works only for @bool@.
-    NotOp Expression
-  | -- | Arithmetic operation, see 'ArithmeticOp'.
-    ArithmeticOp ArithmeticOp
-  | -- | Comparison operation, see 'ComparisonOp'.
-    ComparisonOp ComparisonOp
+-- | Binary operator.
+data BinaryOperator
+  = -- | Boolean operator, see 'BooleanOperator'.
+    BooleanOp BooleanOperator
+  | -- | Arithmetic operator, see 'ArithmeticOperator'.
+    ArithmeticOp ArithmeticOperator
+  | -- | Comparison operator, see 'ComparisonOperator'.
+    ComparisonOp ComparisonOperator
   deriving (Show, Eq)
 
--- | Boolean operation.
-data BooleanOp
-  = -- | And operation (@a && b@).
-    AndOp {bL :: Expression, bR :: Expression}
-  | -- | Or operation (@a || b@).
-    OrOp {bL :: Expression, bR :: Expression}
+-- | Unary operator.
+data UnaryOperator
+  = -- | Negation operator (@not a@), works only for @bool@.
+    NotOp
   deriving (Show, Eq)
 
--- | Arithmetic operation.
-data ArithmeticOp
-  = -- | Addition operation (@a + b@).
-    PlusOp {aL :: Expression, aR :: Expression}
-  | -- | Subtraction operation (@a - b@).
-    MinusOp {aL :: Expression, aR :: Expression}
-  | -- | Multiplication operation (@a * b@).
-    MulOp {aL :: Expression, aR :: Expression}
-  | -- | Division operation (@a / b@).
-    DivOp {aL :: Expression, aR :: Expression}
+-- | Boolean operator.
+data BooleanOperator
+  = -- | And operator (@a && b@).
+    AndOp
+  | -- | Or operator (@a || b@).
+    OrOp
   deriving (Show, Eq)
 
--- | Comparison operation.
-data ComparisonOp
-  = -- | Equality check (@a = b@).
-    EqOp {cL :: Expression, cR :: Expression}
-  | -- | Non-equality check (@a <> b@).
-    NeOp {cL :: Expression, cR :: Expression}
-  | -- | Less than (@a < b@).
-    LtOp {cL :: Expression, cR :: Expression}
+-- | Arithmetic operator.
+data ArithmeticOperator
+  = -- | Addition operator (@a + b@).
+    PlusOp
+  | -- | Subtraction operator (@a - b@).
+    MinusOp
+  | -- | Multiplication operator (@a * b@).
+    MulOp
+  | -- | Division operator (@a / b@).
+    DivOp
+  deriving (Show, Eq)
+
+-- | Comparison operator.
+data ComparisonOperator
+  = -- | Equality check operator (@a = b@).
+    EqOp
+  | -- | Non-equality check operator (@a <> b@).
+    NeOp
+  | -- | Less than operator (@a < b@).
+    LtOp
   | -- | Less than or equal operator (@a <= b@).
-    LeOp {cL :: Expression, cR :: Expression}
+    LeOp
   | -- | More than operator (@a > b@).
-    MtOp {cL :: Expression, cR :: Expression}
+    MtOp
   | -- | More than or equal operator (@a >= b@).
-    MeOp {cL :: Expression, cR :: Expression}
+    MeOp
   deriving (Show, Eq)
 
 -- ** Identifier
