@@ -62,7 +62,7 @@ inferSingle (ExprBinaryOperation op lhs rhs) = do
   case op of
     BooleanOp _ -> ut =:= UTyBool
     ArithmeticOp _ -> ut =:= UTyInt
-    ComparisonOp _ -> return ut
+    ComparisonOp _ -> return UTyBool
 inferSingle (ExprUnaryOperation op x) = do
   x' <- inferSingle x
   case op of
