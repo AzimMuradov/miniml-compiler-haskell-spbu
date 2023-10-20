@@ -58,17 +58,12 @@ inferSingle (ExprIf e1 e2 e3) = do
 inferSingle (ExprBinaryOperation op lhs rhs) = do
   lhs' <- inferSingle lhs
   rhs' <- inferSingle rhs
-  let opErr = ImpossibleBinOpApplication lhs' rhs'
-  ut <- case (lhs', rhs') of
-    (UTyFun _ _, _) -> throwError opErr
-    (_, UTyFun _ _) -> throwError opErr
-    (UTyVar _, _) -> lhs' =:= rhs'
-    (_, UTyVar _) -> lhs' =:= rhs'
-    _ -> withError (const opErr) (lhs' =:= rhs')
-  withError (const opErr) $ case op of
-    BooleanOp _ -> ut =:= UTyBool
-    ArithmeticOp _ -> ut =:= UTyInt
-    ComparisonOp _ -> return UTyBool
+  withError (const $ ImpossibleBinOpApplication lhs' rhs') $ do
+    ut <- lhs' =:= rhs'
+    case op of
+      BooleanOp _ -> ut =:= UTyBool
+      ArithmeticOp _ -> ut =:= UTyInt
+      ComparisonOp _ -> return UTyBool
 inferSingle (ExprUnaryOperation op x) = do
   x' <- inferSingle x
   withError (const $ ImpossibleUnOpApplication x') $ case op of
