@@ -122,9 +122,7 @@ data BinaryOperator
 
 -- | Unary operator.
 data UnaryOperator
-  = -- | Negation operator (@not a@), works only for @bool@.
-    NotOp
-  | -- | Unary minus operator (@-a@), works only for @int@.
+  = -- | Unary minus operator (@-a@), works only for @int@.
     UnaryMinusOp
   deriving (Show, Eq)
 

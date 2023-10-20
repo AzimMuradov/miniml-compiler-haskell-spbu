@@ -67,7 +67,6 @@ inferSingle (ExprBinaryOperation op lhs rhs) = do
 inferSingle (ExprUnaryOperation op x) = do
   ut <- inferSingle x
   withError (const $ ImpossibleUnOpApplication ut) $ case op of
-    NotOp -> ut =:= UTyBool
     UnaryMinusOp -> ut =:= UTyInt
 inferSingle (ExprLetInV (x, Just pty) xdef body) = do
   let upty = toUPolytype (Forall [] $ toTypeF pty)
