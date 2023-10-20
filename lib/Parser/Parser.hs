@@ -64,7 +64,8 @@ exprTerm =
 
 opsTable :: [[Operator Parser Expression]]
 opsTable =
-  [ [applicationOp],
+  [ [applicationOp, unaryOp "not" NotOp],
+    [unaryOp "-" UnaryMinusOp],
     [arithmeticOp "*" MulOp, arithmeticOp "/" DivOp],
     [arithmeticOp "+" PlusOp, arithmeticOp "-" MinusOp],
     [ comparisonOp "=" EqOp,
@@ -75,11 +76,7 @@ opsTable =
       comparisonOp ">" MtOp
     ],
     [booleanOp "&&" AndOp],
-    [booleanOp "||" OrOp],
-    [ unaryOp "not" NotOp,
-      unaryOp "+" UnaryPlusOp,
-      unaryOp "-" UnaryMinusOp
-    ]
+    [booleanOp "||" OrOp]
   ]
 
 applicationOp :: Operator Parser Expression
