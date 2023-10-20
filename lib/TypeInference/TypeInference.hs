@@ -56,19 +56,19 @@ inferSingle (ExprIf e1 e2 e3) = do
   e3' <- inferSingle e3
   e2' =:= e3'
 inferSingle (ExprBinaryOperation op lhs rhs) = do
-  lhs' <- inferSingle lhs
-  rhs' <- inferSingle rhs
-  withError (const $ ImpossibleBinOpApplication lhs' rhs') $ do
-    ut <- lhs' =:= rhs'
+  utLhs <- inferSingle lhs
+  utRhs <- inferSingle rhs
+  withError (const $ ImpossibleBinOpApplication utLhs utRhs) $ do
+    ut <- utLhs =:= utRhs
     case op of
       BooleanOp _ -> ut =:= UTyBool
       ArithmeticOp _ -> ut =:= UTyInt
       ComparisonOp _ -> return UTyBool
 inferSingle (ExprUnaryOperation op x) = do
-  x' <- inferSingle x
-  withError (const $ ImpossibleUnOpApplication x') $ case op of
-    NotOp -> x' =:= UTyBool
-    UnaryMinusOp -> x' =:= UTyInt
+  ut <- inferSingle x
+  withError (const $ ImpossibleUnOpApplication ut) $ case op of
+    NotOp -> ut =:= UTyBool
+    UnaryMinusOp -> ut =:= UTyInt
 inferSingle (ExprLetInV (x, Just pty) xdef body) = do
   let upty = toUPolytype (Forall [] $ toTypeF pty)
   upty' <- skolemize upty
