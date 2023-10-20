@@ -10,6 +10,7 @@ MiniML is a minimal dialect of ML (Meta Language).
 - Basic literals (decimal integers, `true`, `false`)
 - Basic arithmetic operators (`+`, `-`, `*`, `/`) and boolean operators (`&&`, `||`)
 - Comparison operators (`=`, `<>`, `<`, `<=`, `>`, `>=`)
+- Unary operators (`-`, `not`)
 - Lambdas (`fun a b -> a + b`)
 - Functions and recursive functions declarations, let-bindings (`let f x = x * x`, `let rec f x = x * f x`, `let x = 42`)
 - Nested let-bindings, functions (`let f x = x * x in ...`, `let rec f x = x * f x in ...`, `let x = 42 in ...`)
