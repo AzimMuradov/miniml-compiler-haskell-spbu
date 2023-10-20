@@ -20,33 +20,11 @@ tests =
         test5,
         test6,
         test7,
-        test8
+        test8,
+        testUnaryMinusOp
       ]
-      <> [ testU0
-         ]
 
 -- Tests
-
-testU0 :: Test
-testU0 =
-  "[let a = 7]"
-    ~: do
-      let expected =
-            Just $
-              Program
-                [ StmtExpr (ExprUnaryOperation UnaryMinusOp (ExprValue (ValInt 7))),
-                  StmtExpr (ExprUnaryOperation UnaryMinusOp (ExprValue (ValInt 7))),
-                  StmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprValue (ValInt 0)) (ExprValue (ValInt 7))),
-                  StmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprValue (ValInt 0)) (ExprUnaryOperation UnaryMinusOp (ExprValue (ValInt 7)))),
-                  StmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprValue (ValInt 0)) (ExprUnaryOperation UnaryMinusOp (ExprValue (ValInt 7)))),
-                  StmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprIdentifier "a") (ExprValue (ValInt 7))),
-                  StmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprIdentifier "a") (ExprIdentifier "b")),
-                  StmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprIdentifier "a") (ExprUnaryOperation UnaryMinusOp (ExprIdentifier "b"))),
-                  StmtExpr (ExprApplication (ExprIdentifier "a") (ExprUnaryOperation UnaryMinusOp (ExprIdentifier "b")))
-                ]
-      let actual = parseProgram "-7;;- 7;; 0 - 7;; 0 - -7;; 0 - - 7;; a - 7;; a - b;; a - -b;; a (-b);;"
-
-      expected ~=? actual
 
 test0 :: Test
 test0 =
@@ -173,6 +151,27 @@ test8 =
                   StmtExpr (ExprApplication (ExprIdentifier "f") (ExprValue (ValInt 4)))
                 ]
       let actual = parseProgram "let f a = a * a;;f 4"
+
+      expected ~=? actual
+
+testUnaryMinusOp :: Test
+testUnaryMinusOp =
+  "[unary minus operator]"
+    ~: do
+      let expected =
+            Just $
+              Program
+                [ StmtExpr (ExprUnaryOperation UnaryMinusOp (ExprValue (ValInt 7))),
+                  StmtExpr (ExprUnaryOperation UnaryMinusOp (ExprValue (ValInt 7))),
+                  StmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprValue (ValInt 0)) (ExprValue (ValInt 7))),
+                  StmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprValue (ValInt 0)) (ExprUnaryOperation UnaryMinusOp (ExprValue (ValInt 7)))),
+                  StmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprValue (ValInt 0)) (ExprUnaryOperation UnaryMinusOp (ExprValue (ValInt 7)))),
+                  StmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprIdentifier "a") (ExprValue (ValInt 7))),
+                  StmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprIdentifier "a") (ExprIdentifier "b")),
+                  StmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprIdentifier "a") (ExprUnaryOperation UnaryMinusOp (ExprIdentifier "b"))),
+                  StmtExpr (ExprApplication (ExprIdentifier "a") (ExprUnaryOperation UnaryMinusOp (ExprIdentifier "b")))
+                ]
+      let actual = parseProgram "-7;;- 7;; 0 - 7;; 0 - -7;; 0 - - 7;; a - 7;; a - b;; a - -b;; a (-b);;"
 
       expected ~=? actual
 
