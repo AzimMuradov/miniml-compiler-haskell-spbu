@@ -97,13 +97,6 @@ lookup (Var v) = do
   ctx <- ask
   maybe (throwError $ UnboundVar v) instantiate (M.lookup v ctx)
 
-checkForDuplicate :: LookUpType -> Infer UType
-checkForDuplicate (Var v) = do
-  ctx <- ask
-  case M.lookup v ctx of
-    (Just _) -> throwError $ DuplicateDifinition v
-    Nothing -> return $ UTyVar v
-
 withBinding :: (MonadReader Ctx m) => Identifier -> UPolytype -> m a -> m a
 withBinding x ty = local (M.insert x ty)
 
@@ -137,7 +130,6 @@ newtype LookUpType = Var Identifier
 data TypeError where
   EmptyList :: TypeError
   Unreachable :: TypeError
-  DuplicateDifinition :: Identifier -> TypeError
   UnboundVar :: Identifier -> TypeError
   Infinite :: IntVar -> UType -> TypeError
   ImpossibleBinOpApplication :: UType -> UType -> TypeError

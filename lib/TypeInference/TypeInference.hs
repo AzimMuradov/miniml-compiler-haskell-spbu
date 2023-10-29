@@ -23,17 +23,14 @@ check e ty = do
 helpInferStatements :: [Statement] -> Infer UType -> Infer UType
 helpInferStatements [] pr = pr
 helpInferStatements ((StmtVarDecl (ident, t) body) : xs) _ = do
-  _ <- checkForDuplicate (Var ident)
   res <- inferSingle body
   vType <- maybe (return res) ((=:=) res <$> fromTypeToUType) t
   pvType <- generalize vType
   withBinding ident pvType (helpInferStatements xs $ return vType)
 helpInferStatements ((StmtFunDecl ident (Fun args restype body)) : xs) _ = do
-  _ <- checkForDuplicate (Var ident)
   res <- inferFun args restype body
   withBinding ident (Forall [] res) (helpInferStatements xs $ return res)
 helpInferStatements ((StmtRecFunDecl ident (Fun args restype body)) : xs) _ = do
-  _ <- checkForDuplicate (Var ident)
   preT <- fresh
   next <- withBinding ident (Forall [] preT) $ inferFun args restype body
   after <- withBinding ident (Forall [] next) $ inferFun args restype body
