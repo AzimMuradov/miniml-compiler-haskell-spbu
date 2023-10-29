@@ -121,7 +121,7 @@ typeP' =
 valueP :: Parser Value
 valueP =
   choice'
-    [ ValUnit <$ unitP,
+    [ ValUnit <$ unitLitP,
       ValBool <$> boolLitP,
       ValInt <$> intLitP,
       ValFun <$ kwFun <*> funP arrow

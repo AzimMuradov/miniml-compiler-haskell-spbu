@@ -50,8 +50,9 @@ eq = symbol "="
 
 -- * Literals
 
-unitP :: Parser Text
-unitP = parens ""
+-- | Unit literal parser.
+unitLitP :: Parser Text
+unitLitP = parens ""
 
 -- | Boolean literal parser.
 boolLitP :: Parser Bool
@@ -77,7 +78,7 @@ identifierP =
     otherP = firstP <|> digitChar
 
 reservedP :: Parser Text
-reservedP = choice [kwLet, kwRec, kwIn, kwIf, kwThen, kwElse, kwFun, idBool, idInt, idTrue, idFalse]
+reservedP = choice [kwLet, kwRec, kwIn, kwIf, kwThen, kwElse, kwFun, idUnit, idBool, idInt, idTrue, idFalse]
 
 reservedP' :: Text -> Parser Text
 reservedP' ident = lexeme $ string ident <* notFollowedBy (letterChar <|> char '_' <|> digitChar)
