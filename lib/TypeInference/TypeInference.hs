@@ -48,10 +48,11 @@ inferStatements' ((StmtStdDecl (StdDecl ident t)) : xs) _ = do
 
 inferSingle :: Expression -> Infer UType
 inferSingle (ExprIdentifier x) = lookup (Var x)
-inferSingle (ExprValue ValUnit) = return UTyUnit
-inferSingle (ExprValue (ValBool _)) = return UTyBool
-inferSingle (ExprValue (ValInt _)) = return UTyInt
-inferSingle (ExprValue (ValFun fun)) = inferFun fun
+inferSingle (ExprValue value) = case value of
+  ValUnit -> return UTyUnit
+  ValBool _ -> return UTyBool
+  ValInt _ -> return UTyInt
+  ValFun fun -> inferFun fun
 inferSingle (ExprBinaryOperation op lhs rhs) = do
   utLhs <- inferSingle lhs
   utRhs <- inferSingle rhs
