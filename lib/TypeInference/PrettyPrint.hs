@@ -51,7 +51,7 @@ instance Pretty IntVar where
   pretty = unpack . mkVarName "u"
 
 instance Pretty TypeError where
-  pretty EmptyList = printf "List of statemnet is empty"
+  pretty EmptyList = printf "List of statements is empty"
   pretty Unreachable = printf "Unreachable state"
   pretty (ImpossibleBinOpApplication c1 c2) = printf "It is not possible to apply this operation between '%s' and '%s'" (prettyPrec 0 c1) (prettyPrec 0 c2)
   pretty (ImpossibleUnOpApplication c) = printf "It is not possible to apply this operation to '%s'" (prettyPrec 0 c)
