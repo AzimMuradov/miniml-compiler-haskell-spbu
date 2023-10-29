@@ -41,7 +41,7 @@ inferStatements' ((StmtUserDecl (DeclRecFun ident (Fun args restype body))) : xs
   next <- withBinding ident (Forall [] preT) $ inferFun args restype body
   after <- withBinding ident (Forall [] next) $ inferFun args restype body
   withBinding ident (Forall [] after) (inferStatements' xs $ return next)
-inferStatements' ((StmtStdDecl ident t) : xs) _ = do
+inferStatements' ((StmtStdDecl (StdDecl ident t)) : xs) _ = do
   let t' = fromTypeToUType t
   pT <- generalize t'
   withBinding ident pT (inferStatements' xs $ return t')

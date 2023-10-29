@@ -4,14 +4,14 @@ module StdLib (stdDeclarations) where
 
 import Parser.Ast
 
-stdDeclarations :: [Statement]
+stdDeclarations :: [StdDeclaration]
 stdDeclarations = [notDecl, printBool, printInt]
 
-notDecl :: Statement
-notDecl = StmtStdDecl "not" (TFun TBool TBool)
+notDecl :: StdDeclaration
+notDecl = StdDecl "not" (TFun TBool TBool)
 
-printBool :: Statement
-printBool = StmtStdDecl "print_bool" (TFun TBool TUnit)
+printBool :: StdDeclaration
+printBool = StdDecl "print_bool" (TFun TBool TUnit)
 
-printInt :: Statement
-printInt = StmtStdDecl "print_int" (TFun TInt TUnit)
+printInt :: StdDeclaration
+printInt = StdDecl "print_int" (TFun TInt TUnit)

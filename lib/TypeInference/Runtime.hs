@@ -14,7 +14,7 @@ import Control.Monad.Reader
 import Control.Unification.IntVar (evalIntBindingT)
 import Data.Functor.Identity (Identity (runIdentity))
 import qualified Data.Map as M
-import Parser.Ast (Program (Program))
+import Parser.Ast (Program (Program), Statement (StmtStdDecl))
 import StdLib
 import TypeInference.HindleyMilner
   ( Infer,
@@ -37,4 +37,4 @@ runInfer =
     >>> runIdentity
 
 inferPolytype :: Program -> Either TypeError Polytype
-inferPolytype (Program stmts) = runInfer $ inferStatements $ stdDeclarations <> stmts
+inferPolytype (Program stmts) = runInfer $ inferStatements $ (StmtStdDecl <$> stdDeclarations) <> stmts

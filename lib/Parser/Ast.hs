@@ -18,8 +18,8 @@ newtype Program = Program [Statement]
 data Statement
   = -- | User declaration statement, see 'UserDeclaration'.
     StmtUserDecl UserDeclaration
-  | -- | Standard declaration statement from the 'StdLib'Standard declaration statement.
-    StmtStdDecl Identifier Type
+  | -- | Standard declaration statement, see 'StdDeclaration'.
+    StmtStdDecl StdDeclaration
   | -- | Expression statement, see 'Expression'.
     StmtExpr Expression
   deriving (Show, Eq)
@@ -38,6 +38,12 @@ data UserDeclaration
     DeclFun Identifier Fun
   | -- | Recursive function declaration (e.g., @let rec f x y = f x 1 + f 1 y@).
     DeclRecFun Identifier Fun
+  deriving (Show, Eq)
+
+-- ** Standard Declarations
+
+-- | Standard declaration from the 'StdLib'.
+data StdDeclaration = StdDecl Identifier Type
   deriving (Show, Eq)
 
 ---------------------------------------------------------Types----------------------------------------------------------
