@@ -12,30 +12,32 @@ import Data.Text (Text)
 newtype Program = Program [Statement]
   deriving (Show, Eq)
 
--------------------------------------------------------Statements-------------------------------------------------------
-
--- * Statements
+-- ** Statements
 
 -- | Statement.
 data Statement
-  = -- | Expression statement, see 'Expression'.
-    StmtExpr Expression
-  | -- | Variable declaration (e.g., @let x = 5@).
-    -- | Function declaration (e.g., @let f x y = x + y@).
-    -- | Recursive function declaration (e.g., @let rec f x y = f x 1 + f 1 y@).
+  = -- | User declaration statement, see 'UserDeclaration'.
     StmtUserDecl UserDeclaration
-  | StmtStdDecl Identifier Type
+  | -- | Standard declaration statement from the 'StdLib'Standard declaration statement.
+    StmtStdDecl Identifier Type
+  | -- | Expression statement, see 'Expression'.
+    StmtExpr Expression
   deriving (Show, Eq)
 
----------------------------------------------------User-Declarations----------------------------------------------------
+------------------------------------------------------Declarations------------------------------------------------------
 
--- * User Declarations
+-- * Declarations
+
+-- ** User Declarations
 
 -- | User declaration.
 data UserDeclaration
-  = DeclVar (Identifier, Maybe Type) Expression
-  | DeclFun Identifier Fun
-  | DeclRecFun Identifier Fun
+  = -- | Variable declaration (e.g., @let x = 5@).
+    DeclVar (Identifier, Maybe Type) Expression
+  | -- | Function declaration (e.g., @let f x y = x + y@).
+    DeclFun Identifier Fun
+  | -- | Recursive function declaration (e.g., @let rec f x y = f x 1 + f 1 y@).
+    DeclRecFun Identifier Fun
   deriving (Show, Eq)
 
 ---------------------------------------------------------Types----------------------------------------------------------
@@ -76,9 +78,13 @@ data Expression
     --
     -- > if condition then expr1 else expr2
     ExprIf Expression Expression Expression
-  | -- | ( let x = 4 in ... )
-    -- | ( let f x y = x + y in ... )
-    -- | ( let rec f x y = x + y in ... )
+  | -- | Let expression.
+    --
+    -- > let x = 4 in x * x
+    --
+    -- > let f x y = x + y in f 4 8
+    --
+    -- > let rec f x y = x + y in f 4 8
     ExprLetIn UserDeclaration Expression
   deriving (Show, Eq)
 
@@ -86,11 +92,11 @@ data Expression
 
 -- | Literal or function value.
 data Value
-  = -- | Unit literal value (e.g. @()@).
+  = -- | Unit literal value (@()@).
     ValUnit
-  | -- | Boolean literal value (e.g., @true@, @false@).
+  | -- | Boolean literal value (@true@, @false@).
     ValBool Bool
-  | -- | Int literal value (e.g., @4@, @-15@).
+  | -- | Int literal value (e.g., @0@, @4@, @15@, @23@).
     ValInt Integer
   | -- | Function value, see 'Fun'.
     ValFun Fun
