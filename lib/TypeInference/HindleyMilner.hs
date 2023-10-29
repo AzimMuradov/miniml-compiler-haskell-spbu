@@ -32,8 +32,6 @@ import GHC.Generics (Generic1)
 import Parser.Ast
 import Prelude hiding (lookup)
 
-type MeasureV = Map Identifier Integer
-
 data HType a
   = TyVarF Identifier
   | TyBoolF
