@@ -32,7 +32,10 @@ tests =
         testrec,
         testfix0,
         testfix1,
-        testfix2
+        testfix2,
+        testduplicate0,
+        testduplicate1,
+        testduplicate2
       ]
 
 -- Tests
@@ -187,6 +190,33 @@ testrec =
     ~: do
       let expected = "int -> int"
       let actual = eval $ parseProgram "let rec f x = if x = 0 then 0 else let g x = if x = 0 then 0 else f (x - 1) in g (x - 1)"
+
+      expected ~=? actual
+
+testduplicate0 :: Test
+testduplicate0 =
+  "[let f = 5 let f = 6]"
+    ~: do
+      let expected = "int"
+      let actual = eval $ parseProgram "let f = 5 let f = 6"
+
+      expected ~=? actual
+
+testduplicate1 :: Test
+testduplicate1 =
+  "[let f = 5 let f = fun x y -> x + y]"
+    ~: do
+      let expected = "int -> int -> int"
+      let actual = eval $ parseProgram "let f = 5 let f = fun x y -> x + y"
+
+      expected ~=? actual
+
+testduplicate2 :: Test
+testduplicate2 =
+  "[let f = 5 let f = fun x -> x = 2 let k = f (fun x -> x + 1)]"
+    ~: do
+      let expected = "The type 'int' does not match the type 'u1 -> u1'"
+      let actual = eval $ parseProgram "let f = 5 let f = fun x -> x = 2 let k = f (fun x -> x + 1)"
 
       expected ~=? actual
 
