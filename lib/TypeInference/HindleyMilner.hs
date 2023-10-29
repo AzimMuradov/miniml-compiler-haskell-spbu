@@ -34,6 +34,7 @@ import Prelude hiding (lookup)
 
 data HType a
   = TyVarF Identifier
+  | TyUnitF
   | TyBoolF
   | TyIntF
   | TyFunF a a
@@ -53,6 +54,9 @@ type UPolytype = Poly UType
 pattern TyVar :: Identifier -> TypeF
 pattern TyVar v = Fix (TyVarF v)
 
+pattern TyUnit :: TypeF
+pattern TyUnit = Fix TyUnitF
+
 pattern TyInt :: TypeF
 pattern TyInt = Fix TyIntF
 
@@ -65,6 +69,9 @@ pattern TyFun t1 t2 = Fix (TyFunF t1 t2)
 pattern UTyVar :: Identifier -> UType
 pattern UTyVar v = UTerm (TyVarF v)
 
+pattern UTyUnit :: UType
+pattern UTyUnit = UTerm TyUnitF
+
 pattern UTyInt :: UType
 pattern UTyInt = UTerm TyIntF
 
@@ -76,12 +83,14 @@ pattern UTyFun t1 t2 = UTerm (TyFunF t1 t2)
 
 toTypeF :: Type -> TypeF
 toTypeF x = case x of
+  TUnit -> Fix TyUnitF
   TBool -> Fix TyBoolF
   TInt -> Fix TyIntF
   (TFun t1 t2) -> Fix $ TyFunF (toTypeF t1) (toTypeF t2)
 
 fromTypeToUType :: Type -> UType
 fromTypeToUType x = case x of
+  TUnit -> UTerm TyUnitF
   TBool -> UTerm TyBoolF
   TInt -> UTerm TyIntF
   (TFun t1 t2) -> UTerm $ TyFunF (fromTypeToUType t1) (fromTypeToUType t2)

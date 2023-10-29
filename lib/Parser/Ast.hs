@@ -36,7 +36,9 @@ data Statement
 
 -- | All existing types.
 data Type
-  = -- | Boolean type.
+  = -- | Unit type
+    TUnit
+  | -- | Boolean type.
     TBool
   | -- | Integer type.
     TInt
@@ -78,7 +80,9 @@ data Expression
 
 -- | Literal or function value.
 data Value
-  = -- | Boolean literal value (e.g., @true@, @false@).
+  = -- | Unit literal value (e.g. @()@).
+    ValUnit
+  | -- | Boolean literal value (e.g., @true@, @false@).
     ValBool Bool
   | -- | Int literal value (e.g., @4@, @-15@).
     ValInt Integer
