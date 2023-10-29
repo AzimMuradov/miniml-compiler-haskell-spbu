@@ -32,6 +32,7 @@ library
         Parser.Ast
         Parser.Lexer
         Parser.Parser
+        StdLib
         TypeInference.HindleyMilner
         TypeInference.PrettyPrint
         TypeInference.Runtime
@@ -66,6 +67,7 @@ test-suite tests
     other-modules:
         FactorialTest
         Parser.ParserTest
+        StdLibTest
         TypeInference.TypeInferenceTest
 
     build-depends:

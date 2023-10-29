@@ -9,7 +9,6 @@
 module TypeInference.TypeInference where
 
 import Control.Monad.Except
-import Control.Unification (UTerm (UVar))
 import Data.List.NonEmpty (NonEmpty, toList)
 import Data.Maybe
 import Parser.Ast
@@ -23,22 +22,26 @@ check e ty = do
 
 helpInferStatements :: [Statement] -> Infer UType -> Infer UType
 helpInferStatements [] pr = pr
-helpInferStatements ((StmtVarDecl (VarDecl (ident, t) body)) : xs) _ = do
+helpInferStatements ((StmtVarDecl (ident, t) body) : xs) _ = do
   _ <- checkForDuplicate (Var ident)
   res <- inferSingle body
   vType <- maybe (return res) ((=:=) res <$> fromTypeToUType) t
   pvType <- generalize vType
   withBinding ident pvType (helpInferStatements xs $ return vType)
-helpInferStatements ((StmtFunDecl (FunDecl ident (Fun args restype body))) : xs) _ = do
+helpInferStatements ((StmtFunDecl ident (Fun args restype body)) : xs) _ = do
   _ <- checkForDuplicate (Var ident)
   res <- inferFun args restype body
   withBinding ident (Forall [] res) (helpInferStatements xs $ return res)
-helpInferStatements ((StmtRecFunDecl (RecFunDecl ident (Fun args restype body))) : xs) _ = do
+helpInferStatements ((StmtRecFunDecl ident (Fun args restype body)) : xs) _ = do
   _ <- checkForDuplicate (Var ident)
   preT <- fresh
   next <- withBinding ident (Forall [] preT) $ inferFun args restype body
   after <- withBinding ident (Forall [] next) $ inferFun args restype body
   withBinding ident (Forall [] after) (helpInferStatements xs $ return next)
+helpInferStatements ((StmtStdDecl ident t) : xs) _ = do
+  let t' = fromTypeToUType t
+  pT <- generalize t'
+  withBinding ident pT (helpInferStatements xs $ return t')
 helpInferStatements ((StmtExpr e) : xs) _ = do
   res <- inferSingle e
   helpInferStatements xs (return res)
@@ -56,12 +59,19 @@ inferSingle (ExprIf e1 e2 e3) = do
   e2' <- inferSingle e2
   e3' <- inferSingle e3
   e2' =:= e3'
-inferSingle (ExprOperations (NotOp x)) = do
-  _ <- check x UTyBool
-  return UTyBool
-inferSingle (ExprOperations (BooleanOp x)) = booleanOpInfer (bL x) (bR x)
-inferSingle (ExprOperations (ComparisonOp x)) = comparationOpInfer (cL x) (cR x)
-inferSingle (ExprOperations (ArithmeticOp x)) = arithmeticOperationInfer (aL x) (aR x)
+inferSingle (ExprBinaryOperation op lhs rhs) = do
+  utLhs <- inferSingle lhs
+  utRhs <- inferSingle rhs
+  withError (const $ ImpossibleBinOpApplication utLhs utRhs) $ do
+    ut <- utLhs =:= utRhs
+    case op of
+      BooleanOp _ -> ut =:= UTyBool
+      ArithmeticOp _ -> ut =:= UTyInt
+      ComparisonOp _ -> return UTyBool
+inferSingle (ExprUnaryOperation op x) = do
+  ut <- inferSingle x
+  withError (const $ ImpossibleUnOpApplication ut) $ case op of
+    UnaryMinusOp -> ut =:= UTyInt
 inferSingle (ExprLetInV (x, Just pty) xdef body) = do
   let upty = toUPolytype (Forall [] $ toTypeF pty)
   upty' <- skolemize upty
@@ -89,31 +99,6 @@ inferSingle (ExprLetRecInF f (Fun args restype fbody) lbody) = do
   inferedBlock <- withBinding f (Forall [] next) (inferSingle lbody)
   pfdef <- generalize after
   withBinding f pfdef (return inferedBlock)
-
-arithmeticOperationInfer :: Expression -> Expression -> Infer UType
-arithmeticOperationInfer e1 e2 = do
-  t1 <- inferSingle e1
-  t2 <- inferSingle e2
-  case (t1, t2) of
-    (UVar _, UVar _) -> (t1 =:= UTyInt) <* (t2 =:= UTyInt)
-    (UTyInt, _) -> t1 =:= t2
-    (_, UTyInt) -> t1 =:= t2
-    _ -> throwError $ ImpossibleOpApplication t1 t2
-
-booleanOpInfer :: Expression -> Expression -> Infer UType
-booleanOpInfer e1 e2 = do
-  t1 <- inferSingle e1
-  t2 <- inferSingle e2
-  case (t1, t2) of
-    (UTyBool, UTyBool) -> return UTyBool
-    _ -> throwError $ ImpossibleOpApplication t1 t2
-
-comparationOpInfer :: Expression -> Expression -> Infer UType
-comparationOpInfer e1 e2 = do
-  t1 <- inferSingle e1
-  t2 <- inferSingle e2
-  _ <- t1 =:= t2
-  return UTyBool
 
 inferFun :: NonEmpty (Identifier, Maybe Type) -> Maybe Type -> Expression -> Infer UType
 inferFun args restype body = inferFun' $ toList args

@@ -29,26 +29,21 @@ testFacRecParsing =
       let expected =
             Just $
               Program
-                [ StmtRecFunDecl $
-                    RecFunDecl
-                      "factorial"
-                      ( Fun
-                          (NonEmpty.singleton ("n", Nothing))
-                          Nothing
-                          ( ExprIf
-                              (ExprOperations (ComparisonOp (LeOp {cL = ExprIdentifier "n", cR = ExprValue (ValInt 0)})))
-                              (ExprValue (ValInt 1))
-                              ( ExprOperations
-                                  ( ArithmeticOp
-                                      ( MulOp
-                                          { aL = ExprIdentifier "n",
-                                            aR = ExprApplication (ExprIdentifier "factorial") (ExprOperations (ArithmeticOp (MinusOp {aL = ExprIdentifier "n", aR = ExprValue (ValInt 1)})))
-                                          }
-                                      )
-                                  )
-                              )
-                          )
-                      )
+                [ StmtRecFunDecl
+                    "factorial"
+                    ( Fun
+                        (NonEmpty.singleton ("n", Nothing))
+                        Nothing
+                        ( ExprIf
+                            (ExprBinaryOperation (ComparisonOp LeOp) (ExprIdentifier "n") (ExprValue (ValInt 0)))
+                            (ExprValue (ValInt 1))
+                            ( ExprBinaryOperation
+                                (ArithmeticOp MulOp)
+                                (ExprIdentifier "n")
+                                (ExprApplication (ExprIdentifier "factorial") (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprIdentifier "n") (ExprValue (ValInt 1))))
+                            )
+                        )
+                    )
                 ]
       let actual = parseProgram "let rec factorial n = if n <= 0 then 1 else n * factorial (n - 1)"
 
@@ -70,29 +65,28 @@ testFacRecLoopParsing =
       let expected =
             Just $
               Program
-                [ StmtFunDecl $
-                    FunDecl
-                      "factorial"
-                      ( Fun
-                          (NonEmpty.singleton ("n", Nothing))
-                          Nothing
-                          ( ExprLetRecInF
-                              "loop"
-                              ( Fun
-                                  (NonEmpty.fromList [("i", Nothing), ("accum", Nothing)])
-                                  Nothing
-                                  ( ExprIf
-                                      (ExprOperations (ComparisonOp (MtOp {cL = ExprIdentifier "i", cR = ExprIdentifier "n"})))
-                                      (ExprIdentifier "accum")
-                                      ( ExprApplication
-                                          (ExprApplication (ExprIdentifier "loop") (ExprOperations (ArithmeticOp (PlusOp {aL = ExprIdentifier "i", aR = ExprValue (ValInt 1)}))))
-                                          (ExprOperations (ArithmeticOp (MulOp {aL = ExprIdentifier "accum", aR = ExprIdentifier "i"})))
-                                      )
-                                  )
-                              )
-                              (ExprApplication (ExprApplication (ExprIdentifier "loop") (ExprValue (ValInt 1))) (ExprValue (ValInt 1)))
-                          )
-                      )
+                [ StmtFunDecl
+                    "factorial"
+                    ( Fun
+                        (NonEmpty.singleton ("n", Nothing))
+                        Nothing
+                        ( ExprLetRecInF
+                            "loop"
+                            ( Fun
+                                (NonEmpty.fromList [("i", Nothing), ("accum", Nothing)])
+                                Nothing
+                                ( ExprIf
+                                    (ExprBinaryOperation (ComparisonOp MtOp) (ExprIdentifier "i") (ExprIdentifier "n"))
+                                    (ExprIdentifier "accum")
+                                    ( ExprApplication
+                                        (ExprApplication (ExprIdentifier "loop") (ExprBinaryOperation (ArithmeticOp PlusOp) (ExprIdentifier "i") (ExprValue (ValInt 1))))
+                                        (ExprBinaryOperation (ArithmeticOp MulOp) (ExprIdentifier "accum") (ExprIdentifier "i"))
+                                    )
+                                )
+                            )
+                            (ExprApplication (ExprApplication (ExprIdentifier "loop") (ExprValue (ValInt 1))) (ExprValue (ValInt 1)))
+                        )
+                    )
                 ]
       let actual = parseProgram "let factorial n = let rec loop i accum = if i > n then accum else loop (i + 1) (accum * i) in loop 1 1"
 
