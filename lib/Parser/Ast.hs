@@ -21,13 +21,21 @@ data Statement
   = -- | Expression statement, see 'Expression'.
     StmtExpr Expression
   | -- | Variable declaration (e.g., @let x = 5@).
-    StmtVarDecl (Identifier, Maybe Type) Expression
-  | -- | Function declaration (e.g., @let f x y = x + y@).
-    StmtFunDecl Identifier Fun
-  | -- | Recursive function declaration (e.g., @let rec f x y = f x 1 + f 1 y@).
-    StmtRecFunDecl Identifier Fun
-  | -- | Standard library declaration.
-    StmtStdDecl Identifier Type
+    -- | Function declaration (e.g., @let f x y = x + y@).
+    -- | Recursive function declaration (e.g., @let rec f x y = f x 1 + f 1 y@).
+    StmtUserDecl UserDeclaration
+  | StmtStdDecl Identifier Type
+  deriving (Show, Eq)
+
+---------------------------------------------------User-Declarations----------------------------------------------------
+
+-- * User Declarations
+
+-- | User declaration.
+data UserDeclaration
+  = DeclVar (Identifier, Maybe Type) Expression
+  | DeclFun Identifier Fun
+  | DeclRecFun Identifier Fun
   deriving (Show, Eq)
 
 ---------------------------------------------------------Types----------------------------------------------------------
@@ -69,11 +77,9 @@ data Expression
     -- > if condition then expr1 else expr2
     ExprIf Expression Expression Expression
   | -- | ( let x = 4 in ... )
-    ExprLetInV (Identifier, Maybe Type) Expression Expression
-  | -- | ( let f x y = x + y in ... )
-    ExprLetInF Identifier Fun Expression
-  | -- | ( let rec f x y = x + y in ... )
-    ExprLetRecInF Identifier Fun Expression
+    -- | ( let f x y = x + y in ... )
+    -- | ( let rec f x y = x + y in ... )
+    ExprLetIn UserDeclaration Expression
   deriving (Show, Eq)
 
 -- ** Values

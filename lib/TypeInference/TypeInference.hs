@@ -28,15 +28,15 @@ inferStatements' [] pr = pr
 inferStatements' ((StmtExpr e) : xs) _ = do
   res <- inferSingle e
   inferStatements' xs (return res)
-inferStatements' ((StmtVarDecl (ident, t) body) : xs) _ = do
+inferStatements' ((StmtUserDecl (DeclVar (ident, t) body)) : xs) _ = do
   res <- inferSingle body
   vType <- maybe (return res) ((=:=) res <$> fromTypeToUType) t
   pvType <- generalize vType
   withBinding ident pvType (inferStatements' xs $ return vType)
-inferStatements' ((StmtFunDecl ident (Fun args restype body)) : xs) _ = do
+inferStatements' ((StmtUserDecl (DeclFun ident (Fun args restype body))) : xs) _ = do
   res <- inferFun args restype body
   withBinding ident (Forall [] res) (inferStatements' xs $ return res)
-inferStatements' ((StmtRecFunDecl ident (Fun args restype body)) : xs) _ = do
+inferStatements' ((StmtUserDecl (DeclRecFun ident (Fun args restype body))) : xs) _ = do
   preT <- fresh
   next <- withBinding ident (Forall [] preT) $ inferFun args restype body
   after <- withBinding ident (Forall [] next) $ inferFun args restype body
@@ -76,21 +76,21 @@ inferSingle (ExprIf e1 e2 e3) = do
   e2' <- inferSingle e2
   e3' <- inferSingle e3
   e2' =:= e3'
-inferSingle (ExprLetInV (x, Just pty) xdef body) = do
+inferSingle (ExprLetIn (DeclVar (x, Just pty) xdef) body) = do
   let upty = toUPolytype (Forall [] $ toTypeF pty)
   upty' <- skolemize upty
   bl <- inferSingle xdef
   _ <- bl =:= upty'
   withBinding x upty $ inferSingle body
-inferSingle (ExprLetInV (x, Nothing) xdef body) = do
+inferSingle (ExprLetIn (DeclVar (x, Nothing) xdef) body) = do
   ty <- inferSingle xdef
   pty <- generalize ty
   withBinding x pty $ inferSingle body
-inferSingle (ExprLetInF f (Fun args restype fbody) lbody) = do
+inferSingle (ExprLetIn (DeclFun f (Fun args restype fbody)) lbody) = do
   fdef <- inferFun args restype fbody
   pfdef <- generalize fdef
   withBinding f pfdef $ inferSingle lbody
-inferSingle (ExprLetRecInF f (Fun args restype fbody) lbody) = do
+inferSingle (ExprLetIn (DeclRecFun f (Fun args restype fbody)) lbody) = do
   preT <- fresh
   next <- withBinding f (Forall [] preT) $ inferFun args restype fbody
   after <- withBinding f (Forall [] next) $ inferFun args restype fbody
