@@ -50,6 +50,9 @@ eq = symbol "="
 
 -- * Literals
 
+unitP :: Parser Text
+unitP = parens ""
+
 -- | Boolean literal parser.
 boolLitP :: Parser Bool
 boolLitP = True <$ idTrue <|> False <$ idFalse
@@ -110,6 +113,10 @@ kwFun :: Parser Text
 kwFun = reservedP' "fun"
 
 -- ** Predeclared identifiers
+
+-- | @unit@ identifier parser.
+idUnit :: Parser Text
+idUnit = reservedP' "unit"
 
 -- | @bool@ identifier parser.
 idBool :: Parser Text

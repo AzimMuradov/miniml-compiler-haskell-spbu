@@ -81,7 +81,7 @@ data Expression
 -- | Literal or function value.
 data Value
   = -- | Unit value (e.g. @()@).
-    ValUnit 
+    ValUnit
   | -- | Boolean literal value (e.g., @true@, @false@).
     ValBool Bool
   | -- | Int literal value (e.g., @4@, @-15@).
