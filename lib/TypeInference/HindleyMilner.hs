@@ -140,7 +140,8 @@ data TypeError where
   DuplicateDifinition :: Identifier -> TypeError
   UnboundVar :: Identifier -> TypeError
   Infinite :: IntVar -> UType -> TypeError
-  ImpossibleOpApplication :: UType -> UType -> TypeError
+  ImpossibleBinOpApplication :: UType -> UType -> TypeError
+  ImpossibleUnOpApplication :: UType -> TypeError
   Mismatch :: HType UType -> HType UType -> TypeError
 
 instance Fallible HType IntVar TypeError where

@@ -53,7 +53,8 @@ instance Pretty IntVar where
 instance Pretty TypeError where
   pretty EmptyList = printf "List of statemnet is empty"
   pretty Unreachable = printf "Unreachable state"
-  pretty (ImpossibleOpApplication c1 c2) = printf "It is not possible to apply this operation between '%s' and '%s'" (prettyPrec 0 c1) (prettyPrec 0 c2)
+  pretty (ImpossibleBinOpApplication c1 c2) = printf "It is not possible to apply this operation between '%s' and '%s'" (prettyPrec 0 c1) (prettyPrec 0 c2)
+  pretty (ImpossibleUnOpApplication c) = printf "It is not possible to apply this operation to '%s'" (prettyPrec 0 c)
   pretty (DuplicateDifinition x) = printf "Duplicate definition of value '%s'" (unpack x)
   pretty (UnboundVar x) = printf "Unbound variable '%s'" (unpack x)
   pretty (Infinite x ty) = printf "Infinite type %s = %s" (pretty x) (pretty ty)
