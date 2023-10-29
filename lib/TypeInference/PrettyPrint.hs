@@ -30,6 +30,7 @@ instance (Pretty (t (Fix t))) => Pretty (Fix t) where
 
 instance (Pretty t) => Pretty (HType t) where
   prettyPrec _ (TyVarF x) = unpack x
+  prettyPrec _ TyUnitF = "unit"
   prettyPrec _ TyBoolF = "bool"
   prettyPrec _ TyIntF = "int"
   prettyPrec p (TyFunF ty1 ty2) =

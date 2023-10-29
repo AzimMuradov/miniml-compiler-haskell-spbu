@@ -48,6 +48,7 @@ inferStatements' ((StmtStdDecl ident t) : xs) _ = do
 
 inferSingle :: Expression -> Infer UType
 inferSingle (ExprIdentifier x) = lookup (Var x)
+inferSingle (ExprValue ValUnit) = return UTyUnit
 inferSingle (ExprValue (ValBool _)) = return UTyBool
 inferSingle (ExprValue (ValInt _)) = return UTyInt
 inferSingle (ExprValue (ValFun (Fun xs restype body))) = inferFun xs restype body
