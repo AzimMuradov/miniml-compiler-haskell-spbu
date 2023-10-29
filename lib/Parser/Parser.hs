@@ -24,22 +24,11 @@ statementP :: Parser Statement
 statementP =
   choice'
     [ StmtExpr <$> exprP,
-      StmtRecFunDecl <$> recFunDeclP,
-      StmtFunDecl <$> funDeclP,
-      StmtVarDecl <$> varDeclP
+      StmtRecFunDecl <$ kwLet <* kwRec <*> identifierP <*> funP eq,
+      StmtFunDecl <$ kwLet <*> identifierP <*> funP eq,
+      StmtVarDecl <$ kwLet <*> typedIdentifierP <* eq <*> exprP
     ]
     <* optional' semicolon2
-
--- ** DeclarationSection
-
-varDeclP :: Parser VarDecl
-varDeclP = VarDecl <$ kwLet <*> typedIdentifierP <* eq <*> exprP
-
-funDeclP :: Parser FunDecl
-funDeclP = FunDecl <$ kwLet <*> identifierP <*> funP eq
-
-recFunDeclP :: Parser RecFunDecl
-recFunDeclP = RecFunDecl <$ kwLet <* kwRec <*> identifierP <*> funP eq
 
 -- * ExpressionSection
 

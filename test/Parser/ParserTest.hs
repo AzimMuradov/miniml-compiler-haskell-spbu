@@ -30,7 +30,7 @@ test0 :: Test
 test0 =
   "[let a = 7]"
     ~: do
-      let expected = Just $ Program [StmtVarDecl (VarDecl ("a", Nothing) (ExprValue (ValInt 7)))]
+      let expected = Just $ Program [StmtVarDecl ("a", Nothing) (ExprValue (ValInt 7))]
       let actual = parseProgram "let a = 7"
 
       expected ~=? actual
@@ -69,8 +69,8 @@ test4 =
       let expected =
             Just $
               Program
-                [ StmtVarDecl (VarDecl ("a", Nothing) (ExprValue (ValInt 4))),
-                  StmtVarDecl (VarDecl ("b", Nothing) (ExprValue (ValInt 8)))
+                [ StmtVarDecl ("a", Nothing) (ExprValue (ValInt 4)),
+                  StmtVarDecl ("b", Nothing) (ExprValue (ValInt 8))
                 ]
       let actual = parseProgram "let a = 4 let b = 8"
 
@@ -83,8 +83,8 @@ test5 =
       let expected =
             Just $
               Program
-                [ StmtVarDecl (VarDecl ("a", Nothing) (ExprValue (ValInt 4))),
-                  StmtVarDecl (VarDecl ("b", Nothing) (ExprValue (ValInt 8)))
+                [ StmtVarDecl ("a", Nothing) (ExprValue (ValInt 4)),
+                  StmtVarDecl ("b", Nothing) (ExprValue (ValInt 8))
                 ]
       let actual = parseProgram "let a = 4\nlet b = 8"
 
@@ -97,8 +97,8 @@ test6 =
       let expected =
             Just $
               Program
-                [ StmtVarDecl (VarDecl ("a", Nothing) (ExprValue (ValInt 4))),
-                  StmtVarDecl (VarDecl ("b", Nothing) (ExprValue (ValInt 8)))
+                [ StmtVarDecl ("a", Nothing) (ExprValue (ValInt 4)),
+                  StmtVarDecl ("b", Nothing) (ExprValue (ValInt 8))
                 ]
       let actual = parseProgram "let a = 4;;let b = 8"
 
@@ -112,18 +112,16 @@ test7 =
             Just $
               Program
                 [ StmtFunDecl
-                    ( FunDecl
-                        "f"
-                        ( Fun
-                            (NonEmpty.singleton ("a", Nothing))
-                            Nothing
-                            ( ExprBinaryOperation
-                                (ArithmeticOp MulOp)
-                                (ExprIdentifier "a")
-                                ( ExprApplication
-                                    (ExprApplication (ExprIdentifier "a") (ExprIdentifier "f"))
-                                    (ExprValue (ValInt 4))
-                                )
+                    "f"
+                    ( Fun
+                        (NonEmpty.singleton ("a", Nothing))
+                        Nothing
+                        ( ExprBinaryOperation
+                            (ArithmeticOp MulOp)
+                            (ExprIdentifier "a")
+                            ( ExprApplication
+                                (ExprApplication (ExprIdentifier "a") (ExprIdentifier "f"))
+                                (ExprValue (ValInt 4))
                             )
                         )
                     )
@@ -140,13 +138,11 @@ test8 =
             Just $
               Program
                 [ StmtFunDecl
-                    ( FunDecl
-                        "f"
-                        ( Fun
-                            (NonEmpty.singleton ("a", Nothing))
-                            Nothing
-                            (ExprBinaryOperation (ArithmeticOp MulOp) (ExprIdentifier "a") (ExprIdentifier "a"))
-                        )
+                    "f"
+                    ( Fun
+                        (NonEmpty.singleton ("a", Nothing))
+                        Nothing
+                        (ExprBinaryOperation (ArithmeticOp MulOp) (ExprIdentifier "a") (ExprIdentifier "a"))
                     ),
                   StmtExpr (ExprApplication (ExprIdentifier "f") (ExprValue (ValInt 4)))
                 ]

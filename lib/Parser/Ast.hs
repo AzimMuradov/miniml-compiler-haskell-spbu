@@ -20,26 +20,14 @@ newtype Program = Program [Statement]
 data Statement
   = -- | Expression statement, see 'Expression'.
     StmtExpr Expression
-  | -- | Variable declaration statement, see 'VarDecl'.
-    StmtVarDecl VarDecl
-  | -- | Function declaration statement, see 'FunDecl'.
-    StmtFunDecl FunDecl
-  | -- | Recursive function declaration statement, see 'RecFunDecl'.
-    StmtRecFunDecl RecFunDecl
-  deriving (Show, Eq)
-
--- ** Declarations
-
--- TODO : Add docs ( let x = 5 )
-data VarDecl = VarDecl (Identifier, Maybe Type) Expression
-  deriving (Show, Eq)
-
--- TODO : Add docs ( let f x y = x + y )
-data FunDecl = FunDecl Identifier Fun
-  deriving (Show, Eq)
-
--- TODO : Add docs ( let rec f x y = f x 1 + f 1 y)
-data RecFunDecl = RecFunDecl Identifier Fun
+  | -- | Variable declaration (e.g., @let x = 5@).
+    StmtVarDecl (Identifier, Maybe Type) Expression
+  | -- | Function declaration (e.g., @let f x y = x + y@).
+    StmtFunDecl Identifier Fun
+  | -- | Recursive function declaration (e.g., @let rec f x y = f x 1 + f 1 y@).
+    StmtRecFunDecl Identifier Fun
+  | -- | Standard library declaration.
+    StmtStdDecl Identifier Type
   deriving (Show, Eq)
 
 ---------------------------------------------------------Types----------------------------------------------------------
