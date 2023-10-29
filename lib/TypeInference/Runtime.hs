@@ -25,7 +25,7 @@ import TypeInference.HindleyMilner
     fromUPolytype,
     generalize,
   )
-import TypeInference.TypeInference (inferStatement)
+import TypeInference.TypeInference (inferStatements)
 
 runInfer :: Infer UType -> Either TypeError Polytype
 runInfer =
@@ -37,4 +37,4 @@ runInfer =
     >>> runIdentity
 
 inferPolytype :: Program -> Either TypeError Polytype
-inferPolytype (Program stmts) = runInfer $ inferStatement $ stdDeclarations <> stmts
+inferPolytype (Program stmts) = runInfer $ inferStatements $ stdDeclarations <> stmts
