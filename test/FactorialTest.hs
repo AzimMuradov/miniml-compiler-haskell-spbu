@@ -79,7 +79,7 @@ testFacRecLoopParsing =
                                         (NonEmpty.fromList [("i", Nothing), ("accum", Nothing)])
                                         Nothing
                                         ( ExprIte
-                                            (ExprBinaryOperation (ComparisonOp MtOp) (ExprIdentifier "i") (ExprIdentifier "n"))
+                                            (ExprBinaryOperation (ComparisonOp GtOp) (ExprIdentifier "i") (ExprIdentifier "n"))
                                             (ExprIdentifier "accum")
                                             ( ExprApplication
                                                 (ExprApplication (ExprIdentifier "loop") (ExprBinaryOperation (ArithmeticOp PlusOp) (ExprIdentifier "i") (ExprValue (ValInt 1))))

@@ -61,8 +61,8 @@ opsTable =
       comparisonOp "<>" NeOp,
       comparisonOp "<=" LeOp,
       comparisonOp "<" LtOp,
-      comparisonOp ">=" MeOp,
-      comparisonOp ">" MtOp
+      comparisonOp ">=" GeOp,
+      comparisonOp ">" GtOp
     ],
     [booleanOp "&&" AndOp],
     [booleanOp "||" OrOp]

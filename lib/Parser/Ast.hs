@@ -28,8 +28,6 @@ data Statement
 
 -- * Declarations
 
--- ** User Declarations
-
 -- | User declaration.
 data UserDeclaration
   = -- | Variable declaration (e.g., @let x = 5@).
@@ -39,8 +37,6 @@ data UserDeclaration
   | -- | Recursive function declaration (e.g., @let rec f x y = f x 1 + f 1 y@).
     DeclRecFun Identifier Fun
   deriving (Show, Eq)
-
--- ** Standard Declarations
 
 -- | Standard declaration from the 'StdLib'.
 data StdDeclaration = StdDecl Identifier Type
@@ -76,13 +72,11 @@ data Expression
     ExprValue Value
   | -- | Binary operation, see 'BinaryOperator'.
     ExprBinaryOperation BinaryOperator Expression Expression
-  | -- | Value expression, see 'UnaryOperator'.
+  | -- | Unary operation, see 'UnaryOperator'.
     ExprUnaryOperation UnaryOperator Expression
-  | -- | ( f 6, (fun x y = x + y) 5 6 )
+  | -- | Function application expression (e.g., @f 6@, @(fun x y = x + y) 5@).
     ExprApplication Expression Expression
-  | -- | If-then-else expression.
-    --
-    -- > if x > 4 then x * 8 else x / 15
+  | -- | If-then-else expression (e.g., @if x > 4 then x * 8 else x / 15@).
     ExprIte Expression Expression Expression
   | -- | Let expression.
     --
@@ -90,25 +84,25 @@ data Expression
     --
     -- > let f x y = x + y in f 4 8
     --
-    -- > let rec f x y = x + y in f 4 8
+    -- > let rec f x y = f x 1 + f 1 y in f 4 8
     ExprLetIn UserDeclaration Expression
   deriving (Show, Eq)
 
 -- ** Values
 
--- | Literal or function value.
+-- | Literal or anonymous function.
 data Value
-  = -- | Unit literal value (@()@).
+  = -- | Unit literal (@()@).
     ValUnit
-  | -- | Boolean literal value (@true@, @false@).
+  | -- | Boolean literal (@true@, @false@).
     ValBool Bool
-  | -- | Int literal value (e.g., @0@, @4@, @15@, @23@).
+  | -- | Int literal (e.g., @0@, @4@, @15@, @23@).
     ValInt Integer
-  | -- | Function value, see 'Fun'.
+  | -- | Anonymous function, see 'Fun'.
     ValFun Fun
   deriving (Show, Eq)
 
--- | Function representation without name.
+-- | Function representation without the name.
 --
 -- It contains its parameters, returned type and body.
 --
@@ -158,18 +152,18 @@ data ArithmeticOperator
 
 -- | Comparison operator.
 data ComparisonOperator
-  = -- | Equality check operator (@a = b@).
+  = -- | Equality operator (@a = b@).
     EqOp
-  | -- | Non-equality check operator (@a <> b@).
+  | -- | Non-equality operator (@a <> b@).
     NeOp
   | -- | Less than operator (@a < b@).
     LtOp
   | -- | Less than or equal operator (@a <= b@).
     LeOp
-  | -- | More than operator (@a > b@).
-    MtOp
-  | -- | More than or equal operator (@a >= b@).
-    MeOp
+  | -- | Greater than operator (@a > b@).
+    GtOp
+  | -- | Greater than or equal operator (@a >= b@).
+    GeOp
   deriving (Show, Eq)
 
 -- ** Identifier
