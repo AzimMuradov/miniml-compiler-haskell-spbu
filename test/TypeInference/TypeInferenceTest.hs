@@ -2,7 +2,6 @@
 
 module TypeInference.TypeInferenceTest (tests) where
 
-import Data.Text (Text)
 import Parser.Ast
 import Parser.Parser (parseProgram)
 import Test.HUnit (Test (TestList), (~:), (~=?))

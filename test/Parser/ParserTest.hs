@@ -3,7 +3,6 @@
 module Parser.ParserTest (tests) where
 
 import qualified Data.List.NonEmpty as NonEmpty
-import Data.Text (Text)
 import Parser.Ast
 import Parser.Parser (parseProgram)
 import Test.HUnit (Test (TestList), (~:), (~=?))
