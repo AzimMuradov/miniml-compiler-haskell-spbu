@@ -1,11 +1,37 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Parser.Lexer where
+module Parser.Lexer
+  ( Parser,
+    sc,
+    lexeme,
+    symbol,
+    colon,
+    semicolon2,
+    arrow,
+    eq,
+    leftPar,
+    rightPar,
+    unitLitP,
+    boolLitP,
+    intLitP,
+    identifierP,
+    kwLet,
+    kwRec,
+    kwIn,
+    kwIf,
+    kwThen,
+    kwElse,
+    kwFun,
+    kwUnit,
+    kwBool,
+    kwInt,
+  )
+where
 
 import Data.Text (Text, pack)
 import Data.Void (Void)
 import Parser.Ast (Identifier)
-import Text.Megaparsec (MonadParsec (..), Parsec, between, choice, many, optional, (<|>))
+import Text.Megaparsec (MonadParsec (..), Parsec, choice, many, (<|>))
 import Text.Megaparsec.Char (char, digitChar, letterChar, space1, string)
 import qualified Text.Megaparsec.Char.Lexer as L
 
@@ -28,10 +54,6 @@ symbol = L.symbol sc
 
 -- * Symbols
 
--- | Wraps the given parser with parenthesis.
-parens :: Parser a -> Parser a
-parens = between (symbol "(") (symbol ")")
-
 -- | Colon parser.
 colon :: Parser Text
 colon = symbol ":"
@@ -48,99 +70,95 @@ arrow = symbol "->"
 eq :: Parser Text
 eq = symbol "="
 
+-- | Left parenthesis parser.
+leftPar :: Parser Text
+leftPar = symbol "("
+
+-- | Right parenthesis parser.
+rightPar :: Parser Text
+rightPar = symbol ")"
+
 -- * Literals
 
 -- | Unit literal parser.
 unitLitP :: Parser Text
-unitLitP = parens ""
+unitLitP = leftPar <* rightPar
 
 -- | Boolean literal parser.
 boolLitP :: Parser Bool
-boolLitP = True <$ idTrue <|> False <$ idFalse
+boolLitP = True <$ kwTrue <|> False <$ kwFalse
 
 -- | Decimal integer literal parser.
 intLitP :: Parser Integer
 intLitP = lexeme L.decimal
 
--- * Identifiers and reserved
+-- * Identifiers and keywords
 
 -- ** Identifier
 
 identifierP :: Parser Identifier
-identifierP =
-  lexeme $
-    notFollowedBy reservedP *> do
-      first <- firstP
-      other <- many otherP
-      return $ pack $ first : other
+identifierP = notReserved *> identifier
   where
-    firstP = letterChar <|> char '_'
-    otherP = firstP <|> digitChar
+    identifier = lexeme $ do
+      first <- letterChar <|> char '_'
+      other <- many identifierChar
+      return $ pack $ first : other
+    notReserved =
+      notFollowedBy $
+        choice [kwLet, kwRec, kwIn, kwIf, kwThen, kwElse, kwFun, kwTrue, kwFalse, kwUnit, kwBool, kwInt]
 
-reservedP :: Parser Text
-reservedP = choice [kwLet, kwRec, kwIn, kwIf, kwThen, kwElse, kwFun, idUnit, idBool, idInt, idTrue, idFalse]
+keyword :: Text -> Parser Text
+keyword ident = lexeme $ string ident <* notFollowedBy identifierChar
 
-reservedP' :: Text -> Parser Text
-reservedP' ident = lexeme $ string ident <* notFollowedBy (letterChar <|> char '_' <|> digitChar)
+identifierChar :: Parser Char
+identifierChar = letterChar <|> char '_' <|> digitChar
 
 -- ** Keywords
 
 -- @let@ keyword parser.
 kwLet :: Parser Text
-kwLet = reservedP' "let"
+kwLet = keyword "let"
 
 -- @rec@ keyword parser.
 kwRec :: Parser Text
-kwRec = reservedP' "rec"
+kwRec = keyword "rec"
 
 -- @in@ keyword parser.
 kwIn :: Parser Text
-kwIn = reservedP' "in"
+kwIn = keyword "in"
 
 -- @if@ keyword parser.
 kwIf :: Parser Text
-kwIf = reservedP' "if"
+kwIf = keyword "if"
 
 -- @then@ keyword parser.
 kwThen :: Parser Text
-kwThen = reservedP' "then"
+kwThen = keyword "then"
 
 -- @else@ keyword parser.
 kwElse :: Parser Text
-kwElse = reservedP' "else"
+kwElse = keyword "else"
 
 -- @fun@ keyword parser.
 kwFun :: Parser Text
-kwFun = reservedP' "fun"
+kwFun = keyword "fun"
 
--- ** Predeclared identifiers
+-- | @true@ keyword parser.
+kwTrue :: Parser Text
+kwTrue = keyword "true"
 
--- | @unit@ identifier parser.
-idUnit :: Parser Text
-idUnit = reservedP' "unit"
+-- | @false@ keyword parser.
+kwFalse :: Parser Text
+kwFalse = keyword "false"
 
--- | @bool@ identifier parser.
-idBool :: Parser Text
-idBool = reservedP' "bool"
+-- | @unit@ keyword parser.
+kwUnit :: Parser Text
+kwUnit = keyword "unit"
 
--- | @int@ identifier parser.
-idInt :: Parser Text
-idInt = reservedP' "int"
+-- | @bool@ keyword parser.
+kwBool :: Parser Text
+kwBool = keyword "bool"
 
--- | @true@ identifier parser.
-idTrue :: Parser Text
-idTrue = reservedP' "true"
-
--- | @false@ identifier parser.
-idFalse :: Parser Text
-idFalse = reservedP' "false"
-
--- * Utilities
-
--- ** Backtracking support
-
-choice' :: (Foldable f, MonadParsec e s m, Functor f) => f (m a) -> m a
-choice' x = choice $ try <$> x
-
-optional' :: (MonadParsec e s f) => f a -> f (Maybe a)
-optional' = optional . try
+-- | @int@ keyword parser.
+kwInt :: Parser Text
+kwInt = keyword "int"

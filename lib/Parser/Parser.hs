@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TupleSections #-}
 
 module Parser.Parser (parseProgram) where
 
@@ -7,6 +8,7 @@ import Data.List.NonEmpty (some1)
 import Data.Text (Text)
 import Parser.Ast
 import Parser.Lexer
+import Parser.Utils
 import Text.Megaparsec (MonadParsec (..), many, parseMaybe)
 
 -- * Program Parser
@@ -21,6 +23,8 @@ programP = Program <$> (many semicolon2 *> many (statementP <* many semicolon2))
 statementP :: Parser Statement
 statementP = choice' [StmtExpr <$> exprP, StmtUserDecl <$> userDeclP]
 
+-- ** User Declaration Parsers
+
 userDeclP :: Parser UserDeclaration
 userDeclP = choice' [recFunDeclP, funDeclP, varDeclP]
   where
@@ -28,11 +32,9 @@ userDeclP = choice' [recFunDeclP, funDeclP, varDeclP]
     funDeclP = DeclFun <$ kwLet <*> identifierP <*> funP eq
     recFunDeclP = DeclRecFun <$ kwLet <* kwRec <*> identifierP <*> funP eq
 
-    varSigP = parameterP
+    varSigP = manyParens $ (,) <$> manyParens identifierP <*> optionalTypeAnnotationP
 
--- * ExpressionSection
-
--- MainExprParser
+-- ** Expression Parsers
 
 exprP :: Parser Expression
 exprP = makeExprParser exprTerm opsTable
@@ -47,7 +49,7 @@ exprTerm =
       ExprIdentifier <$> identifierP
     ]
 
--- ** Operation parsers
+-- ** Operation Parsers
 
 opsTable :: [[Operator Parser Expression]]
 opsTable =
@@ -84,25 +86,24 @@ comparisonOp name op = binaryLeftOp name $ ComparisonOp op
 unaryOp :: Text -> UnaryOperator -> Operator Parser Expression
 unaryOp name op = Prefix $ ExprUnaryOperation op <$ symbol name
 
--- TypeParser
+-- ** Type Parsers
 
 typeP :: Parser Type
 typeP =
   choice'
-    [ TFun <$> typeP' <* arrow <*> typeP,
-      typeP'
+    [ TFun <$> primitiveOrInParensTypeP <* arrow <*> typeP,
+      primitiveOrInParensTypeP
     ]
+  where
+    primitiveOrInParensTypeP = choice' [parens typeP, primitiveTypeP]
+    primitiveTypeP =
+      choice'
+        [ TUnit <$ kwUnit,
+          TBool <$ kwBool,
+          TInt <$ kwInt
+        ]
 
-typeP' :: Parser Type
-typeP' =
-  choice'
-    [ parens typeP,
-      TUnit <$ idUnit,
-      TBool <$ idBool,
-      TInt <$ idInt
-    ]
-
--- ValueParsers
+-- ** Value Parsers
 
 valueP :: Parser Value
 valueP =
@@ -113,17 +114,17 @@ valueP =
       ValFun <$ kwFun <*> funP arrow
     ]
 
+-- ** Function Parser
+
 funP :: Parser Text -> Parser Fun
-funP sepSymbolP = Fun <$> some1 parameterP <*> optionalTypeP <* sepSymbolP <*> exprP
+funP sepSymbolP = Fun <$> some1 parameterP <*> optionalTypeAnnotationP <* sepSymbolP <*> exprP
 
 parameterP :: Parser (Identifier, Maybe Type)
-parameterP = manyParensP $ (,) <$> manyParensP identifierP <*> optionalTypeP
-  where
-    manyParensP :: Parser a -> Parser a
-    manyParensP p = choice' [p, someParensP p]
+parameterP =
+  choice'
+    [ someParens $ (,) <$> manyParens identifierP <* colon <*> (Just <$> typeP),
+      (,Nothing) <$> manyParens identifierP
+    ]
 
-    someParensP :: Parser a -> Parser a
-    someParensP p = parens $ choice' [p, someParensP p]
-
-optionalTypeP :: Parser (Maybe Type)
-optionalTypeP = optional' (colon *> typeP)
+optionalTypeAnnotationP :: Parser (Maybe Type)
+optionalTypeAnnotationP = optional' (colon *> typeP)
