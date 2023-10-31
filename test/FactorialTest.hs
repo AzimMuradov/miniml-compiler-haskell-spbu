@@ -29,18 +29,20 @@ testFacRecParsing =
       let expected =
             Just $
               Program
-                [ StmtRecFunDecl
-                    "factorial"
-                    ( Fun
-                        (NonEmpty.singleton ("n", Nothing))
-                        Nothing
-                        ( ExprIf
-                            (ExprBinaryOperation (ComparisonOp LeOp) (ExprIdentifier "n") (ExprValue (ValInt 0)))
-                            (ExprValue (ValInt 1))
-                            ( ExprBinaryOperation
-                                (ArithmeticOp MulOp)
-                                (ExprIdentifier "n")
-                                (ExprApplication (ExprIdentifier "factorial") (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprIdentifier "n") (ExprValue (ValInt 1))))
+                [ StmtUserDecl
+                    ( DeclRecFun
+                        "factorial"
+                        ( Fun
+                            (NonEmpty.singleton ("n", Nothing))
+                            Nothing
+                            ( ExprIf
+                                (ExprBinaryOperation (ComparisonOp LeOp) (ExprIdentifier "n") (ExprValue (ValInt 0)))
+                                (ExprValue (ValInt 1))
+                                ( ExprBinaryOperation
+                                    (ArithmeticOp MulOp)
+                                    (ExprIdentifier "n")
+                                    (ExprApplication (ExprIdentifier "factorial") (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprIdentifier "n") (ExprValue (ValInt 1))))
+                                )
                             )
                         )
                     )
@@ -65,26 +67,30 @@ testFacRecLoopParsing =
       let expected =
             Just $
               Program
-                [ StmtFunDecl
-                    "factorial"
-                    ( Fun
-                        (NonEmpty.singleton ("n", Nothing))
-                        Nothing
-                        ( ExprLetRecInF
-                            "loop"
-                            ( Fun
-                                (NonEmpty.fromList [("i", Nothing), ("accum", Nothing)])
-                                Nothing
-                                ( ExprIf
-                                    (ExprBinaryOperation (ComparisonOp MtOp) (ExprIdentifier "i") (ExprIdentifier "n"))
-                                    (ExprIdentifier "accum")
-                                    ( ExprApplication
-                                        (ExprApplication (ExprIdentifier "loop") (ExprBinaryOperation (ArithmeticOp PlusOp) (ExprIdentifier "i") (ExprValue (ValInt 1))))
-                                        (ExprBinaryOperation (ArithmeticOp MulOp) (ExprIdentifier "accum") (ExprIdentifier "i"))
+                [ StmtUserDecl
+                    ( DeclFun
+                        "factorial"
+                        ( Fun
+                            (NonEmpty.singleton ("n", Nothing))
+                            Nothing
+                            ( ExprLetIn
+                                ( DeclRecFun
+                                    "loop"
+                                    ( Fun
+                                        (NonEmpty.fromList [("i", Nothing), ("accum", Nothing)])
+                                        Nothing
+                                        ( ExprIf
+                                            (ExprBinaryOperation (ComparisonOp MtOp) (ExprIdentifier "i") (ExprIdentifier "n"))
+                                            (ExprIdentifier "accum")
+                                            ( ExprApplication
+                                                (ExprApplication (ExprIdentifier "loop") (ExprBinaryOperation (ArithmeticOp PlusOp) (ExprIdentifier "i") (ExprValue (ValInt 1))))
+                                                (ExprBinaryOperation (ArithmeticOp MulOp) (ExprIdentifier "accum") (ExprIdentifier "i"))
+                                            )
+                                        )
                                     )
                                 )
+                                (ExprApplication (ExprApplication (ExprIdentifier "loop") (ExprValue (ValInt 1))) (ExprValue (ValInt 1)))
                             )
-                            (ExprApplication (ExprApplication (ExprIdentifier "loop") (ExprValue (ValInt 1))) (ExprValue (ValInt 1)))
                         )
                     )
                 ]
