@@ -2,6 +2,7 @@ module Main where
 
 import Data.Text (pack)
 import Options.Applicative
+import Parser.Ast (Program (Program))
 import Parser.Parser (parseProgram)
 import TypeInference.PrettyPrint (pretty)
 import TypeInference.Runtime (inferPolytype)
@@ -33,6 +34,7 @@ runAndShow fileText = runAndShow' <> "\n"
   where
     runAndShow' = case parseProgram (pack fileText) of
       Nothing -> "Please, try again. Can't parse your program."
+      Just (Program []) -> ""
       Just p -> case inferPolytype p of
         Left err -> pretty err
         Right pt -> pretty pt

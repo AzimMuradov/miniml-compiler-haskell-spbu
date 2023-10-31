@@ -7,26 +7,19 @@ import Data.List.NonEmpty (some1)
 import Data.Text (Text)
 import Parser.Ast
 import Parser.Lexer
-import Text.Megaparsec (MonadParsec (..), parseMaybe, some)
+import Text.Megaparsec (MonadParsec (..), many, parseMaybe)
 
--- * MainSection
+-- * Program Parser
 
 -- | Parser entry point
 parseProgram :: Text -> Maybe Program
 parseProgram = parseMaybe $ sc *> programP <* eof
 
--- | Main Parser
 programP :: Parser Program
-programP = Program <$> some statementP
+programP = Program <$> (many semicolon2 *> many (statementP <* many semicolon2))
 
--- | Global Statements Parser
 statementP :: Parser Statement
-statementP =
-  choice'
-    [ StmtExpr <$> exprP,
-      StmtUserDecl <$> userDeclP
-    ]
-    <* optional' semicolon2
+statementP = choice' [StmtExpr <$> exprP, StmtUserDecl <$> userDeclP]
 
 userDeclP :: Parser UserDeclaration
 userDeclP = choice' [recFunDeclP, funDeclP, varDeclP]
