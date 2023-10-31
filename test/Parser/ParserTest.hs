@@ -3,9 +3,8 @@
 module Parser.ParserTest (tests) where
 
 import qualified Data.List.NonEmpty as NonEmpty
-import Data.Text (Text)
 import Parser.Ast
-import Parser.Parser (parse, programP)
+import Parser.Parser (parseProgram)
 import Test.HUnit (Test (TestList), (~:), (~=?))
 
 tests :: Test
@@ -30,7 +29,7 @@ test0 :: Test
 test0 =
   "[let a = 7]"
     ~: do
-      let expected = Just $ Program [StmtVarDecl ("a", Nothing) (ExprValue (ValInt 7))]
+      let expected = Just $ Program [StmtUserDecl (DeclVar ("a", Nothing) (ExprValue (ValInt 7)))]
       let actual = parseProgram "let a = 7"
 
       expected ~=? actual
@@ -69,8 +68,8 @@ test4 =
       let expected =
             Just $
               Program
-                [ StmtVarDecl ("a", Nothing) (ExprValue (ValInt 4)),
-                  StmtVarDecl ("b", Nothing) (ExprValue (ValInt 8))
+                [ StmtUserDecl (DeclVar ("a", Nothing) (ExprValue (ValInt 4))),
+                  StmtUserDecl (DeclVar ("b", Nothing) (ExprValue (ValInt 8)))
                 ]
       let actual = parseProgram "let a = 4 let b = 8"
 
@@ -83,8 +82,8 @@ test5 =
       let expected =
             Just $
               Program
-                [ StmtVarDecl ("a", Nothing) (ExprValue (ValInt 4)),
-                  StmtVarDecl ("b", Nothing) (ExprValue (ValInt 8))
+                [ StmtUserDecl (DeclVar ("a", Nothing) (ExprValue (ValInt 4))),
+                  StmtUserDecl (DeclVar ("b", Nothing) (ExprValue (ValInt 8)))
                 ]
       let actual = parseProgram "let a = 4\nlet b = 8"
 
@@ -97,8 +96,8 @@ test6 =
       let expected =
             Just $
               Program
-                [ StmtVarDecl ("a", Nothing) (ExprValue (ValInt 4)),
-                  StmtVarDecl ("b", Nothing) (ExprValue (ValInt 8))
+                [ StmtUserDecl (DeclVar ("a", Nothing) (ExprValue (ValInt 4))),
+                  StmtUserDecl (DeclVar ("b", Nothing) (ExprValue (ValInt 8)))
                 ]
       let actual = parseProgram "let a = 4;;let b = 8"
 
@@ -111,17 +110,19 @@ test7 =
       let expected =
             Just $
               Program
-                [ StmtFunDecl
-                    "f"
-                    ( Fun
-                        (NonEmpty.singleton ("a", Nothing))
-                        Nothing
-                        ( ExprBinaryOperation
-                            (ArithmeticOp MulOp)
-                            (ExprIdentifier "a")
-                            ( ExprApplication
-                                (ExprApplication (ExprIdentifier "a") (ExprIdentifier "f"))
-                                (ExprValue (ValInt 4))
+                [ StmtUserDecl
+                    ( DeclFun
+                        "f"
+                        ( Fun
+                            (NonEmpty.singleton ("a", Nothing))
+                            Nothing
+                            ( ExprBinaryOperation
+                                (ArithmeticOp MulOp)
+                                (ExprIdentifier "a")
+                                ( ExprApplication
+                                    (ExprApplication (ExprIdentifier "a") (ExprIdentifier "f"))
+                                    (ExprValue (ValInt 4))
+                                )
                             )
                         )
                     )
@@ -137,12 +138,14 @@ test8 =
       let expected =
             Just $
               Program
-                [ StmtFunDecl
-                    "f"
-                    ( Fun
-                        (NonEmpty.singleton ("a", Nothing))
-                        Nothing
-                        (ExprBinaryOperation (ArithmeticOp MulOp) (ExprIdentifier "a") (ExprIdentifier "a"))
+                [ StmtUserDecl
+                    ( DeclFun
+                        "f"
+                        ( Fun
+                            (NonEmpty.singleton ("a", Nothing))
+                            Nothing
+                            (ExprBinaryOperation (ArithmeticOp MulOp) (ExprIdentifier "a") (ExprIdentifier "a"))
+                        )
                     ),
                   StmtExpr (ExprApplication (ExprIdentifier "f") (ExprValue (ValInt 4)))
                 ]
@@ -170,8 +173,3 @@ testUnaryMinusOp =
       let actual = parseProgram "-7;;- 7;; 0 - 7;; 0 - -7;; 0 - - 7;; a - 7;; a - b;; a - -b;; a (-b);;"
 
       expected ~=? actual
-
--- Utils
-
-parseProgram :: Text -> Maybe Program
-parseProgram = parse programP

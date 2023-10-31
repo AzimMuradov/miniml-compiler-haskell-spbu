@@ -51,20 +51,24 @@ type Polytype = Poly TypeF
 
 type UPolytype = Poly UType
 
+-- TypeF
+
 pattern TyVar :: Identifier -> TypeF
 pattern TyVar v = Fix (TyVarF v)
 
 pattern TyUnit :: TypeF
 pattern TyUnit = Fix TyUnitF
 
-pattern TyInt :: TypeF
-pattern TyInt = Fix TyIntF
-
 pattern TyBool :: TypeF
 pattern TyBool = Fix TyBoolF
 
+pattern TyInt :: TypeF
+pattern TyInt = Fix TyIntF
+
 pattern TyFun :: TypeF -> TypeF -> TypeF
 pattern TyFun t1 t2 = Fix (TyFunF t1 t2)
+
+-- UType
 
 pattern UTyVar :: Identifier -> UType
 pattern UTyVar v = UTerm (TyVarF v)
@@ -72,28 +76,28 @@ pattern UTyVar v = UTerm (TyVarF v)
 pattern UTyUnit :: UType
 pattern UTyUnit = UTerm TyUnitF
 
-pattern UTyInt :: UType
-pattern UTyInt = UTerm TyIntF
-
 pattern UTyBool :: UType
 pattern UTyBool = UTerm TyBoolF
+
+pattern UTyInt :: UType
+pattern UTyInt = UTerm TyIntF
 
 pattern UTyFun :: UType -> UType -> UType
 pattern UTyFun t1 t2 = UTerm (TyFunF t1 t2)
 
 toTypeF :: Type -> TypeF
-toTypeF x = case x of
-  TUnit -> Fix TyUnitF
-  TBool -> Fix TyBoolF
-  TInt -> Fix TyIntF
-  (TFun t1 t2) -> Fix $ TyFunF (toTypeF t1) (toTypeF t2)
+toTypeF = \case
+  TUnit -> TyUnit
+  TBool -> TyBool
+  TInt -> TyInt
+  TFun t1 t2 -> TyFun (toTypeF t1) (toTypeF t2)
 
 fromTypeToUType :: Type -> UType
-fromTypeToUType x = case x of
-  TUnit -> UTerm TyUnitF
-  TBool -> UTerm TyBoolF
-  TInt -> UTerm TyIntF
-  (TFun t1 t2) -> UTerm $ TyFunF (fromTypeToUType t1) (fromTypeToUType t2)
+fromTypeToUType = \case
+  TUnit -> UTyUnit
+  TBool -> UTyBool
+  TInt -> UTyInt
+  TFun t1 t2 -> UTyFun (fromTypeToUType t1) (fromTypeToUType t2)
 
 type Infer = ReaderT Ctx (ExceptT TypeError (IntBindingT HType Identity))
 
@@ -135,7 +139,6 @@ instance FreeVars Ctx where
 newtype LookUpType = Var Identifier
 
 data TypeError where
-  EmptyList :: TypeError
   Unreachable :: TypeError
   UnboundVar :: Identifier -> TypeError
   Infinite :: IntVar -> UType -> TypeError

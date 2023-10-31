@@ -6,17 +6,20 @@ MiniML is a minimal dialect of ML (Meta Language).
 
 ## Supported Features
 
-- Basic data types (`int`, `bool`, `'a -> 'b`)
-- Basic literals (decimal integers, `true`, `false`)
-- Basic arithmetic operators (`+`, `-`, `*`, `/`) and boolean operators (`&&`, `||`)
+- Basic data types (`unit`, `bool`, `int`, `'a -> 'b`)
+- Basic literals (`true`, `false`, decimal integers)
+- Basic boolean operators (`&&`, `||`) and arithmetic operators (`+`, `-`, `*`, `/`)
 - Comparison operators (`=`, `<>`, `<`, `<=`, `>`, `>=`)
 - Unary operators (`-`)
-- Standard library (`not : bool -> bool`)
-- Lambdas (`fun a b -> a + b`)
+- Standard library
+  - `not : bool -> bool`
+  - `print_bool : bool -> unit`
+  - `print_int : int -> unit`
+- Anonymous functions (`fun a b -> a + b`)
 - Functions and recursive functions declarations, let-bindings (`let f x = x * x`, `let rec f x = x * f x`, `let x = 42`)
-- Nested let-bindings, functions (`let f x = x * x in ...`, `let rec f x = x * f x in ...`, `let x = 42 in ...`)
+- Let expressions (`let f x = x * x in ...`, `let rec f x = x * f x in ...`, `let x = 42 in ...`)
 - Currying
-- Conditionals (`if ... then ... else ...`)
+- Conditionals (`if x > 15 then x * 16 else x / 23`)
 
 ## Implemented Modules
 
