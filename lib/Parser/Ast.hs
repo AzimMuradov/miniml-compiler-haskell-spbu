@@ -12,22 +12,34 @@ import Data.Text (Text)
 newtype Program = Program [Statement]
   deriving (Show, Eq)
 
--------------------------------------------------------Statements-------------------------------------------------------
-
--- * Statements
+-- ** Statements
 
 -- | Statement.
 data Statement
-  = -- | Expression statement, see 'Expression'.
+  = -- | User declaration statement, see 'UserDeclaration'.
+    StmtUserDecl UserDeclaration
+  | -- | Standard declaration statement, see 'StdDeclaration'.
+    StmtStdDecl StdDeclaration
+  | -- | Expression statement, see 'Expression'.
     StmtExpr Expression
-  | -- | Variable declaration (e.g., @let x = 5@).
-    StmtVarDecl (Identifier, Maybe Type) Expression
+  deriving (Show, Eq)
+
+------------------------------------------------------Declarations------------------------------------------------------
+
+-- * Declarations
+
+-- | User declaration.
+data UserDeclaration
+  = -- | Variable declaration (e.g., @let x = 5@).
+    DeclVar (Identifier, Maybe Type) Expression
   | -- | Function declaration (e.g., @let f x y = x + y@).
-    StmtFunDecl Identifier Fun
+    DeclFun Identifier Fun
   | -- | Recursive function declaration (e.g., @let rec f x y = f x 1 + f 1 y@).
-    StmtRecFunDecl Identifier Fun
-  | -- | Standard library declaration.
-    StmtStdDecl Identifier Type
+    DeclRecFun Identifier Fun
+  deriving (Show, Eq)
+
+-- | Standard declaration from the 'StdLib'.
+data StdDeclaration = StdDecl Identifier Type
   deriving (Show, Eq)
 
 ---------------------------------------------------------Types----------------------------------------------------------
@@ -60,37 +72,37 @@ data Expression
     ExprValue Value
   | -- | Binary operation, see 'BinaryOperator'.
     ExprBinaryOperation BinaryOperator Expression Expression
-  | -- | Value expression, see 'UnaryOperator'.
+  | -- | Unary operation, see 'UnaryOperator'.
     ExprUnaryOperation UnaryOperator Expression
-  | -- | ( f 6, (fun x y = x + y) 5 6 )
+  | -- | Function application expression (e.g., @f 6@, @(fun x y = x + y) 5@).
     ExprApplication Expression Expression
-  | -- | If-else expression.
+  | -- | If-then-else expression (e.g., @if x > 4 then x * 8 else x / 15@).
+    ExprIte Expression Expression Expression
+  | -- | Let expression.
     --
-    -- > if condition then expr1 else expr2
-    ExprIf Expression Expression Expression
-  | -- | ( let x = 4 in ... )
-    ExprLetInV (Identifier, Maybe Type) Expression Expression
-  | -- | ( let f x y = x + y in ... )
-    ExprLetInF Identifier Fun Expression
-  | -- | ( let rec f x y = x + y in ... )
-    ExprLetRecInF Identifier Fun Expression
+    -- > let x = 4 in x * x
+    --
+    -- > let f x y = x + y in f 4 8
+    --
+    -- > let rec f x y = f x 1 + f 1 y in f 4 8
+    ExprLetIn UserDeclaration Expression
   deriving (Show, Eq)
 
 -- ** Values
 
--- | Literal or function value.
+-- | Literal or anonymous function.
 data Value
-  = -- | Unit literal value (e.g. @()@).
+  = -- | Unit literal (@()@).
     ValUnit
-  | -- | Boolean literal value (e.g., @true@, @false@).
+  | -- | Boolean literal (@true@, @false@).
     ValBool Bool
-  | -- | Int literal value (e.g., @4@, @-15@).
+  | -- | Int literal (e.g., @0@, @4@, @15@, @23@).
     ValInt Integer
-  | -- | Function value, see 'Fun'.
+  | -- | Anonymous function, see 'Fun'.
     ValFun Fun
   deriving (Show, Eq)
 
--- | Function representation without name.
+-- | Function representation without the name.
 --
 -- It contains its parameters, returned type and body.
 --
@@ -140,18 +152,18 @@ data ArithmeticOperator
 
 -- | Comparison operator.
 data ComparisonOperator
-  = -- | Equality check operator (@a = b@).
+  = -- | Equality operator (@a = b@).
     EqOp
-  | -- | Non-equality check operator (@a <> b@).
+  | -- | Non-equality operator (@a <> b@).
     NeOp
   | -- | Less than operator (@a < b@).
     LtOp
   | -- | Less than or equal operator (@a <= b@).
     LeOp
-  | -- | More than operator (@a > b@).
-    MtOp
-  | -- | More than or equal operator (@a >= b@).
-    MeOp
+  | -- | Greater than operator (@a > b@).
+    GtOp
+  | -- | Greater than or equal operator (@a >= b@).
+    GeOp
   deriving (Show, Eq)
 
 -- ** Identifier

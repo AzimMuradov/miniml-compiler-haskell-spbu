@@ -3,9 +3,8 @@
 module FactorialTest (tests) where
 
 import qualified Data.List.NonEmpty as NonEmpty
-import Data.Text (Text)
 import Parser.Ast
-import Parser.Parser (parse, programP)
+import Parser.Parser (parseProgram)
 import Test.HUnit (Test (TestList), (~:), (~=?))
 import TypeInference.PrettyPrint (pretty)
 import TypeInference.Runtime (inferPolytype)
@@ -29,18 +28,20 @@ testFacRecParsing =
       let expected =
             Just $
               Program
-                [ StmtRecFunDecl
-                    "factorial"
-                    ( Fun
-                        (NonEmpty.singleton ("n", Nothing))
-                        Nothing
-                        ( ExprIf
-                            (ExprBinaryOperation (ComparisonOp LeOp) (ExprIdentifier "n") (ExprValue (ValInt 0)))
-                            (ExprValue (ValInt 1))
-                            ( ExprBinaryOperation
-                                (ArithmeticOp MulOp)
-                                (ExprIdentifier "n")
-                                (ExprApplication (ExprIdentifier "factorial") (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprIdentifier "n") (ExprValue (ValInt 1))))
+                [ StmtUserDecl
+                    ( DeclRecFun
+                        "factorial"
+                        ( Fun
+                            (NonEmpty.singleton ("n", Nothing))
+                            Nothing
+                            ( ExprIte
+                                (ExprBinaryOperation (ComparisonOp LeOp) (ExprIdentifier "n") (ExprValue (ValInt 0)))
+                                (ExprValue (ValInt 1))
+                                ( ExprBinaryOperation
+                                    (ArithmeticOp MulOp)
+                                    (ExprIdentifier "n")
+                                    (ExprApplication (ExprIdentifier "factorial") (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprIdentifier "n") (ExprValue (ValInt 1))))
+                                )
                             )
                         )
                     )
@@ -65,26 +66,30 @@ testFacRecLoopParsing =
       let expected =
             Just $
               Program
-                [ StmtFunDecl
-                    "factorial"
-                    ( Fun
-                        (NonEmpty.singleton ("n", Nothing))
-                        Nothing
-                        ( ExprLetRecInF
-                            "loop"
-                            ( Fun
-                                (NonEmpty.fromList [("i", Nothing), ("accum", Nothing)])
-                                Nothing
-                                ( ExprIf
-                                    (ExprBinaryOperation (ComparisonOp MtOp) (ExprIdentifier "i") (ExprIdentifier "n"))
-                                    (ExprIdentifier "accum")
-                                    ( ExprApplication
-                                        (ExprApplication (ExprIdentifier "loop") (ExprBinaryOperation (ArithmeticOp PlusOp) (ExprIdentifier "i") (ExprValue (ValInt 1))))
-                                        (ExprBinaryOperation (ArithmeticOp MulOp) (ExprIdentifier "accum") (ExprIdentifier "i"))
+                [ StmtUserDecl
+                    ( DeclFun
+                        "factorial"
+                        ( Fun
+                            (NonEmpty.singleton ("n", Nothing))
+                            Nothing
+                            ( ExprLetIn
+                                ( DeclRecFun
+                                    "loop"
+                                    ( Fun
+                                        (NonEmpty.fromList [("i", Nothing), ("accum", Nothing)])
+                                        Nothing
+                                        ( ExprIte
+                                            (ExprBinaryOperation (ComparisonOp GtOp) (ExprIdentifier "i") (ExprIdentifier "n"))
+                                            (ExprIdentifier "accum")
+                                            ( ExprApplication
+                                                (ExprApplication (ExprIdentifier "loop") (ExprBinaryOperation (ArithmeticOp PlusOp) (ExprIdentifier "i") (ExprValue (ValInt 1))))
+                                                (ExprBinaryOperation (ArithmeticOp MulOp) (ExprIdentifier "accum") (ExprIdentifier "i"))
+                                            )
+                                        )
                                     )
                                 )
+                                (ExprApplication (ExprApplication (ExprIdentifier "loop") (ExprValue (ValInt 1))) (ExprValue (ValInt 1)))
                             )
-                            (ExprApplication (ExprApplication (ExprIdentifier "loop") (ExprValue (ValInt 1))) (ExprValue (ValInt 1)))
                         )
                     )
                 ]
@@ -102,9 +107,6 @@ testFacRecLoopTypeInference =
       expected ~=? actual
 
 -- Utils
-
-parseProgram :: Text -> Maybe Program
-parseProgram = parse programP
 
 eval :: Maybe Program -> String
 eval s = case s of
