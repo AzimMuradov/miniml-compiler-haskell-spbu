@@ -5,7 +5,7 @@ module Parser.ParserTest (tests) where
 import qualified Data.List.NonEmpty as NonEmpty
 import Data.Text (Text)
 import Parser.Ast
-import Parser.Parser (parse, programP)
+import Parser.Parser (parseProgram)
 import Test.HUnit (Test (TestList), (~:), (~=?))
 
 tests :: Test
@@ -174,8 +174,3 @@ testUnaryMinusOp =
       let actual = parseProgram "-7;;- 7;; 0 - 7;; 0 - -7;; 0 - - 7;; a - 7;; a - b;; a - -b;; a (-b);;"
 
       expected ~=? actual
-
--- Utils
-
-parseProgram :: Text -> Maybe Program
-parseProgram = parse programP

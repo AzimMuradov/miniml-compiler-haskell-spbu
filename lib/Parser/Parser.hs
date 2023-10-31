@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Parser.Parser (parse, programP) where
+module Parser.Parser (parseProgram) where
 
 import Control.Monad.Combinators.Expr (Operator (..), makeExprParser)
 import Data.List.NonEmpty (some1)
@@ -12,8 +12,8 @@ import Text.Megaparsec (MonadParsec (..), parseMaybe, some)
 -- * MainSection
 
 -- | Parser entry point
-parse :: Parser a -> Text -> Maybe a
-parse p = parseMaybe $ sc *> p <* eof
+parseProgram :: Text -> Maybe Program
+parseProgram = parseMaybe $ sc *> programP <* eof
 
 -- | Main Parser
 programP :: Parser Program

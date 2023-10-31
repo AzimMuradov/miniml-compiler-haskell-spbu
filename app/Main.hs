@@ -2,7 +2,7 @@ module Main where
 
 import Data.Text (pack)
 import Options.Applicative
-import Parser.Parser (parse, programP)
+import Parser.Parser (parseProgram)
 import TypeInference.PrettyPrint (pretty)
 import TypeInference.Runtime (inferPolytype)
 
@@ -31,7 +31,7 @@ runApp App {input = i} = runApp' runAndShow i
 runAndShow :: String -> String
 runAndShow fileText = runAndShow' <> "\n"
   where
-    runAndShow' = case parse programP (pack fileText) of
+    runAndShow' = case parseProgram (pack fileText) of
       Nothing -> "Please, try again. Can't parse your program."
       Just p -> case inferPolytype p of
         Left err -> pretty err
