@@ -35,7 +35,7 @@ testFacRecParsing =
                         ( Fun
                             (NonEmpty.singleton ("n", Nothing))
                             Nothing
-                            ( ExprIf
+                            ( ExprIte
                                 (ExprBinaryOperation (ComparisonOp LeOp) (ExprIdentifier "n") (ExprValue (ValInt 0)))
                                 (ExprValue (ValInt 1))
                                 ( ExprBinaryOperation
@@ -79,7 +79,7 @@ testFacRecLoopParsing =
                                     ( Fun
                                         (NonEmpty.fromList [("i", Nothing), ("accum", Nothing)])
                                         Nothing
-                                        ( ExprIf
+                                        ( ExprIte
                                             (ExprBinaryOperation (ComparisonOp MtOp) (ExprIdentifier "i") (ExprIdentifier "n"))
                                             (ExprIdentifier "accum")
                                             ( ExprApplication

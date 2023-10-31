@@ -80,10 +80,10 @@ data Expression
     ExprUnaryOperation UnaryOperator Expression
   | -- | ( f 6, (fun x y = x + y) 5 6 )
     ExprApplication Expression Expression
-  | -- | If-else expression.
+  | -- | If-then-else expression.
     --
-    -- > if condition then expr1 else expr2
-    ExprIf Expression Expression Expression
+    -- > if x > 4 then x * 8 else x / 15
+    ExprIte Expression Expression Expression
   | -- | Let expression.
     --
     -- > let x = 4 in x * x

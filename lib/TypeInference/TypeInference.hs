@@ -72,7 +72,7 @@ inferExpression (ExprApplication funExpr argExpr) = do
   resUT <- fresh
   _ <- funUT =:= UTyFun argUT resUT
   return resUT
-inferExpression (ExprIf c t e) = do
+inferExpression (ExprIte c t e) = do
   _ <- check c UTyBool
   t' <- inferExpression t
   e' <- inferExpression e

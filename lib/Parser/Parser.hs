@@ -50,7 +50,7 @@ exprTerm =
     [ parens exprP,
       ExprLetIn <$> userDeclP <* kwIn <*> exprP,
       ExprValue <$> valueP,
-      ExprIf <$ kwIf <*> exprP <* kwThen <*> exprP <* kwElse <*> exprP,
+      ExprIte <$ kwIf <*> exprP <* kwThen <*> exprP <* kwElse <*> exprP,
       ExprIdentifier <$> identifierP
     ]
 
