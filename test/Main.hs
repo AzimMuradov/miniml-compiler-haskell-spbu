@@ -2,27 +2,27 @@
 
 module Main where
 
-import qualified Integration.FactorialTest
+import qualified Sample.FactorialTest
 import Test.Tasty (TestTree, defaultMain, testGroup)
 import qualified Unit.Parser.ParserTest as Unit.ParserTest
 import qualified Unit.StdLibTest
 import qualified Unit.TypeInference.TypeInferenceTest as Unit.TypeInferenceTest
 
 main :: IO ()
-main = defaultMain $ testGroup "all tests" [unitTests, goldenTests]
+main = defaultMain $ testGroup "all tests" [unitTests, sampleTests]
 
 unitTests :: TestTree
 unitTests =
   testGroup
-    "unit tests"
+    "unit tests (HUnit)"
     [ Unit.ParserTest.tests,
       Unit.StdLibTest.tests,
       Unit.TypeInferenceTest.tests
     ]
 
-goldenTests :: TestTree
-goldenTests =
+sampleTests :: TestTree
+sampleTests =
   testGroup
-    "integration tests (golden)"
-    [ Integration.FactorialTest.tests
+    "sample tests (Golden)"
+    [ Sample.FactorialTest.tests
     ]

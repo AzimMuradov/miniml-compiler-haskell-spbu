@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Integration.FactorialTest (tests) where
+module Sample.FactorialTest (tests) where
 
 import Data.ByteString.Lazy.Char8 (ByteString, pack)
 import Data.Text (Text)
@@ -17,7 +17,7 @@ import TypeInference.Runtime (inferPolytype)
 tests :: TestTree
 tests =
   testGroup
-    "factorial golden tests"
+    "factorial"
     [ testParsing "recursive factorial" facRec,
       testParsing "factorial with recursive loop" facRecLoop,
       testTypeInference "recursive factorial" facRec,
@@ -45,7 +45,7 @@ evalToBS :: Text -> ByteString
 evalToBS = pack . eval . parseProgram
 
 testFile :: String -> String
-testFile filename = "test/Integration/Factorial/" <> filename
+testFile filename = "test/Sample/Factorial/" <> filename
 
 facRec :: String -> String
 facRec ext = testFile $ "FacRec." <> ext
