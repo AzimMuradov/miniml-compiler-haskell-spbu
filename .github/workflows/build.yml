@@ -44,7 +44,7 @@ jobs:
       - name: Build project
         run: cabal build
       - name: Run tests
-        run: cabal test --test-show-details=direct
+        run: cabal test --test-show-details=direct --test-options "--color=always"
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

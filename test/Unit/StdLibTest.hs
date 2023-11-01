@@ -1,30 +1,31 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module StdLibTest (tests) where
+module Unit.StdLibTest (tests) where
 
 import Parser.Ast
 import Parser.Parser (parseProgram)
-import Test.HUnit (Test (TestList), (~:), (~=?))
+import Test.Tasty (TestTree, testGroup)
+import Test.Tasty.HUnit (testCase, (@=?))
 import TypeInference.PrettyPrint (pretty)
 import TypeInference.Runtime (inferPolytype)
 
-tests :: Test
+tests :: TestTree
 tests =
-  "stdlib"
-    ~: TestList
-      [ testNotFunctionTypeInference
-      ]
+  testGroup
+    "stdlib"
+    [ testNotFunctionTypeInference
+    ]
 
 -- Tests
 
-testNotFunctionTypeInference :: Test
+testNotFunctionTypeInference :: TestTree
 testNotFunctionTypeInference =
-  "not function type inference"
-    ~: do
+  testCase "not function type inference" $
+    do
       let expected = "bool -> bool"
       let actual = eval . parseProgram $ "not"
 
-      expected ~=? actual
+      expected @=? actual
 
 -- Utils
 
