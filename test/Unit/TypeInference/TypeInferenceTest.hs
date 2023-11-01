@@ -1,250 +1,271 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module TypeInference.TypeInferenceTest (tests) where
+module Unit.TypeInference.TypeInferenceTest (tests) where
 
 import Parser.Ast
 import Parser.Parser (parseProgram)
-import Test.HUnit (Test (TestList), (~:), (~=?))
+import Test.Tasty (TestTree, testGroup)
+import Test.Tasty.HUnit (testCase, (@=?))
 import TypeInference.PrettyPrint (pretty)
 import TypeInference.Runtime (inferPolytype)
 
-tests :: Test
+tests :: TestTree
 tests =
-  "type-inference"
-    ~: TestList
-      [ test0,
-        test1,
-        test2,
-        test3,
-        test4,
-        test5,
-        test6,
-        test7,
-        test8,
-        test9,
-        test10,
-        test11,
-        test12,
-        test13,
-        testredecalaration,
-        testfib,
-        testrec,
-        testfix0,
-        testfix1,
-        testfix2,
-        testduplicate0,
-        testduplicate1,
-        testduplicate2
-      ]
+  testGroup
+    "type-inference"
+    [ test0,
+      test1,
+      test2,
+      test3,
+      test4,
+      test5,
+      test6,
+      test7,
+      test8,
+      test9,
+      test10,
+      test11,
+      test12,
+      test13,
+      testredecalaration,
+      testfib,
+      testrec,
+      testfix0,
+      testfix1,
+      testfix2,
+      testduplicate0,
+      testduplicate1,
+      testduplicate2
+    ]
 
 -- Tests
 
-test0 :: Test
+test0 :: TestTree
 test0 =
-  "[1 + 1]"
-    ~: do
-      let expected = "int"
-      let actual = eval $ parseProgram "1 + 1"
+  testCase "[1 + 1]" $ do
+    let expected = "int"
+    let actual = eval $ parseProgram "1 + 1"
 
-      expected ~=? actual
+    expected @=? actual
 
-test1 :: Test
+test1 :: TestTree
 test1 =
-  "[false = true]"
-    ~: do
+  testCase "[false = true]" $
+    do
       let expected = "bool"
       let actual = eval $ parseProgram "false = true"
 
-      expected ~=? actual
+      expected @=? actual
 
-test2 :: Test
+test2 :: TestTree
 test2 =
-  "[false = 1]"
-    ~: do
+  testCase
+    "[false = 1]"
+    $ do
       let expected = "It is not possible to apply this operation between 'bool' and 'int'"
       let actual = eval $ parseProgram "false = 1"
 
-      expected ~=? actual
+      expected @=? actual
 
-test3 :: Test
+test3 :: TestTree
 test3 =
-  "[let x = 1]"
-    ~: do
+  testCase
+    "[let x = 1]"
+    $ do
       let expected = "int"
       let actual = eval $ parseProgram "let x = 1"
 
-      expected ~=? actual
+      expected @=? actual
 
-test4 :: Test
+test4 :: TestTree
 test4 =
-  "[let f x = x + 1]"
-    ~: do
+  testCase
+    "[let f x = x + 1]"
+    $ do
       let expected = "int -> int"
       let actual = eval $ parseProgram "let f x = x + 1"
 
-      expected ~=? actual
+      expected @=? actual
 
-test5 :: Test
+test5 :: TestTree
 test5 =
-  "[let f x = x + true]"
-    ~: do
+  testCase
+    "[let f x = x + true]"
+    $ do
       let expected = "It is not possible to apply this operation between 'u0' and 'bool'"
       let actual = eval $ parseProgram "let f x = x + true"
 
-      expected ~=? actual
+      expected @=? actual
 
-test6 :: Test
+test6 :: TestTree
 test6 =
-  "[let rec f x = x + 1]"
-    ~: do
+  testCase
+    "[let rec f x = x + 1]"
+    $ do
       let expected = "int -> int"
       let actual = eval $ parseProgram "let rec f x = x + 1"
 
-      expected ~=? actual
+      expected @=? actual
 
-test7 :: Test
+test7 :: TestTree
 test7 =
-  "[let x = 1 in x + 1]"
-    ~: do
+  testCase
+    "[let x = 1 in x + 1]"
+    $ do
       let expected = "int"
       let actual = eval $ parseProgram "let x = 1 in x + 1"
 
-      expected ~=? actual
+      expected @=? actual
 
-test8 :: Test
+test8 :: TestTree
 test8 =
-  "[let rec f x = true in f 5 <> false]"
-    ~: do
+  testCase
+    "[let rec f x = true in f 5 <> false]"
+    $ do
       let expected = "bool"
       let actual = eval $ parseProgram "let rec f x = true in f 5 <> false"
 
-      expected ~=? actual
+      expected @=? actual
 
-test9 :: Test
+test9 :: TestTree
 test9 =
-  "[fun x y -> x + y]"
-    ~: do
+  testCase
+    "[fun x y -> x + y]"
+    $ do
       let expected = "int -> int -> int"
       let actual = eval $ parseProgram "fun x y -> x + y"
 
-      expected ~=? actual
+      expected @=? actual
 
-test10 :: Test
+test10 :: TestTree
 test10 =
-  "[let x = 1]"
-    ~: do
+  testCase
+    "[let x = 1]"
+    $ do
       let expected = "int"
       let actual = eval $ parseProgram "let x = 1"
 
-      expected ~=? actual
+      expected @=? actual
 
-test11 :: Test
+test11 :: TestTree
 test11 =
-  "[let f x = y + x]"
-    ~: do
+  testCase
+    "[let f x = y + x]"
+    $ do
       let expected = "Unbound variable 'y'"
       let actual = eval $ parseProgram "let f x = y + x"
 
-      expected ~=? actual
+      expected @=? actual
 
-test12 :: Test
+test12 :: TestTree
 test12 =
-  "[let f x = f (x - 1)]"
-    ~: do
+  testCase
+    "[let f x = f (x - 1)]"
+    $ do
       let expected = "Unbound variable 'f'"
       let actual = eval $ parseProgram "let f x = f (x - 1)"
 
-      expected ~=? actual
+      expected @=? actual
 
-test13 :: Test
+test13 :: TestTree
 test13 =
-  "[1 && (false || true)]"
-    ~: do
+  testCase
+    "[1 && (false || true)]"
+    $ do
       let expected = "It is not possible to apply this operation between 'int' and 'bool'"
       let actual = eval $ parseProgram "1 && (false || true)"
 
-      expected ~=? actual
+      expected @=? actual
 
-testredecalaration :: Test
+testredecalaration :: TestTree
 testredecalaration =
-  "[let x = true;; let f x = x + 1]"
-    ~: do
+  testCase
+    "[let x = true;; let f x = x + 1]"
+    $ do
       let expected = "int -> int"
       let actual = eval $ parseProgram "let x = true;; let f x = x + 1"
 
-      expected ~=? actual
+      expected @=? actual
 
-testfib :: Test
+testfib :: TestTree
 testfib =
-  "[let n = 30;; let rec fib n = if n <= 1 then 1 else fib (n - 1) + fib (n - 2);; fib (n - 2)]"
-    ~: do
+  testCase
+    "[let n = 30;; let rec fib n = if n <= 1 then 1 else fib (n - 1) + fib (n - 2);; fib (n - 2)]"
+    $ do
       let expected = "int"
       let actual = eval $ parseProgram "let n = 30;; let rec fib n = if n <= 1 then 1 else fib (n - 1) + fib (n - 2);; fib (n - 2)"
 
-      expected ~=? actual
+      expected @=? actual
 
-testrec :: Test
+testrec :: TestTree
 testrec =
-  "[let rec f x = if x = 0 then 0 else let g x = if x = 0 then 0 else f (x - 1) in g (x - 1)]"
-    ~: do
+  testCase
+    "[let rec f x = if x = 0 then 0 else let g x = if x = 0 then 0 else f (x - 1) in g (x - 1)]"
+    $ do
       let expected = "int -> int"
       let actual = eval $ parseProgram "let rec f x = if x = 0 then 0 else let g x = if x = 0 then 0 else f (x - 1) in g (x - 1)"
 
-      expected ~=? actual
+      expected @=? actual
 
-testduplicate0 :: Test
+testduplicate0 :: TestTree
 testduplicate0 =
-  "[let f = 5 let f = 6]"
-    ~: do
+  testCase
+    "[let f = 5 let f = 6]"
+    $ do
       let expected = "int"
       let actual = eval $ parseProgram "let f = 5 let f = 6"
 
-      expected ~=? actual
+      expected @=? actual
 
-testduplicate1 :: Test
+testduplicate1 :: TestTree
 testduplicate1 =
-  "[let f = 5 let f = fun x y -> x + y]"
-    ~: do
+  testCase
+    "[let f = 5 let f = fun x y -> x + y]"
+    $ do
       let expected = "int -> int -> int"
       let actual = eval $ parseProgram "let f = 5 let f = fun x y -> x + y"
 
-      expected ~=? actual
+      expected @=? actual
 
-testduplicate2 :: Test
+testduplicate2 :: TestTree
 testduplicate2 =
-  "[let f = 5 let f = fun x -> x = 2 let k = f (fun x -> x + 1)]"
-    ~: do
+  testCase
+    "[let f = 5 let f = fun x -> x = 2 let k = f (fun x -> x + 1)]"
+    $ do
       let expected = "The type 'int' does not match the type 'u1 -> u1'"
       let actual = eval $ parseProgram "let f = 5 let f = fun x -> x = 2 let k = f (fun x -> x + 1)"
 
-      expected ~=? actual
+      expected @=? actual
 
-testfix0 :: Test
+testfix0 :: TestTree
 testfix0 =
-  "[let rec fix f = f (fix f)]"
-    ~: do
+  testCase
+    "[let rec fix f = f (fix f)]"
+    $ do
       let expected = "forall a6. (a6 -> a6) -> a6"
       let actual = eval $ parseProgram "let rec fix f = f (fix f)"
 
-      expected ~=? actual
+      expected @=? actual
 
-testfix1 :: Test
+testfix1 :: TestTree
 testfix1 =
-  "[let rec fix f x = f (fix f) x;; fix (fun re n -> if n <= 1 then 1 else n * re (n - 1))]"
-    ~: do
+  testCase
+    "[let rec fix f x = f (fix f) x;; fix (fun re n -> if n <= 1 then 1 else n * re (n - 1))]"
+    $ do
       let expected = "int -> int"
       let actual = eval $ parseProgram "let rec fix f x = f (fix f) x;; fix (fun re n -> if n <= 1 then 1 else n * re (n - 1))"
 
-      expected ~=? actual
+      expected @=? actual
 
-testfix2 :: Test
+testfix2 :: TestTree
 testfix2 =
-  "[let rec fix f x = f (fix f) x;; fix (fun re n -> if n <= 1 then 1 else n * re (n - 1)) 10]"
-    ~: do
+  testCase
+    "[let rec fix f x = f (fix f) x;; fix (fun re n -> if n <= 1 then 1 else n * re (n - 1)) 10]"
+    $ do
       let expected = "int"
       let actual = eval $ parseProgram "let rec fix f x = f (fix f) x;; fix (fun re n -> if n <= 1 then 1 else n * re (n - 1)) 10"
 
-      expected ~=? actual
+      expected @=? actual
 
 -- Utils
 

@@ -1,0 +1,63 @@
+Just
+    ( Program
+        [ StmtUserDecl
+            ( DeclFun "factorial"
+                ( Fun
+                    (
+                        ( "n"
+                        , Nothing
+                        ) :| []
+                    ) Nothing
+                    ( ExprLetIn
+                        ( DeclRecFun "loop"
+                            ( Fun
+                                (
+                                    ( "i"
+                                    , Nothing
+                                    ) :|
+                                    [
+                                        ( "accum"
+                                        , Nothing
+                                        )
+                                    ]
+                                ) Nothing
+                                ( ExprIte
+                                    ( ExprBinaryOperation ( ComparisonOp GtOp )
+                                        ( ExprIdentifier "i" )
+                                        ( ExprIdentifier "n" )
+                                    )
+                                    ( ExprIdentifier "accum" )
+                                    ( ExprApplication
+                                        ( ExprApplication
+                                            ( ExprIdentifier "loop" )
+                                            ( ExprBinaryOperation ( ArithmeticOp PlusOp )
+                                                ( ExprIdentifier "i" )
+                                                ( ExprValue
+                                                    ( ValInt 1 )
+                                                )
+                                            )
+                                        )
+                                        ( ExprBinaryOperation ( ArithmeticOp MulOp )
+                                            ( ExprIdentifier "accum" )
+                                            ( ExprIdentifier "i" )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                        ( ExprApplication
+                            ( ExprApplication
+                                ( ExprIdentifier "loop" )
+                                ( ExprValue
+                                    ( ValInt 1 )
+                                )
+                            )
+                            ( ExprValue
+                                ( ValInt 1 )
+                            )
+                        )
+                    )
+                )
+            )
+        ]
+    )

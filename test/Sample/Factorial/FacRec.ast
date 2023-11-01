@@ -1,0 +1,37 @@
+Just
+    ( Program
+        [ StmtUserDecl
+            ( DeclRecFun "factorial"
+                ( Fun
+                    (
+                        ( "n"
+                        , Nothing
+                        ) :| []
+                    ) Nothing
+                    ( ExprIte
+                        ( ExprBinaryOperation ( ComparisonOp LeOp )
+                            ( ExprIdentifier "n" )
+                            ( ExprValue
+                                ( ValInt 0 )
+                            )
+                        )
+                        ( ExprValue
+                            ( ValInt 1 )
+                        )
+                        ( ExprBinaryOperation ( ArithmeticOp MulOp )
+                            ( ExprIdentifier "n" )
+                            ( ExprApplication
+                                ( ExprIdentifier "factorial" )
+                                ( ExprBinaryOperation ( ArithmeticOp MinusOp )
+                                    ( ExprIdentifier "n" )
+                                    ( ExprValue
+                                        ( ValInt 1 )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        ]
+    )
