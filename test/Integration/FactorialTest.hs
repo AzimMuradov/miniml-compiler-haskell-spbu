@@ -2,7 +2,8 @@
 
 module Integration.FactorialTest (tests) where
 
-import Data.ByteString.Lazy.Char8 (pack)
+import Data.ByteString.Lazy.Char8 (ByteString, pack)
+import Data.Text (Text)
 import qualified Data.Text.IO as LBS
 import Data.Text.Lazy (unpack)
 import Parser.Ast
@@ -17,26 +18,40 @@ tests :: TestTree
 tests =
   testGroup
     "factorial golden tests"
-    [ goldenVsString
-        "recursive factorial parsing"
-        "test/Integration/Factorial/FacRec.ast"
-        (parseToBS <$> LBS.readFile "test/Integration/Factorial/FacRec.ml"),
-      goldenVsString
-        "recursive factorial type inference"
-        "test/Integration/Factorial/FacRec.ti"
-        (evalToBS <$> LBS.readFile "test/Integration/Factorial/FacRec.ml"),
-      goldenVsString
-        "recursive factorial with the `loop` nested function parsing"
-        "test/Integration/Factorial/FacRecLoop.ast"
-        (parseToBS <$> LBS.readFile "test/Integration/Factorial/FacRecLoop.ml"),
-      goldenVsString
-        "recursive factorial with the `loop` nested function type inference"
-        "test/Integration/Factorial/FacRecLoop.ti"
-        (evalToBS <$> LBS.readFile "test/Integration/Factorial/FacRecLoop.ml")
+    [ testParsing "recursive factorial" facRec,
+      testParsing "factorial with recursive loop" facRecLoop,
+      testTypeInference "recursive factorial" facRec,
+      testTypeInference "factorial with recursive loop" facRecLoop
     ]
-  where
-    parseToBS = pack . unpack . pShowNoColor . parseProgram
-    evalToBS = pack . eval . parseProgram
+
+testParsing :: String -> (String -> FilePath) -> TestTree
+testParsing title testFileProvider =
+  goldenVsString
+    (title <> " - parsing")
+    (testFileProvider "ast")
+    (parseToBS <$> LBS.readFile (testFileProvider "ml"))
+
+testTypeInference :: String -> (String -> FilePath) -> TestTree
+testTypeInference title testFileProvider =
+  goldenVsString
+    (title <> " - type inference")
+    (testFileProvider "ti")
+    (evalToBS <$> LBS.readFile (testFileProvider "ml"))
+
+parseToBS :: Text -> ByteString
+parseToBS = pack . unpack . pShowNoColor . parseProgram
+
+evalToBS :: Text -> ByteString
+evalToBS = pack . eval . parseProgram
+
+testFile :: String -> String
+testFile filename = "test/Integration/Factorial/" <> filename
+
+facRec :: String -> String
+facRec ext = testFile $ "FacRec." <> ext
+
+facRecLoop :: String -> String
+facRecLoop ext = testFile $ "FacRecLoop." <> ext
 
 eval :: Maybe Program -> String
 eval s = case s of
