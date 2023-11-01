@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module StdLibTest (tests) where
+module Unit.StdLibTest (tests) where
 
 import Parser.Ast
 import Parser.Parser (parseProgram)

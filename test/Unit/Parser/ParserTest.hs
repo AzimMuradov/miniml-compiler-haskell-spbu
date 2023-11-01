@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Parser.ParserTest (tests) where
+module Unit.Parser.ParserTest (tests) where
 
 import qualified Data.List.NonEmpty as NonEmpty
 import Parser.Ast

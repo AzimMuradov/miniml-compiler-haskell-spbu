@@ -1,12 +1,12 @@
 module Main where
 
-import qualified FactorialTest
-import qualified Parser.ParserTest as ParserTest
-import qualified StdLibTest
-import Test.HUnit (Test (TestList))
+import qualified Integration.FactorialTest
+import Test.HUnit (Test (TestList), (~:))
 import Test.Hspec (describe, hspec)
 import Test.Hspec.Contrib.HUnit (fromHUnitTest)
-import qualified TypeInference.TypeInferenceTest as TypeInferenceTest
+import qualified Unit.Parser.ParserTest as Unit.ParserTest
+import qualified Unit.StdLibTest
+import qualified Unit.TypeInference.TypeInferenceTest as Unit.TypeInferenceTest
 
 main :: IO ()
 main = hspec $ do
@@ -14,10 +14,17 @@ main = hspec $ do
     fromHUnitTest hUnitTest
 
 hUnitTest :: Test
-hUnitTest =
-  TestList
-    [ FactorialTest.tests,
-      ParserTest.tests,
-      StdLibTest.tests,
-      TypeInferenceTest.tests
-    ]
+hUnitTest = TestList [unitTest, integrationTest]
+  where
+    unitTest =
+      "unit tests"
+        ~: TestList
+          [ Unit.ParserTest.tests,
+            Unit.StdLibTest.tests,
+            Unit.TypeInferenceTest.tests
+          ]
+    integrationTest =
+      "integration tests"
+        ~: TestList
+          [ Integration.FactorialTest.tests
+          ]

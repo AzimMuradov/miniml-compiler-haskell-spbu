@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module FactorialTest (tests) where
+module Integration.FactorialTest (tests) where
 
 import qualified Data.List.NonEmpty as NonEmpty
 import Parser.Ast

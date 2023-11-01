@@ -66,10 +66,10 @@ test-suite tests
     type:           exitcode-stdio-1.0
     main-is:        Main.hs
     other-modules:
-        FactorialTest
-        Parser.ParserTest
-        StdLibTest
-        TypeInference.TypeInferenceTest
+        Integration.FactorialTest
+        Unit.Parser.ParserTest
+        Unit.StdLibTest
+        Unit.TypeInference.TypeInferenceTest
 
     build-depends:
         , hspec          >=2.11.7

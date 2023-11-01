@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module TypeInference.TypeInferenceTest (tests) where
+module Unit.TypeInference.TypeInferenceTest (tests) where
 
 import Parser.Ast
 import Parser.Parser (parseProgram)
