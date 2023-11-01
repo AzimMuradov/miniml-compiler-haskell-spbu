@@ -77,7 +77,7 @@ test4 =
 
 test5 :: Test
 test5 =
-  "[let a = 4\nlet b = 8]"
+  "[let a = 4\\nlet b = 8]"
     ~: do
       let expected =
             Just $
