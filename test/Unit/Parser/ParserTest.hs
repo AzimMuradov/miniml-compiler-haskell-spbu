@@ -1,115 +1,63 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TupleSections #-}
 
 module Unit.Parser.ParserTest (tests) where
 
 import qualified Data.List.NonEmpty as NonEmpty
+import Data.Text (Text, unpack)
 import Parser.Ast
 import Parser.Parser (parseProgram)
 import Test.Tasty (TestTree, testGroup)
-import Test.Tasty.HUnit (testCase, (@=?))
+import Test.Tasty.HUnit (Assertion, assertEqual, testCase)
 
 tests :: TestTree
 tests =
   testGroup
     "parser"
-    [ test0,
-      test1,
-      test2,
-      test3,
-      test4,
-      test5,
-      test6,
-      test7,
-      test8,
+    [ testLetDecls,
+      testWhitespace,
       testUnaryMinusOp
     ]
 
 -- Tests
 
-test0 :: TestTree
-test0 =
-  testCase "[let a = 7]" $ do
-    let expected = Just $ Program [StmtUserDecl (DeclVar ("a", Nothing) (ExprValue (ValInt 7)))]
-    let actual = parseProgram "let a = 7"
+testLetDecls :: TestTree
+testLetDecls = testCase "let declarations" $ do
+  let varDecl' x v = StmtUserDecl (DeclVar (x, Nothing) (ExprValue (ValInt v)))
 
-    expected @=? actual
+  let varDecl x = varDecl' x 4
+  let funDecl x args = StmtUserDecl (DeclFun x (Fun ((,Nothing) <$> NonEmpty.fromList args) Nothing (ExprValue (ValInt 4))))
+  let recFunDecl x args = StmtUserDecl (DeclRecFun x (Fun ((,Nothing) <$> NonEmpty.fromList args) Nothing (ExprValue (ValInt 4))))
 
-test1 :: TestTree
-test1 =
-  testCase "[let = 7]" $
-    do
-      let expected = Nothing
-      let actual = parseProgram "let = 7"
+  let aDecl = varDecl "a"
+  let bDecl = varDecl' "b" 8
 
-      expected @=? actual
+  "let a = 4" ==?=> Just (Program [aDecl])
+  "let a" ==?=> Nothing
+  "let = 4" ==?=> Nothing
+  "leta = 4" ==?=> Just (Program [StmtExpr (ExprBinaryOperation (ComparisonOp EqOp) (ExprIdentifier "leta") (ExprValue (ValInt 4)))])
 
-test2 :: TestTree
-test2 = testCase
-  "[let a]"
-  $ do
-    let expected = Nothing
-    let actual = parseProgram "let a"
+  "let rec a = 4" ==?=> Nothing
+  "let rec a b = 4" ==?=> Just (Program [recFunDecl "a" ["b"]])
+  "let reca a b = 4" ==?=> Just (Program [funDecl "reca" ["a", "b"]])
+  "leta rec a b = 4" ==?=> Nothing
+  "letaa rec a b = 4" ==?=> Nothing
+  "let reca = 4" ==?=> Just (Program [varDecl "reca"])
+  "let recaa = 4" ==?=> Just (Program [varDecl "recaa"])
+  "let let a = 4" ==?=> Nothing
+  "let let = 4" ==?=> Nothing
+  "let leta = 4" ==?=> Just (Program [varDecl "leta"])
 
-    expected @=? actual
+  "let a = 4 let b = 8" ==?=> Just (Program [aDecl, bDecl])
+  "let a = 4\nlet b = 8" ==?=> Just (Program [aDecl, bDecl])
+  "let a = 4;;let b = 8" ==?=> Just (Program [aDecl, bDecl])
+  ";;let a = 4;;;;let b = 8;;;;;; ;;" ==?=> Just (Program [aDecl, bDecl])
 
-test3 :: TestTree
-test3 = testCase
-  "[leta = 7]"
-  $ do
-    let expected = Just $ Program [StmtExpr (ExprBinaryOperation (ComparisonOp EqOp) (ExprIdentifier "leta") (ExprValue (ValInt 7)))]
-    let actual = parseProgram "leta = 7"
-
-    expected @=? actual
-
-test4 :: TestTree
-test4 = testCase
-  "[let a = 4 let b = 8]"
-  $ do
-    let expected =
-          Just $
-            Program
-              [ StmtUserDecl (DeclVar ("a", Nothing) (ExprValue (ValInt 4))),
-                StmtUserDecl (DeclVar ("b", Nothing) (ExprValue (ValInt 8)))
-              ]
-    let actual = parseProgram "let a = 4 let b = 8"
-
-    expected @=? actual
-
-test5 :: TestTree
-test5 = testCase
-  "[let a = 4\\nlet b = 8]"
-  $ do
-    let expected =
-          Just $
-            Program
-              [ StmtUserDecl (DeclVar ("a", Nothing) (ExprValue (ValInt 4))),
-                StmtUserDecl (DeclVar ("b", Nothing) (ExprValue (ValInt 8)))
-              ]
-    let actual = parseProgram "let a = 4\nlet b = 8"
-
-    expected @=? actual
-
-test6 :: TestTree
-test6 = testCase
-  "[let a = 4;;let b = 8]"
-  $ do
-    let expected =
-          Just $
-            Program
-              [ StmtUserDecl (DeclVar ("a", Nothing) (ExprValue (ValInt 4))),
-                StmtUserDecl (DeclVar ("b", Nothing) (ExprValue (ValInt 8)))
-              ]
-    let actual = parseProgram "let a = 4;;let b = 8"
-
-    expected @=? actual
-
-test7 :: TestTree
-test7 = testCase
-  "[let f a = a * a f 4]"
-  $ do
-    let expected =
-          Just $
-            Program
+testWhitespace :: TestTree
+testWhitespace = testCase "whitespace" $ do
+  let decl =
+        Just
+          ( Program
               [ StmtUserDecl
                   ( DeclFun
                       "f"
@@ -127,17 +75,10 @@ test7 = testCase
                       )
                   )
               ]
-    let actual = parseProgram "let f a = a * a f 4"
-
-    expected @=? actual
-
-test8 :: TestTree
-test8 = testCase
-  "[let f a = a * a;;f 4]"
-  $ do
-    let expected =
-          Just $
-            Program
+          )
+  let declAndApp =
+        Just
+          ( Program
               [ StmtUserDecl
                   ( DeclFun
                       "f"
@@ -149,27 +90,32 @@ test8 = testCase
                   ),
                 StmtExpr (ExprApplication (ExprIdentifier "f") (ExprValue (ValInt 4)))
               ]
-    let actual = parseProgram "let f a = a * a;;f 4"
+          )
 
-    expected @=? actual
+  "let f a = a * a f 4" ==?=> decl
+  "let f a = a * a\nf 4" ==?=> decl
+  "let f a = a * a;;f 4" ==?=> declAndApp
 
 testUnaryMinusOp :: TestTree
-testUnaryMinusOp = testCase
-  "[unary minus operator]"
-  $ do
-    let expected =
-          Just $
-            Program
-              [ StmtExpr (ExprUnaryOperation UnaryMinusOp (ExprValue (ValInt 7))),
-                StmtExpr (ExprUnaryOperation UnaryMinusOp (ExprValue (ValInt 7))),
-                StmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprValue (ValInt 0)) (ExprValue (ValInt 7))),
-                StmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprValue (ValInt 0)) (ExprUnaryOperation UnaryMinusOp (ExprValue (ValInt 7)))),
-                StmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprValue (ValInt 0)) (ExprUnaryOperation UnaryMinusOp (ExprValue (ValInt 7)))),
-                StmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprIdentifier "a") (ExprValue (ValInt 7))),
-                StmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprIdentifier "a") (ExprIdentifier "b")),
-                StmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) (ExprIdentifier "a") (ExprUnaryOperation UnaryMinusOp (ExprIdentifier "b"))),
-                StmtExpr (ExprApplication (ExprIdentifier "a") (ExprUnaryOperation UnaryMinusOp (ExprIdentifier "b")))
-              ]
-    let actual = parseProgram "-7;;- 7;; 0 - 7;; 0 - -7;; 0 - - 7;; a - 7;; a - b;; a - -b;; a (-b);;"
+testUnaryMinusOp = testCase "unary minus operator" $ do
+  let prgStmtExpr e = Just (Program [StmtExpr e])
 
-    expected @=? actual
+  let zero = ExprValue (ValInt 0)
+  let seven = ExprValue (ValInt 7)
+  let a = ExprIdentifier "a"
+  let b = ExprIdentifier "b"
+
+  let minus = ExprUnaryOperation UnaryMinusOp
+
+  "-7" ==?=> prgStmtExpr (minus seven)
+  "- 7" ==?=> prgStmtExpr (minus seven)
+  "0 - 7" ==?=> prgStmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) zero seven)
+  "0 - -7" ==?=> prgStmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) zero (minus seven))
+  "0 - - 7" ==?=> prgStmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) zero (minus seven))
+  "a - 7" ==?=> prgStmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) a seven)
+  "a - b" ==?=> prgStmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) a b)
+  "a - -b" ==?=> prgStmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) a (minus b))
+  "a (-b)" ==?=> prgStmtExpr (ExprApplication a (minus b))
+
+(==?=>) :: Text -> Maybe Program -> Assertion
+(==?=>) text maybeAst = assertEqual ("[" <> unpack text <> "]") maybeAst (parseProgram text)
