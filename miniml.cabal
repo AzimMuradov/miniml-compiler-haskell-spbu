@@ -73,13 +73,10 @@ test-suite tests
         Unit.TypeInference.TypeInferenceTest
 
     build-depends:
-        , hspec          >=2.11.7
-        , hspec-contrib  >=0.5.2
-        , HUnit          >=1.6.2.0
         , mini-ml
         , pretty-simple  >=4.1.2.0
         , tasty          >=1.5
         , tasty-golden   >=2.3.5
-        , tasty-hspec    >=1.2.0.4
+        , tasty-hunit    >=0.10.1
 
     hs-source-dirs: test
