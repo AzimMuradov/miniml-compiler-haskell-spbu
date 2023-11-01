@@ -72,7 +72,9 @@ test-suite tests
         TypeInference.TypeInferenceTest
 
     build-depends:
-        , HUnit    >=1.6.2.0
+        , hspec          >=2.11.7
+        , hspec-contrib  >=0.5.2
+        , HUnit          >=1.6.2.0
         , mini-ml
 
     hs-source-dirs: test

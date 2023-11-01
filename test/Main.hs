@@ -3,20 +3,21 @@ module Main where
 import qualified FactorialTest
 import qualified Parser.ParserTest as ParserTest
 import qualified StdLibTest
-import qualified System.Exit as Exit
-import Test.HUnit (Counts (failures), Test (TestList), runTestTT)
+import Test.HUnit (Test (TestList))
+import Test.Hspec (describe, hspec)
+import Test.Hspec.Contrib.HUnit (fromHUnitTest)
 import qualified TypeInference.TypeInferenceTest as TypeInferenceTest
 
 main :: IO ()
-main = do
-  result <-
-    runTestTT $
-      TestList
-        [ FactorialTest.tests,
-          ParserTest.tests,
-          StdLibTest.tests,
-          TypeInferenceTest.tests
-        ]
-  if failures result > 0
-    then Exit.exitFailure
-    else Exit.exitSuccess
+main = hspec $ do
+  describe "legacy HUnit tests" $ do
+    fromHUnitTest hUnitTest
+
+hUnitTest :: Test
+hUnitTest =
+  TestList
+    [ FactorialTest.tests,
+      ParserTest.tests,
+      StdLibTest.tests,
+      TypeInferenceTest.tests
+    ]
