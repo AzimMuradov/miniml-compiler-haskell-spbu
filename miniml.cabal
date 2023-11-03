@@ -35,6 +35,10 @@ library
         Parser.Parser
         Parser.Utils
         StdLib
+        Transformations.Anf
+        Transformations.AstToTypelessAst
+        Transformations.TypelessAst
+        Transformations.TypelessAstToAnf
         TypeInference.HindleyMilner
         TypeInference.PrettyPrint
         TypeInference.Runtime
