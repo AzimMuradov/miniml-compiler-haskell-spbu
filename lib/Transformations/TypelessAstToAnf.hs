@@ -21,19 +21,31 @@ normalizeStatement (StmtDecl name value) = Anf.StmtDecl name <$> normalizeTerm' 
 normalizeStatement (StmtExpr expr) = Anf.StmtExpr <$> normalizeTerm' expr
 
 normalizeExpr :: Expression -> CpsWithCnt Anf.Expression Anf.Expression
-normalizeExpr (ExprIdentifier name) = return $ Anf.ExprAtomExpr $ Anf.AtomExprIdentifier name
+normalizeExpr (ExprIdentifier name) = returnAtom $ Anf.AtomIdentifier name
 normalizeExpr (ExprValue value) = case value of
-  ValUnit -> return $ Anf.ExprAtomExpr Anf.AtomExprUnit
-  ValBool bool -> return $ Anf.ExprAtomExpr $ Anf.AtomExprBool bool
-  ValInt int -> return $ Anf.ExprAtomExpr $ Anf.AtomExprInt int
-  ValFun params body -> Anf.ExprAtomExpr <$> (Anf.AtomExprClosure params <$> normalizeTerm body)
-normalizeExpr (ExprApplication f args) = Anf.ExprCompExpr <$> (Anf.CompExprApp <$> normalizeName f <*> mapM normalizeName args)
+  ValUnit -> returnAtom Anf.AtomUnit
+  ValBool bool -> returnAtom $ Anf.AtomBool bool
+  ValInt int -> returnAtom $ Anf.AtomInt int
+  ValFun params body -> Anf.ExprAtom . Anf.AtomClosure params <$> normalizeTerm body
+normalizeExpr (ExprApplication f args) = do
+  f' <- normalizeName f
+  args' <- mapM normalizeName args
+  returnComplex $ Anf.CompApp f' args'
 normalizeExpr (ExprIte c t e) = do
   c' <- normalizeName c
   t' <- normalizeTerm t
   e' <- normalizeTerm e
-  return $ Anf.ExprCompExpr $ Anf.CompExprIte c' t' e'
-normalizeExpr (ExprLetIn x value expr) = Anf.ExprLetIn x <$> normalizeExpr value <*> normalizeExpr expr
+  returnComplex $ Anf.CompIte c' t' e'
+normalizeExpr (ExprLetIn (name, value) expr) = do
+  value' <- normalizeExpr value
+  expr' <- normalizeExpr expr
+  return $ Anf.ExprLetIn name value' expr'
+
+returnAtom :: Anf.AtomicExpression -> CpsWithCnt r Anf.Expression
+returnAtom = return . Anf.ExprAtom
+
+returnComplex :: Anf.ComplexExpression -> CpsWithCnt r Anf.Expression
+returnComplex = return . Anf.ExprComp
 
 normalizeTerm :: Expression -> CpsWithCnt r Anf.Expression
 normalizeTerm expr = lift $ normalizeTerm' expr
@@ -45,12 +57,12 @@ normalizeName :: Expression -> CpsWithCnt Anf.Expression Anf.AtomicExpression
 normalizeName expr = do
   expr' <- normalizeExpr expr
   case expr' of
-    Anf.ExprAtomExpr atom -> return atom
+    Anf.ExprAtom atom -> return atom
     _ -> do
       name <- genName
       mapContT
         (\expr'' -> Anf.ExprLetIn name expr' <$> expr'')
-        (return $ Anf.AtomExprIdentifier name)
+        (return $ Anf.AtomIdentifier name)
 
 genName :: CpsWithCnt r Text
 genName = do

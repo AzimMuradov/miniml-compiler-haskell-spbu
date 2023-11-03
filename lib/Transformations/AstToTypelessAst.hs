@@ -1,7 +1,6 @@
 module Transformations.AstToTypelessAst (astToTypelessAst) where
 
 import Data.List.NonEmpty (NonEmpty ((:|)))
-import qualified Data.List.NonEmpty as NonEmpty
 import Data.Maybe (mapMaybe)
 import qualified Parser.Ast as Ast
 import StdLib (binOpIdentifier, unOpIdentifier)
@@ -30,13 +29,17 @@ transformExpr (Ast.ExprBinaryOperation op lhs rhs) =
 transformExpr (Ast.ExprUnaryOperation op x) =
   TAst.ExprApplication
     (TAst.ExprIdentifier $ unOpIdentifier op)
-    (NonEmpty.singleton $ transformExpr x)
+    (transformExpr x :| [])
 transformExpr (Ast.ExprApplication f arg) =
   TAst.ExprApplication
     (transformExpr f)
-    (NonEmpty.singleton $ transformExpr arg)
-transformExpr (Ast.ExprIte c t e) = TAst.ExprIte (transformExpr c) (transformExpr t) (transformExpr e)
-transformExpr (Ast.ExprLetIn decl expr) = uncurry TAst.ExprLetIn (transformUserDecl decl) (transformExpr expr)
+    (transformExpr arg :| [])
+transformExpr (Ast.ExprIte c t e) =
+  let c' = transformExpr c
+      t' = transformExpr t
+      e' = transformExpr e
+   in TAst.ExprIte c' t' e'
+transformExpr (Ast.ExprLetIn decl expr) = TAst.ExprLetIn (transformUserDecl decl) (transformExpr expr)
 
 transformValue :: Ast.Value -> TAst.Value
 transformValue Ast.ValUnit = TAst.ValUnit

@@ -12,21 +12,21 @@ data Statement
   deriving (Show, Eq)
 
 data AtomicExpression
-  = AtomExprIdentifier Identifier
-  | AtomExprUnit
-  | AtomExprBool Bool
-  | AtomExprInt Integer
-  | AtomExprClosure (NonEmpty Identifier) Expression
+  = AtomIdentifier Identifier
+  | AtomUnit
+  | AtomBool Bool
+  | AtomInt Integer
+  | AtomClosure (NonEmpty Identifier) Expression
   deriving (Show, Eq)
 
 data ComplexExpression
-  = CompExprApp AtomicExpression (NonEmpty AtomicExpression)
-  | CompExprIte AtomicExpression Expression Expression
+  = CompApp AtomicExpression (NonEmpty AtomicExpression)
+  | CompIte AtomicExpression Expression Expression
   deriving (Show, Eq)
 
 data Expression
-  = ExprAtomExpr AtomicExpression
-  | ExprCompExpr ComplexExpression
+  = ExprAtom AtomicExpression
+  | ExprComp ComplexExpression
   | ExprLetIn Identifier Expression Expression
   deriving (Show, Eq)
 

@@ -1,45 +1,45 @@
 Just
     ( Program
         [ StmtDecl "factorial"
-            ( ExprAtomExpr
-                ( AtomExprClosure
+            ( ExprAtom
+                ( AtomClosure
                     ( "n" :| [] )
                     ( ExprLetIn "$0"
-                        ( ExprCompExpr
-                            ( CompExprApp
-                                ( AtomExprIdentifier "(<=)" )
-                                ( AtomExprIdentifier "n" :|
-                                    [ AtomExprInt 0 ]
+                        ( ExprComp
+                            ( CompApp
+                                ( AtomIdentifier "(<=)" )
+                                ( AtomIdentifier "n" :|
+                                    [ AtomInt 0 ]
                                 )
                             )
                         )
-                        ( ExprCompExpr
-                            ( CompExprIte
-                                ( AtomExprIdentifier "$0" )
-                                ( ExprAtomExpr
-                                    ( AtomExprInt 1 )
+                        ( ExprComp
+                            ( CompIte
+                                ( AtomIdentifier "$0" )
+                                ( ExprAtom
+                                    ( AtomInt 1 )
                                 )
                                 ( ExprLetIn "$1"
-                                    ( ExprCompExpr
-                                        ( CompExprApp
-                                            ( AtomExprIdentifier "(-)" )
-                                            ( AtomExprIdentifier "n" :|
-                                                [ AtomExprInt 1 ]
+                                    ( ExprComp
+                                        ( CompApp
+                                            ( AtomIdentifier "(-)" )
+                                            ( AtomIdentifier "n" :|
+                                                [ AtomInt 1 ]
                                             )
                                         )
                                     )
                                     ( ExprLetIn "$2"
-                                        ( ExprCompExpr
-                                            ( CompExprApp
-                                                ( AtomExprIdentifier "factorial" )
-                                                ( AtomExprIdentifier "$1" :| [] )
+                                        ( ExprComp
+                                            ( CompApp
+                                                ( AtomIdentifier "factorial" )
+                                                ( AtomIdentifier "$1" :| [] )
                                             )
                                         )
-                                        ( ExprCompExpr
-                                            ( CompExprApp
-                                                ( AtomExprIdentifier "(*)" )
-                                                ( AtomExprIdentifier "n" :|
-                                                    [ AtomExprIdentifier "$2" ]
+                                        ( ExprComp
+                                            ( CompApp
+                                                ( AtomIdentifier "(*)" )
+                                                ( AtomIdentifier "n" :|
+                                                    [ AtomIdentifier "$2" ]
                                                 )
                                             )
                                         )

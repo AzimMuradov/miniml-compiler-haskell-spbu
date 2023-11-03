@@ -16,7 +16,7 @@ data Expression
   | ExprValue Value
   | ExprApplication Expression (NonEmpty Expression)
   | ExprIte Expression Expression Expression
-  | ExprLetIn Identifier Expression Expression
+  | ExprLetIn (Identifier, Expression) Expression
   deriving (Show, Eq)
 
 data Value
