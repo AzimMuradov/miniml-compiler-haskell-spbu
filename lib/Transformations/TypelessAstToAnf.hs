@@ -27,7 +27,7 @@ normalizeExpr (ExprValue value) = case value of
   ValBool bool -> return $ Anf.ExprAtomExpr $ Anf.AtomExprBool bool
   ValInt int -> return $ Anf.ExprAtomExpr $ Anf.AtomExprInt int
   ValFun params body -> Anf.ExprAtomExpr <$> (Anf.AtomExprClosure params <$> normalizeTerm body)
-normalizeExpr (ExprApplication a b) = Anf.ExprCompExpr <$> (Anf.CompExprApp <$> normalizeName a <*> normalizeName b)
+normalizeExpr (ExprApplication f args) = Anf.ExprCompExpr <$> (Anf.CompExprApp <$> normalizeName f <*> mapM normalizeName args)
 normalizeExpr (ExprIte c t e) = do
   c' <- normalizeName c
   t' <- normalizeTerm t

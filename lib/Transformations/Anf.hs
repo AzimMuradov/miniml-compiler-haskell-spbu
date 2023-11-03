@@ -20,7 +20,7 @@ data AtomicExpression
   deriving (Show, Eq)
 
 data ComplexExpression
-  = CompExprApp AtomicExpression AtomicExpression
+  = CompExprApp AtomicExpression (NonEmpty AtomicExpression)
   | CompExprIte AtomicExpression Expression Expression
   deriving (Show, Eq)
 

@@ -14,7 +14,7 @@ data Statement
 data Expression
   = ExprIdentifier Identifier
   | ExprValue Value
-  | ExprApplication Expression Expression
+  | ExprApplication Expression (NonEmpty Expression)
   | ExprIte Expression Expression Expression
   | ExprLetIn Identifier Expression Expression
   deriving (Show, Eq)

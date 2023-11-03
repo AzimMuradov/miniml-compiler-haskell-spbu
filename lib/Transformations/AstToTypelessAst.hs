@@ -1,5 +1,7 @@
 module Transformations.AstToTypelessAst (astToTypelessAst) where
 
+import Data.List.NonEmpty (NonEmpty ((:|)))
+import qualified Data.List.NonEmpty as NonEmpty
 import Data.Maybe (mapMaybe)
 import qualified Parser.Ast as Ast
 import StdLib (binOpIdentifier, unOpIdentifier)
@@ -22,10 +24,17 @@ transformExpr :: Ast.Expression -> TAst.Expression
 transformExpr (Ast.ExprIdentifier name) = TAst.ExprIdentifier name
 transformExpr (Ast.ExprValue value) = TAst.ExprValue $ transformValue value
 transformExpr (Ast.ExprBinaryOperation op lhs rhs) =
-  let app1 = TAst.ExprApplication (TAst.ExprIdentifier $ binOpIdentifier op) (transformExpr lhs)
-   in TAst.ExprApplication app1 (transformExpr rhs)
-transformExpr (Ast.ExprUnaryOperation op x) = TAst.ExprApplication (TAst.ExprIdentifier $ unOpIdentifier op) (transformExpr x)
-transformExpr (Ast.ExprApplication f arg) = TAst.ExprApplication (transformExpr f) (transformExpr arg)
+  TAst.ExprApplication
+    (TAst.ExprIdentifier $ binOpIdentifier op)
+    (transformExpr lhs :| [transformExpr rhs])
+transformExpr (Ast.ExprUnaryOperation op x) =
+  TAst.ExprApplication
+    (TAst.ExprIdentifier $ unOpIdentifier op)
+    (NonEmpty.singleton $ transformExpr x)
+transformExpr (Ast.ExprApplication f arg) =
+  TAst.ExprApplication
+    (transformExpr f)
+    (NonEmpty.singleton $ transformExpr arg)
 transformExpr (Ast.ExprIte c t e) = TAst.ExprIte (transformExpr c) (transformExpr t) (transformExpr e)
 transformExpr (Ast.ExprLetIn decl expr) = uncurry TAst.ExprLetIn (transformUserDecl decl) (transformExpr expr)
 
