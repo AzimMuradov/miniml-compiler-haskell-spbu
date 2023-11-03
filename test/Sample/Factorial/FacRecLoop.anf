@@ -1,0 +1,83 @@
+Just
+    ( Program
+        [ StmtDecl "factorial"
+            ( ExprAtomExpr
+                ( AtomExprClosure
+                    ( "n" :| [] )
+                    ( ExprLetIn "$4"
+                        ( ExprCompExpr
+                            ( CompExprApp
+                                ( AtomExprIdentifier "loop" )
+                                ( AtomExprInt 1 :| [] )
+                            )
+                        )
+                        ( ExprLetIn "loop"
+                            ( ExprAtomExpr
+                                ( AtomExprClosure
+                                    ( "i" :| [ "accum" ] )
+                                    ( ExprLetIn "$0"
+                                        ( ExprCompExpr
+                                            ( CompExprApp
+                                                ( AtomExprIdentifier "(>)" )
+                                                ( AtomExprIdentifier "i" :|
+                                                    [ AtomExprIdentifier "n" ]
+                                                )
+                                            )
+                                        )
+                                        ( ExprCompExpr
+                                            ( CompExprIte
+                                                ( AtomExprIdentifier "$0" )
+                                                ( ExprAtomExpr
+                                                    ( AtomExprIdentifier "accum" )
+                                                )
+                                                ( ExprLetIn "$1"
+                                                    ( ExprCompExpr
+                                                        ( CompExprApp
+                                                            ( AtomExprIdentifier "(+)" )
+                                                            ( AtomExprIdentifier "i" :|
+                                                                [ AtomExprInt 1 ]
+                                                            )
+                                                        )
+                                                    )
+                                                    ( ExprLetIn "$2"
+                                                        ( ExprCompExpr
+                                                            ( CompExprApp
+                                                                ( AtomExprIdentifier "loop" )
+                                                                ( AtomExprIdentifier "$1" :| [] )
+                                                            )
+                                                        )
+                                                        ( ExprLetIn "$3"
+                                                            ( ExprCompExpr
+                                                                ( CompExprApp
+                                                                    ( AtomExprIdentifier "(*)" )
+                                                                    ( AtomExprIdentifier "accum" :|
+                                                                        [ AtomExprIdentifier "i" ]
+                                                                    )
+                                                                )
+                                                            )
+                                                            ( ExprCompExpr
+                                                                ( CompExprApp
+                                                                    ( AtomExprIdentifier "$2" )
+                                                                    ( AtomExprIdentifier "$3" :| [] )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                            ( ExprCompExpr
+                                ( CompExprApp
+                                    ( AtomExprIdentifier "$4" )
+                                    ( AtomExprInt 1 :| [] )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        ]
+    )

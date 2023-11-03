@@ -1,0 +1,54 @@
+Just
+    ( Program
+        [ StmtDecl "factorial"
+            ( ExprAtomExpr
+                ( AtomExprClosure
+                    ( "n" :| [] )
+                    ( ExprLetIn "$0"
+                        ( ExprCompExpr
+                            ( CompExprApp
+                                ( AtomExprIdentifier "(<=)" )
+                                ( AtomExprIdentifier "n" :|
+                                    [ AtomExprInt 0 ]
+                                )
+                            )
+                        )
+                        ( ExprCompExpr
+                            ( CompExprIte
+                                ( AtomExprIdentifier "$0" )
+                                ( ExprAtomExpr
+                                    ( AtomExprInt 1 )
+                                )
+                                ( ExprLetIn "$1"
+                                    ( ExprCompExpr
+                                        ( CompExprApp
+                                            ( AtomExprIdentifier "(-)" )
+                                            ( AtomExprIdentifier "n" :|
+                                                [ AtomExprInt 1 ]
+                                            )
+                                        )
+                                    )
+                                    ( ExprLetIn "$2"
+                                        ( ExprCompExpr
+                                            ( CompExprApp
+                                                ( AtomExprIdentifier "factorial" )
+                                                ( AtomExprIdentifier "$1" :| [] )
+                                            )
+                                        )
+                                        ( ExprCompExpr
+                                            ( CompExprApp
+                                                ( AtomExprIdentifier "(*)" )
+                                                ( AtomExprIdentifier "n" :|
+                                                    [ AtomExprIdentifier "$2" ]
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        ]
+    )

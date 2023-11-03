@@ -11,6 +11,7 @@ import Parser.Parser (parseProgram)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.Golden (goldenVsString)
 import Text.Pretty.Simple (pShowNoColor)
+import Transformations.AstToAnf (astToAnf)
 import TypeInference.PrettyPrint (pretty)
 import TypeInference.Runtime (inferPolytype)
 
@@ -21,7 +22,9 @@ tests =
     [ testParsing "recursive factorial" facRec,
       testParsing "factorial with recursive loop" facRecLoop,
       testTypeInference "recursive factorial" facRec,
-      testTypeInference "factorial with recursive loop" facRecLoop
+      testTypeInference "factorial with recursive loop" facRecLoop,
+      testAstToAnf "recursive factorial" facRec,
+      testAstToAnf "factorial with recursive loop" facRecLoop
     ]
 
 testParsing :: String -> (String -> FilePath) -> TestTree
@@ -38,11 +41,21 @@ testTypeInference title testFileProvider =
     (testFileProvider "ti")
     (evalToBS <$> LBS.readFile (testFileProvider "ml"))
 
+testAstToAnf :: String -> (String -> FilePath) -> TestTree
+testAstToAnf title testFileProvider =
+  goldenVsString
+    (title <> " - ANF")
+    (testFileProvider "anf")
+    (transformToBS <$> LBS.readFile (testFileProvider "ml"))
+
 parseToBS :: Text -> ByteString
 parseToBS = pack . unpack . pShowNoColor . parseProgram
 
 evalToBS :: Text -> ByteString
 evalToBS = pack . eval . parseProgram
+
+transformToBS :: Text -> ByteString
+transformToBS file = pack $ unpack $ pShowNoColor (astToAnf <$> parseProgram file)
 
 testFile :: String -> String
 testFile filename = "test/Sample/Factorial/" <> filename
