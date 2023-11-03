@@ -36,6 +36,7 @@ library
         Parser.Utils
         StdLib
         Transformations.Anf
+        Transformations.AstToAnf
         Transformations.AstToTypelessAst
         Transformations.TypelessAst
         Transformations.TypelessAstToAnf
