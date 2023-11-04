@@ -19,28 +19,28 @@ Just
                                 ( ExprAtom
                                     ( AtomInt 1 )
                                 )
-                                ( ExprLetIn "$1"
-                                    ( ExprComp
-                                        ( CompApp
-                                            ( AtomIdentifier "(-)" )
-                                            ( AtomIdentifier "n" :|
-                                                [ AtomInt 1 ]
+                                ( ExprLetIn "$2"
+                                    ( ExprLetIn "$1"
+                                        ( ExprComp
+                                            ( CompApp
+                                                ( AtomIdentifier "(-)" )
+                                                ( AtomIdentifier "n" :|
+                                                    [ AtomInt 1 ]
+                                                )
                                             )
                                         )
-                                    )
-                                    ( ExprLetIn "$2"
                                         ( ExprComp
                                             ( CompApp
                                                 ( AtomIdentifier "factorial" )
                                                 ( AtomIdentifier "$1" :| [] )
                                             )
                                         )
-                                        ( ExprComp
-                                            ( CompApp
-                                                ( AtomIdentifier "(*)" )
-                                                ( AtomIdentifier "n" :|
-                                                    [ AtomIdentifier "$2" ]
-                                                )
+                                    )
+                                    ( ExprComp
+                                        ( CompApp
+                                            ( AtomIdentifier "(*)" )
+                                            ( AtomIdentifier "n" :|
+                                                [ AtomIdentifier "$2" ]
                                             )
                                         )
                                     )
