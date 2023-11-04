@@ -42,12 +42,9 @@ stdDeclarationsForTypelessAst = (mapper <$> stdDeclarationsForAst) <> operatorDe
     operatorDecls = (binOpIdentifier <$> binOps) <> (unOpIdentifier <$> unaryOps)
 
     binOps =
-      (Ast.BooleanOp <$> booleanOps)
-        <> (Ast.ArithmeticOp <$> arithmeticOps)
-        <> (Ast.ComparisonOp <$> comparisonOps)
-    booleanOps = [minBound .. maxBound]
-    arithmeticOps = [minBound .. maxBound]
-    comparisonOps = [minBound .. maxBound]
+      (Ast.BooleanOp <$> [minBound .. maxBound])
+        <> (Ast.ArithmeticOp <$> [minBound .. maxBound])
+        <> (Ast.ComparisonOp <$> [minBound .. maxBound])
     unaryOps = [minBound .. maxBound]
 
 -- ** Operator Declarations
