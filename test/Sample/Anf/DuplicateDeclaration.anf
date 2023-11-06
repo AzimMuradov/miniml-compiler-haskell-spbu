@@ -1,0 +1,59 @@
+Just
+    ( Program
+        [ StmtDecl "$0"
+            ( ExprAtom
+                ( AtomInt 5 )
+            )
+        , StmtDecl "$1"
+            ( ExprAtom
+                ( AtomClosure
+                    ( "$2" :| [] )
+                    ( ExprComp
+                        ( CompApp
+                            ( AtomIdentifier "(*)" )
+                            ( AtomIdentifier "$2" :|
+                                [ AtomIdentifier "$0" ]
+                            )
+                        )
+                    )
+                )
+            )
+        , StmtExpr
+            ( ExprComp
+                ( CompApp
+                    ( AtomIdentifier "$1" )
+                    ( AtomIdentifier "$0" :| [] )
+                )
+            )
+        , StmtDecl "$3"
+            ( ExprAtom ( AtomBool True ) )
+        , StmtExpr
+            ( ExprComp
+                ( CompApp
+                    ( AtomIdentifier "$1" )
+                    ( AtomIdentifier "$3" :| [] )
+                )
+            )
+        , StmtDecl "$4"
+            ( ExprAtom
+                ( AtomClosure
+                    ( "$5" :| [] )
+                    ( ExprComp
+                        ( CompApp
+                            ( AtomIdentifier "(*)" )
+                            ( AtomIdentifier "$5" :|
+                                [ AtomIdentifier "$3" ]
+                            )
+                        )
+                    )
+                )
+            )
+        , StmtExpr
+            ( ExprComp
+                ( CompApp
+                    ( AtomIdentifier "$4" )
+                    ( AtomInt 5 :| [] )
+                )
+            )
+        ]
+    )
