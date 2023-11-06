@@ -4,14 +4,14 @@ Just
             ( ExprAtom
                 ( AtomInt 5 )
             )
-        , StmtDecl "$1"
+        , StmtDecl "$2"
             ( ExprAtom
                 ( AtomClosure
-                    ( "$2" :| [] )
+                    ( "$1" :| [] )
                     ( ExprComp
                         ( CompApp
                             ( AtomIdentifier "(*)" )
-                            ( AtomIdentifier "$2" :|
+                            ( AtomIdentifier "$1" :|
                                 [ AtomIdentifier "$0" ]
                             )
                         )
@@ -21,7 +21,7 @@ Just
         , StmtExpr
             ( ExprComp
                 ( CompApp
-                    ( AtomIdentifier "$1" )
+                    ( AtomIdentifier "$2" )
                     ( AtomIdentifier "$0" :| [] )
                 )
             )
@@ -30,18 +30,18 @@ Just
         , StmtExpr
             ( ExprComp
                 ( CompApp
-                    ( AtomIdentifier "$1" )
+                    ( AtomIdentifier "$2" )
                     ( AtomIdentifier "$3" :| [] )
                 )
             )
-        , StmtDecl "$4"
+        , StmtDecl "$5"
             ( ExprAtom
                 ( AtomClosure
-                    ( "$5" :| [] )
+                    ( "$4" :| [] )
                     ( ExprComp
                         ( CompApp
                             ( AtomIdentifier "(*)" )
-                            ( AtomIdentifier "$5" :|
+                            ( AtomIdentifier "$4" :|
                                 [ AtomIdentifier "$3" ]
                             )
                         )
@@ -51,7 +51,7 @@ Just
         , StmtExpr
             ( ExprComp
                 ( CompApp
-                    ( AtomIdentifier "$4" )
+                    ( AtomIdentifier "$5" )
                     ( AtomInt 5 :| [] )
                 )
             )
