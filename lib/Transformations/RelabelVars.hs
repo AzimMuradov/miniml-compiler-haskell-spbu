@@ -8,7 +8,7 @@ where
 
 import Control.Monad (replicateM_)
 import Control.Monad.State (MonadState (get), State, modify, runState)
-import Data.Maybe (fromJust)
+import Data.Maybe (fromMaybe)
 import Data.Text (cons, pack)
 import Transformations.TypelessAst
 
@@ -71,7 +71,7 @@ relabelExpression (ExprLetIn (name, value) expr) = do
 findLabel :: Identifier -> RelabelerState Identifier
 findLabel name = do
   Env scs _ <- get
-  return $ fromJust $ lookup name scs
+  return $ fromMaybe name (lookup name scs)
 
 pushScope :: Identifier -> RelabelerState ()
 pushScope name = modify $ \(Env scs cnt) ->
