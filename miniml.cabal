@@ -35,6 +35,12 @@ library
         Parser.Parser
         Parser.Utils
         StdLib
+        Transformations.Anf
+        Transformations.AstToAnf
+        Transformations.AstToTypelessAst
+        Transformations.RelabelVars
+        Transformations.TypelessAst
+        Transformations.TypelessAstToAnf
         TypeInference.HindleyMilner
         TypeInference.PrettyPrint
         TypeInference.Runtime
@@ -67,6 +73,7 @@ test-suite tests
     type:           exitcode-stdio-1.0
     main-is:        Main.hs
     other-modules:
+        Sample.AnfTest
         Sample.FactorialTest
         Unit.Parser.ParserTest
         Unit.StdLibTest

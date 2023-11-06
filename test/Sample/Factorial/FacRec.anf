@@ -1,0 +1,54 @@
+Just
+    ( Program
+        [ StmtDecl "$0"
+            ( ExprAtom
+                ( AtomClosure
+                    ( "$1" :| [] )
+                    ( ExprLetIn "$2"
+                        ( ExprComp
+                            ( CompApp
+                                ( AtomIdentifier "(<=)" )
+                                ( AtomIdentifier "$1" :|
+                                    [ AtomInt 0 ]
+                                )
+                            )
+                        )
+                        ( ExprComp
+                            ( CompIte
+                                ( AtomIdentifier "$2" )
+                                ( ExprAtom
+                                    ( AtomInt 1 )
+                                )
+                                ( ExprLetIn "$4"
+                                    ( ExprLetIn "$3"
+                                        ( ExprComp
+                                            ( CompApp
+                                                ( AtomIdentifier "(-)" )
+                                                ( AtomIdentifier "$1" :|
+                                                    [ AtomInt 1 ]
+                                                )
+                                            )
+                                        )
+                                        ( ExprComp
+                                            ( CompApp
+                                                ( AtomIdentifier "$0" )
+                                                ( AtomIdentifier "$3" :| [] )
+                                            )
+                                        )
+                                    )
+                                    ( ExprComp
+                                        ( CompApp
+                                            ( AtomIdentifier "(*)" )
+                                            ( AtomIdentifier "$1" :|
+                                                [ AtomIdentifier "$4" ]
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        ]
+    )

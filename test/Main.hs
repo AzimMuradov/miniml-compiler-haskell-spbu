@@ -2,6 +2,7 @@
 
 module Main where
 
+import qualified Sample.AnfTest
 import qualified Sample.FactorialTest
 import Test.Tasty (TestTree, defaultMain, testGroup)
 import qualified Unit.Parser.ParserTest as Unit.ParserTest
@@ -24,5 +25,6 @@ sampleTests :: TestTree
 sampleTests =
   testGroup
     "sample tests (Golden)"
-    [ Sample.FactorialTest.tests
+    [ Sample.FactorialTest.tests,
+      Sample.AnfTest.tests
     ]

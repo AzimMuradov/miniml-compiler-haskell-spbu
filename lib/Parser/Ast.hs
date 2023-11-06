@@ -128,7 +128,7 @@ data BinaryOperator
 data UnaryOperator
   = -- | Unary minus operator (@-a@), works only for @int@.
     UnaryMinusOp
-  deriving (Show, Eq)
+  deriving (Show, Eq, Enum, Bounded)
 
 -- | Boolean operator.
 data BooleanOperator
@@ -136,7 +136,7 @@ data BooleanOperator
     AndOp
   | -- | Or operator (@a || b@).
     OrOp
-  deriving (Show, Eq)
+  deriving (Show, Eq, Enum, Bounded)
 
 -- | Arithmetic operator.
 data ArithmeticOperator
@@ -148,7 +148,7 @@ data ArithmeticOperator
     MulOp
   | -- | Division operator (@a / b@).
     DivOp
-  deriving (Show, Eq)
+  deriving (Show, Eq, Enum, Bounded)
 
 -- | Comparison operator.
 data ComparisonOperator
@@ -164,7 +164,7 @@ data ComparisonOperator
     GtOp
   | -- | Greater than or equal operator (@a >= b@).
     GeOp
-  deriving (Show, Eq)
+  deriving (Show, Eq, Enum, Bounded)
 
 -- ** Identifier
 
