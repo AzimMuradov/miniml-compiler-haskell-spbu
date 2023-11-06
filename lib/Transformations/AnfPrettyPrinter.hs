@@ -1,8 +1,8 @@
-module Transformations.AnfPrettyPrint (prettyPrint) where
+module Transformations.AnfPrettyPrinter (prettyPrint) where
 
 import Data.List.NonEmpty (toList)
 import Data.Text (unpack)
-import Transformations.Anf as Anf
+import Transformations.Anf
 
 prettyPrint :: Program -> String
 prettyPrint (Program stmts) = prettyPrint' stmts

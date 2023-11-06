@@ -9,7 +9,7 @@ import qualified Data.Text.IO as LBS
 import Parser.Parser (parseProgram)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.Golden (goldenVsString)
-import Transformations.AnfPrettyPrint (prettyPrint)
+import Transformations.AnfPrettyPrinter (prettyPrint)
 import Transformations.AstToAnf (astToAnf)
 
 tests :: TestTree
