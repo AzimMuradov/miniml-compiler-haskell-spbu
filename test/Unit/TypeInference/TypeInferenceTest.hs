@@ -35,7 +35,8 @@ tests =
       testfix2,
       testduplicate0,
       testduplicate1,
-      testduplicate2
+      testduplicate2,
+      test_same_name_arg
     ]
 
 -- Tests
@@ -236,6 +237,14 @@ testduplicate2 =
       let actual = eval $ parseProgram "let f = 5 let f = fun x -> x = 2 let k = f (fun x -> x + 1)"
 
       expected @=? actual
+
+test_same_name_arg :: TestTree
+test_same_name_arg =
+  testCase "[let f x x = x + x]" $ do
+    let expected = "forall a0. a0 -> int -> int"
+    let actual = eval $ parseProgram "let f x x = x + x"
+
+    expected @=? actual
 
 testfix0 :: TestTree
 testfix0 =
