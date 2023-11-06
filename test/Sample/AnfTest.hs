@@ -3,14 +3,14 @@
 module Sample.AnfTest (tests) where
 
 import Data.ByteString.Lazy.Char8 (ByteString, pack)
+import Data.Maybe (fromJust)
 import Data.Text (Text)
 import qualified Data.Text.IO as LBS
-import Data.Text.Lazy (unpack)
 import Parser.Parser (parseProgram)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.Golden (goldenVsString)
-import Text.Pretty.Simple (pShowNoColor)
 import Transformations.AstToAnf (astToAnf)
+import Transformations.PrettyPrint (prettyPrint)
 
 tests :: TestTree
 tests =
@@ -29,7 +29,7 @@ testAstToAnf title testFileProvider =
     (transformToBS <$> LBS.readFile (testFileProvider "ml"))
 
 transformToBS :: Text -> ByteString
-transformToBS file = pack $ unpack $ pShowNoColor (astToAnf <$> parseProgram file)
+transformToBS file = pack $ (prettyPrint . astToAnf) (fromJust (parseProgram file))
 
 testFile :: String -> String
 testFile filename = "test/Sample/Anf/" <> filename
