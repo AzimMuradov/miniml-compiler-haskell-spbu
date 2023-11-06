@@ -6,7 +6,6 @@ import Data.ByteString.Lazy.Char8 (ByteString, pack)
 import Data.Text (Text)
 import qualified Data.Text.IO as LBS
 import Data.Text.Lazy (unpack)
-
 import Parser.Parser (parseProgram)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.Golden (goldenVsString)
