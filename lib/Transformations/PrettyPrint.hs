@@ -1,10 +1,10 @@
 module Transformations.PrettyPrint where
 
 import Data.List.NonEmpty (toList)
+import Data.Text (unpack)
+import Transformations.Anf (Identifier)
 import qualified Transformations.Anf as Anf
 import Prelude hiding (lookup)
-import Transformations.Anf (Identifier)
-import Data.Text (unpack)
 
 prettyPrint :: Anf.Program -> String
 prettyPrint (Anf.Program stmts) = prettyPrint' stmts
@@ -42,4 +42,3 @@ prettyIdentifier ident = "`" ++ unpack ident ++ "`"
 
 parens :: String -> String
 parens val = "(" ++ val ++ ")"
-
