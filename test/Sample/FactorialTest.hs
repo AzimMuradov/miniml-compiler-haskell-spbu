@@ -3,6 +3,7 @@
 module Sample.FactorialTest (tests) where
 
 import Data.ByteString.Lazy.Char8 (ByteString, pack)
+import Data.Maybe (fromJust)
 import Data.Text (Text)
 import qualified Data.Text.IO as LBS
 import Data.Text.Lazy (unpack)
@@ -11,6 +12,7 @@ import Parser.Parser (parseProgram)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.Golden (goldenVsString)
 import Text.Pretty.Simple (pShowNoColor)
+import Transformations.AnfPrettyPrinter (prettyPrint)
 import Transformations.AstToAnf (astToAnf)
 import TypeInference.PrettyPrint (pretty)
 import TypeInference.Runtime (inferPolytype)
@@ -55,7 +57,7 @@ evalToBS :: Text -> ByteString
 evalToBS = pack . eval . parseProgram
 
 transformToBS :: Text -> ByteString
-transformToBS file = pack $ unpack $ pShowNoColor (astToAnf <$> parseProgram file)
+transformToBS file = pack $ (prettyPrint . astToAnf) (fromJust (parseProgram file))
 
 testFile :: String -> String
 testFile filename = "test/Sample/Factorial/" <> filename
