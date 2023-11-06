@@ -32,11 +32,20 @@ relabelTypelessAst' (Program stmts) = Program <$> mapM relabelStatement stmts
 
 relabelStatement :: Statement -> RelabelerState Statement
 relabelStatement stmt = case stmt of
-  StmtDecl name expr -> do
-    pushScope name
-    name' <- findLabel name
-    expr' <- relabelExpression expr
-    return $ StmtDecl name' expr'
+  StmtDecl name expr isRec -> do
+    (name', expr') <-
+      if isRec
+        then do
+          pushScope name
+          name' <- findLabel name
+          expr' <- relabelExpression expr
+          return (name', expr')
+        else do
+          expr' <- relabelExpression expr
+          pushScope name
+          name' <- findLabel name
+          return (name', expr')
+    return $ StmtDecl name' expr' isRec
   StmtExpr expr -> StmtExpr <$> relabelExpression expr
 
 relabelExpression :: Expression -> RelabelerState Expression
@@ -60,13 +69,22 @@ relabelExpression (ExprIte c t e) = do
   t' <- relabelExpression t
   e' <- relabelExpression e
   return $ ExprIte c' t' e'
-relabelExpression (ExprLetIn (name, value) expr) = do
-  pushScope name
-  name' <- findLabel name
-  value' <- relabelExpression value
+relabelExpression (ExprLetIn (name, value, isRec) expr) = do
+  (name', value') <-
+    if isRec
+      then do
+        pushScope name
+        name' <- findLabel name
+        value' <- relabelExpression value
+        return (name', value')
+      else do
+        value' <- relabelExpression value
+        pushScope name
+        name' <- findLabel name
+        return (name', value')
   expr' <- relabelExpression expr
   popScope
-  return $ ExprLetIn (name', value') expr'
+  return $ ExprLetIn (name', value', isRec) expr'
 
 findLabel :: Identifier -> RelabelerState Identifier
 findLabel name = do

@@ -2,6 +2,7 @@ module Transformations.AstToTypelessAst (astToTypelessAst) where
 
 import Data.List.NonEmpty (NonEmpty ((:|)))
 import Data.Maybe (mapMaybe)
+import Data.Tuple.Extra (uncurry3)
 import qualified Parser.Ast as Ast
 import StdLib (binOpIdentifier, unOpIdentifier)
 import qualified Transformations.TypelessAst as TAst
@@ -10,14 +11,14 @@ astToTypelessAst :: Ast.Program -> TAst.Program
 astToTypelessAst (Ast.Program stmts) = TAst.Program $ mapMaybe transformStmt stmts
 
 transformStmt :: Ast.Statement -> Maybe TAst.Statement
-transformStmt (Ast.StmtUserDecl decl) = Just $ uncurry TAst.StmtDecl $ transformUserDecl decl
+transformStmt (Ast.StmtUserDecl decl) = Just $ uncurry3 TAst.StmtDecl $ transformUserDecl decl
 transformStmt (Ast.StmtStdDecl _) = Nothing
 transformStmt (Ast.StmtExpr expr) = Just $ TAst.StmtExpr $ transformExpr expr
 
-transformUserDecl :: Ast.UserDeclaration -> (TAst.Identifier, TAst.Expression)
-transformUserDecl (Ast.DeclVar (name, _) value) = (name, transformExpr value)
-transformUserDecl (Ast.DeclFun name fun) = (name, TAst.ExprValue $ transformFun fun)
-transformUserDecl (Ast.DeclRecFun name fun) = (name, TAst.ExprValue $ transformFun fun)
+transformUserDecl :: Ast.UserDeclaration -> (TAst.Identifier, TAst.Expression, TAst.IsRec)
+transformUserDecl (Ast.DeclVar (name, _) value) = (name, transformExpr value, False)
+transformUserDecl (Ast.DeclFun name fun) = (name, TAst.ExprValue $ transformFun fun, False)
+transformUserDecl (Ast.DeclRecFun name fun) = (name, TAst.ExprValue $ transformFun fun, True)
 
 transformExpr :: Ast.Expression -> TAst.Expression
 transformExpr (Ast.ExprIdentifier name) = TAst.ExprIdentifier name

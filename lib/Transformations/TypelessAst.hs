@@ -7,7 +7,7 @@ newtype Program = Program [Statement]
   deriving (Show, Eq)
 
 data Statement
-  = StmtDecl Identifier Expression
+  = StmtDecl Identifier Expression IsRec
   | StmtExpr Expression
   deriving (Show, Eq)
 
@@ -16,7 +16,7 @@ data Expression
   | ExprValue Value
   | ExprApplication Expression (NonEmpty Expression)
   | ExprIte Expression Expression Expression
-  | ExprLetIn (Identifier, Expression) Expression
+  | ExprLetIn (Identifier, Expression, IsRec) Expression
   deriving (Show, Eq)
 
 data Value
@@ -27,3 +27,5 @@ data Value
   deriving (Show, Eq)
 
 type Identifier = Text
+
+type IsRec = Bool

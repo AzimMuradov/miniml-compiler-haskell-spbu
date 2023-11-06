@@ -20,7 +20,7 @@ normalizeProgram :: TAst.Program -> CntState Anf.Program
 normalizeProgram (TAst.Program stmts) = Anf.Program <$> mapM normalizeStatement stmts
 
 normalizeStatement :: TAst.Statement -> CntState Anf.Statement
-normalizeStatement (TAst.StmtDecl name value) = Anf.StmtDecl name <$> normalizeExpr value
+normalizeStatement (TAst.StmtDecl name value _) = Anf.StmtDecl name <$> normalizeExpr value
 normalizeStatement (TAst.StmtExpr expr) = Anf.StmtExpr <$> normalizeExpr expr
 
 normalizeExpr :: TAst.Expression -> CntState Anf.Expression
@@ -39,7 +39,7 @@ normalizeExpr (TAst.ExprIte c t e) = evalContT $ do
   t' <- lift $ normalizeExpr t
   e' <- lift $ normalizeExpr e
   returnComplex $ Anf.CompIte c' t' e'
-normalizeExpr (TAst.ExprLetIn (name, value) expr) = do
+normalizeExpr (TAst.ExprLetIn (name, value, _) expr) = do
   value' <- normalizeExpr value
   expr' <- normalizeExpr expr
   return $ Anf.ExprLetIn name value' expr'
