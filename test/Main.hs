@@ -2,8 +2,8 @@
 
 module Main where
 
-import qualified Sample.FactorialTest
 import qualified Sample.AnfTest
+import qualified Sample.FactorialTest
 import Test.Tasty (TestTree, defaultMain, testGroup)
 import qualified Unit.Parser.ParserTest as Unit.ParserTest
 import qualified Unit.StdLibTest

@@ -73,8 +73,8 @@ test-suite tests
     type:           exitcode-stdio-1.0
     main-is:        Main.hs
     other-modules:
-        Sample.FactorialTest
         Sample.AnfTest
+        Sample.FactorialTest
         Unit.Parser.ParserTest
         Unit.StdLibTest
         Unit.TypeInference.TypeInferenceTest
