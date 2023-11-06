@@ -17,8 +17,9 @@ tests :: TestTree
 tests =
   testGroup
     "anf"
-    [ testAstToAnf "tes" test,
-      testAstToAnf "dup" testDuplicate
+    [ testAstToAnf "simpleTest" simpleTest,
+      testAstToAnf "hardTest" hardTest,
+      testAstToAnf "duplicateTest" testDuplicate
     ]
 
 testAstToAnf :: String -> (String -> FilePath) -> TestTree
@@ -34,8 +35,11 @@ transformToBS file = pack $ unpack $ pShowNoColor (astToAnf <$> parseProgram fil
 testFile :: String -> String
 testFile filename = "test/Sample/Anf/" <> filename
 
-test :: String -> String
-test ext = testFile $ "Test." <> ext
+simpleTest :: String -> String
+simpleTest ext = testFile $ "SimpleTest." <> ext
+
+hardTest :: String -> String
+hardTest ext = testFile $ "HardTest." <> ext
 
 testDuplicate :: String -> String
 testDuplicate ext = testFile $ "DuplicateDeclaration." <> ext
