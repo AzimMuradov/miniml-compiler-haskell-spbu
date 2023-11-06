@@ -74,6 +74,7 @@ test-suite tests
     main-is:        Main.hs
     other-modules:
         Sample.FactorialTest
+        Sample.AnfTest
         Unit.Parser.ParserTest
         Unit.StdLibTest
         Unit.TypeInference.TypeInferenceTest
