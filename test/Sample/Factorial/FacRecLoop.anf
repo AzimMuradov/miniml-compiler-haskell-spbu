@@ -1,0 +1,83 @@
+Just
+    ( Program
+        [ StmtDecl "$4"
+            ( ExprAtom
+                ( AtomClosure
+                    ( "$0" :| [] )
+                    ( ExprLetIn "$1"
+                        ( ExprAtom
+                            ( AtomClosure
+                                ( "$2" :| [ "$3" ] )
+                                ( ExprLetIn "$5"
+                                    ( ExprComp
+                                        ( CompApp
+                                            ( AtomIdentifier "(>)" )
+                                            ( AtomIdentifier "$2" :|
+                                                [ AtomIdentifier "$0" ]
+                                            )
+                                        )
+                                    )
+                                    ( ExprComp
+                                        ( CompIte
+                                            ( AtomIdentifier "$5" )
+                                            ( ExprAtom
+                                                ( AtomIdentifier "$3" )
+                                            )
+                                            ( ExprLetIn "$7"
+                                                ( ExprLetIn "$6"
+                                                    ( ExprComp
+                                                        ( CompApp
+                                                            ( AtomIdentifier "(+)" )
+                                                            ( AtomIdentifier "$2" :|
+                                                                [ AtomInt 1 ]
+                                                            )
+                                                        )
+                                                    )
+                                                    ( ExprComp
+                                                        ( CompApp
+                                                            ( AtomIdentifier "$1" )
+                                                            ( AtomIdentifier "$6" :| [] )
+                                                        )
+                                                    )
+                                                )
+                                                ( ExprLetIn "$8"
+                                                    ( ExprComp
+                                                        ( CompApp
+                                                            ( AtomIdentifier "(*)" )
+                                                            ( AtomIdentifier "$3" :|
+                                                                [ AtomIdentifier "$2" ]
+                                                            )
+                                                        )
+                                                    )
+                                                    ( ExprComp
+                                                        ( CompApp
+                                                            ( AtomIdentifier "$7" )
+                                                            ( AtomIdentifier "$8" :| [] )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                        ( ExprLetIn "$9"
+                            ( ExprComp
+                                ( CompApp
+                                    ( AtomIdentifier "$1" )
+                                    ( AtomInt 1 :| [] )
+                                )
+                            )
+                            ( ExprComp
+                                ( CompApp
+                                    ( AtomIdentifier "$9" )
+                                    ( AtomInt 1 :| [] )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        ]
+    )

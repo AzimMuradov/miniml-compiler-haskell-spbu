@@ -37,4 +37,4 @@ runInfer =
     >>> runIdentity
 
 inferPolytype :: Program -> Either TypeError Polytype
-inferPolytype (Program stmts) = runInfer $ inferStatements $ (StmtStdDecl <$> stdDeclarations) <> stmts
+inferPolytype (Program stmts) = runInfer $ inferStatements $ (StmtStdDecl <$> stdDeclarationsForAst) <> stmts
