@@ -4,39 +4,42 @@ import Control.Monad.Cont (ContT, evalContT, mapContT)
 import Control.Monad.State (MonadTrans (lift), State, evalState, get, modify)
 import Data.Text (Text, cons, pack)
 import qualified Transformations.Anf as Anf
-import Transformations.TypelessAst
+import Transformations.RelabelVars
+import qualified Transformations.TypelessAst as TAst
 
-typelessAstToAnf :: Program -> Anf.Program
-typelessAstToAnf program = evalState (normalizeProgram program) 0
+typelessAstToAnf :: TAst.Program -> Anf.Program
+typelessAstToAnf program = evalState (normalizeProgram relabeledProgram) cnt
+  where
+    (relabeledProgram, Env _ cnt) = relabelTypelessAst program
 
 type CpsWithCnt r a = ContT r CntState a
 
 type CntState = State Int
 
-normalizeProgram :: Program -> CntState Anf.Program
-normalizeProgram (Program stmts) = Anf.Program <$> mapM normalizeStatement stmts
+normalizeProgram :: TAst.Program -> CntState Anf.Program
+normalizeProgram (TAst.Program stmts) = Anf.Program <$> mapM normalizeStatement stmts
 
-normalizeStatement :: Statement -> CntState Anf.Statement
-normalizeStatement (StmtDecl name value) = Anf.StmtDecl name <$> normalizeExpr value
-normalizeStatement (StmtExpr expr) = Anf.StmtExpr <$> normalizeExpr expr
+normalizeStatement :: TAst.Statement -> CntState Anf.Statement
+normalizeStatement (TAst.StmtDecl name value) = Anf.StmtDecl name <$> normalizeExpr value
+normalizeStatement (TAst.StmtExpr expr) = Anf.StmtExpr <$> normalizeExpr expr
 
-normalizeExpr :: Expression -> CntState Anf.Expression
-normalizeExpr (ExprIdentifier name) = returnAtom $ Anf.AtomIdentifier name
-normalizeExpr (ExprValue value) = case value of
-  ValUnit -> returnAtom Anf.AtomUnit
-  ValBool bool -> returnAtom $ Anf.AtomBool bool
-  ValInt int -> returnAtom $ Anf.AtomInt int
-  ValFun params body -> Anf.ExprAtom . Anf.AtomClosure params <$> normalizeExpr body
-normalizeExpr (ExprApplication f args) = evalContT $ do
+normalizeExpr :: TAst.Expression -> CntState Anf.Expression
+normalizeExpr (TAst.ExprIdentifier name) = returnAtom $ Anf.AtomIdentifier name
+normalizeExpr (TAst.ExprValue value) = case value of
+  TAst.ValUnit -> returnAtom Anf.AtomUnit
+  TAst.ValBool bool -> returnAtom $ Anf.AtomBool bool
+  TAst.ValInt int -> returnAtom $ Anf.AtomInt int
+  TAst.ValFun params body -> Anf.ExprAtom . Anf.AtomClosure params <$> normalizeExpr body
+normalizeExpr (TAst.ExprApplication f args) = evalContT $ do
   f' <- normalizeName f
   args' <- mapM normalizeName args
   returnComplex $ Anf.CompApp f' args'
-normalizeExpr (ExprIte c t e) = evalContT $ do
+normalizeExpr (TAst.ExprIte c t e) = evalContT $ do
   c' <- normalizeName c
   t' <- lift $ normalizeExpr t
   e' <- lift $ normalizeExpr e
   returnComplex $ Anf.CompIte c' t' e'
-normalizeExpr (ExprLetIn (name, value) expr) = do
+normalizeExpr (TAst.ExprLetIn (name, value) expr) = do
   value' <- normalizeExpr value
   expr' <- normalizeExpr expr
   return $ Anf.ExprLetIn name value' expr'
@@ -47,18 +50,18 @@ returnAtom = return . Anf.ExprAtom
 returnComplex :: Anf.ComplexExpression -> CpsWithCnt Anf.Expression Anf.Expression
 returnComplex = return . Anf.ExprComp
 
-normalizeName :: Expression -> CpsWithCnt Anf.Expression Anf.AtomicExpression
+normalizeName :: TAst.Expression -> CpsWithCnt Anf.Expression Anf.AtomicExpression
 normalizeName expr = do
   expr' <- lift $ normalizeExpr expr
   case expr' of
     Anf.ExprAtom atom -> return atom
     _ -> do
-      name <- genName
+      name <- lift genName
       mapContT
         (\e -> Anf.ExprLetIn name expr' <$> e)
         (return $ Anf.AtomIdentifier name)
 
-genName :: CpsWithCnt r Text
+genName :: CntState Text
 genName = do
   n <- get
   modify (+ 1)

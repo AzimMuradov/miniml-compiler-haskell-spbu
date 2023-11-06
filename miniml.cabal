@@ -38,6 +38,7 @@ library
         Transformations.Anf
         Transformations.AstToAnf
         Transformations.AstToTypelessAst
+        Transformations.RelabelVars
         Transformations.TypelessAst
         Transformations.TypelessAstToAnf
         TypeInference.HindleyMilner
