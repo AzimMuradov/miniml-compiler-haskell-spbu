@@ -13,7 +13,7 @@ import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.Golden (goldenVsString)
 import Text.Pretty.Simple (pShowNoColor)
 import Transformations.AstToAnf (astToAnf)
-import Transformations.PrettyPrint (prettyPrint)
+import Transformations.AnfPrettyPrint (prettyPrint)
 import TypeInference.PrettyPrint (pretty)
 import TypeInference.Runtime (inferPolytype)
 

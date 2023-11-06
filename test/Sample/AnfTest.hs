@@ -10,7 +10,7 @@ import Parser.Parser (parseProgram)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.Golden (goldenVsString)
 import Transformations.AstToAnf (astToAnf)
-import Transformations.PrettyPrint (prettyPrint)
+import Transformations.AnfPrettyPrint (prettyPrint)
 
 tests :: TestTree
 tests =

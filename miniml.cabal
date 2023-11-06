@@ -38,7 +38,7 @@ library
         Transformations.Anf
         Transformations.AstToAnf
         Transformations.AstToTypelessAst
-        Transformations.PrettyPrint
+        Transformations.AnfPrettyPrint
         Transformations.RelabelVars
         Transformations.TypelessAst
         Transformations.TypelessAstToAnf
