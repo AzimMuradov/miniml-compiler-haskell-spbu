@@ -25,6 +25,10 @@ MiniML is a minimal dialect of ML (Meta Language).
 
 - Parser - [source](lib/Parser/)
 - Type Inference ([Hindley–Milner type system](https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system)) - [source](lib/TypeInference/)
+- Abstract Syntax Tree (AST) to A-Normal Form (ANF) Transformations ([The Essence of Compiling with Continuations](https://www.cs.tufts.edu/~nr/cs257/archive/cormac-flanagan/anormal.pdf), [A-Normalization: Why and How](https://matt.might.net/articles/a-normalization/)) - [source](lib/Transformations/)
+  - AST simplification - [source](lib/Transformations/AstToTypelessAst.hs)
+  - Identifier relabeling to avoid naming errors - [source](lib/Transformations/RelabelVars.hs)
+  - Conversion to ANF - [source](lib/Transformations/TypelessAstToAnf.hs)
 
 ## Developer Documentation
 

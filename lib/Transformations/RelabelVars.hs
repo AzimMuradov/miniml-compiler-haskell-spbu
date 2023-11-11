@@ -12,6 +12,8 @@ import Data.Maybe (fromMaybe)
 import Data.Text (cons, pack)
 import Transformations.TypelessAst
 
+-- Identifier relabeling to avoid naming errors
+
 type RelabelerState = State Env
 
 data Env = Env
