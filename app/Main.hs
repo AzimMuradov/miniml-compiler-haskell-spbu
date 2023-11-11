@@ -3,9 +3,9 @@ module Main where
 import Data.Text (pack)
 import Options.Applicative
 import Parser.Ast (Program (Program))
-import Parser.Parser (parseProgram)
+import Parser.Parser
 import TypeInference.PrettyPrint (pretty)
-import TypeInference.Runtime (inferPolytype)
+import TypeInference.TypeInference
 
 -- * Main
 
@@ -35,7 +35,7 @@ runAndShow fileText = runAndShow' <> "\n"
     runAndShow' = case parseProgram (pack fileText) of
       Nothing -> "Please, try again. Can't parse your program."
       Just (Program []) -> ""
-      Just p -> case inferPolytype p of
+      Just p -> case inferProgram p of
         Left err -> pretty err
         Right pt -> pretty pt
 
