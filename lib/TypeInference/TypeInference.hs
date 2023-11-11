@@ -16,12 +16,8 @@ import TypeInference.HindleyMilner
 import Prelude hiding (lookup)
 
 inferProgram :: Program -> Either TypeError Polytype
-inferProgram (Program stmts) = runInfer $ registerStdDecl (inferStatements stmts)
+inferProgram (Program stmts) = runInfer $ withStdLib (inferStatements stmts)
   where
-    registerStdDecl foo = do
-      decls <- mapM (\(a, b) -> (a,) <$> generalize (fromTypeToUType b)) typedStdDeclarations
-      local (M.union (M.fromList decls)) foo
-
     runInfer :: Infer UType -> Either TypeError Polytype
     runInfer =
       (>>= applyBindings)
@@ -30,6 +26,11 @@ inferProgram (Program stmts) = runInfer $ registerStdDecl (inferStatements stmts
         >>> runExceptT
         >>> evalIntBindingT
         >>> runIdentity
+
+    withStdLib infer = do
+      let generalizeDecl (name, t) = (name,) <$> generalize (fromTypeToUType t)
+      generalizedDecls <- mapM generalizeDecl typedStdDeclarations
+      local (M.union (M.fromList generalizedDecls)) infer
 
 inferStatements :: [Statement] -> Infer UType
 inferStatements x = inferStatements' x (throwError Unreachable)
