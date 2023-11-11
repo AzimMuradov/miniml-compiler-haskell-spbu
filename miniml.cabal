@@ -44,7 +44,6 @@ library
         Transformations.TypelessAstToAnf
         TypeInference.HindleyMilner
         TypeInference.PrettyPrint
-        TypeInference.Runtime
         TypeInference.TypeInference
 
     other-modules:
