@@ -1,19 +1,17 @@
 module Transformations.AstToTypelessAst (astToTypelessAst) where
 
 import Data.List.NonEmpty (NonEmpty ((:|)))
-import Data.Maybe (mapMaybe)
 import Data.Tuple.Extra (uncurry3)
 import qualified Parser.Ast as Ast
 import StdLib (binOpIdentifier, unOpIdentifier)
 import qualified Transformations.TypelessAst as TAst
 
 astToTypelessAst :: Ast.Program -> TAst.Program
-astToTypelessAst (Ast.Program stmts) = TAst.Program $ mapMaybe transformStmt stmts
+astToTypelessAst (Ast.Program stmts) = TAst.Program $ transformStmt <$> stmts
 
-transformStmt :: Ast.Statement -> Maybe TAst.Statement
-transformStmt (Ast.StmtUserDecl decl) = Just $ uncurry3 TAst.StmtDecl $ transformUserDecl decl
-transformStmt (Ast.StmtStdDecl _) = Nothing
-transformStmt (Ast.StmtExpr expr) = Just $ TAst.StmtExpr $ transformExpr expr
+transformStmt :: Ast.Statement -> TAst.Statement
+transformStmt (Ast.StmtUserDecl decl) = uncurry3 TAst.StmtDecl $ transformUserDecl decl
+transformStmt (Ast.StmtExpr expr) = TAst.StmtExpr $ transformExpr expr
 
 transformUserDecl :: Ast.UserDeclaration -> (TAst.Identifier, TAst.Expression, TAst.IsRec)
 transformUserDecl (Ast.DeclVar (name, _) value) = (name, transformExpr value, False)

@@ -1,24 +1,36 @@
-{-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
+{-# LANGUAGE TupleSections #-}
 
-module TypeInference.TypeInference where
+module TypeInference.TypeInference (inferProgram) where
 
+import Control.Category ((>>>))
 import Control.Monad.Except
+import Control.Monad.Reader
+import Control.Unification.IntVar (evalIntBindingT)
+import Data.Functor.Identity (Identity (runIdentity))
 import Data.List.NonEmpty (toList)
+import qualified Data.Map as M
 import Data.Maybe
 import Parser.Ast
+import StdLib
 import TypeInference.HindleyMilner
 import Prelude hiding (lookup)
 
-check :: Expression -> UType -> Infer UType
-check e ty = do
-  ty' <- inferExpression e
-  ty =:= ty'
+inferProgram :: Program -> Either TypeError Polytype
+inferProgram (Program stmts) = runInfer $ withStdLib (inferStatements stmts)
+  where
+    runInfer :: Infer UType -> Either TypeError Polytype
+    runInfer =
+      (>>= applyBindings)
+        >>> (>>= (generalize >>> fmap fromUPolytype))
+        >>> flip runReaderT M.empty
+        >>> runExceptT
+        >>> evalIntBindingT
+        >>> runIdentity
+
+    withStdLib infer = do
+      let generalizeDecl (name, t) = (name,) <$> generalize (fromTypeToUType t)
+      generalizedDecls <- mapM generalizeDecl typedStdDeclarations
+      local (M.union (M.fromList generalizedDecls)) infer
 
 inferStatements :: [Statement] -> Infer UType
 inferStatements x = inferStatements' x (throwError Unreachable)
@@ -41,10 +53,6 @@ inferStatements' ((StmtUserDecl (DeclRecFun ident fun)) : xs) _ = do
   next <- withBinding ident (Forall [] preT) $ inferFun fun
   after <- withBinding ident (Forall [] next) $ inferFun fun
   withBinding ident (Forall [] after) (inferStatements' xs $ return next)
-inferStatements' ((StmtStdDecl (StdDecl ident t)) : xs) _ = do
-  let t' = fromTypeToUType t
-  pT <- generalize t'
-  withBinding ident pT (inferStatements' xs $ return t')
 
 inferExpression :: Expression -> Infer UType
 inferExpression (ExprIdentifier x) = lookup (Var x)
@@ -114,3 +122,10 @@ inferFun (Fun args restype body) = inferFun' $ toList args
       (ident, t) : ys -> do
         t' <- maybe fresh (return . fromTypeToUType) t
         withBinding ident (Forall [] t') $ UTyFun t' <$> inferFun' ys
+
+-- Utils
+
+check :: Expression -> UType -> Infer UType
+check e ty = do
+  ty' <- inferExpression e
+  ty =:= ty'

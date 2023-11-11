@@ -15,7 +15,7 @@ import Text.Pretty.Simple (pShowNoColor)
 import Transformations.AnfPrettyPrinter (prettyPrint)
 import Transformations.AstToAnf (astToAnf)
 import TypeInference.PrettyPrint (pretty)
-import TypeInference.Runtime (inferPolytype)
+import TypeInference.TypeInference
 
 tests :: TestTree
 tests =
@@ -71,6 +71,6 @@ facRecLoop ext = testFile $ "FacRecLoop." <> ext
 eval :: Maybe Program -> String
 eval s = case s of
   Nothing -> "Please, try again. Can't parse your program."
-  Just p -> case inferPolytype p of
+  Just p -> case inferProgram p of
     Left tyerr -> pretty tyerr
     Right ty -> pretty ty
