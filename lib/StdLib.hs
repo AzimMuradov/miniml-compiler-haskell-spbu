@@ -3,7 +3,7 @@
 module StdLib
   ( TypedStdDeclaration,
     typedStdDeclarations,
-    stdDeclarationsForTypelessAst,
+    stdDeclarations,
     binOpIdentifier,
     unOpIdentifier,
   )
@@ -13,17 +13,31 @@ import Data.Text (Text)
 import qualified Parser.Ast as Ast
 import qualified Transformations.TypelessAst as TAst
 
--- * Standard Declarations for 'Ast'
-
-type Identifier = Text
+-- * Standard Library
 
 type TypedStdDeclaration = (Identifier, Ast.Type)
 
--- | The list of standard declarations for 'Ast'.
+type Identifier = Text
+
+-- | The list of typed standard declarations (but without the operators).
 typedStdDeclarations :: [TypedStdDeclaration]
 typedStdDeclarations = [notDecl, printBoolDecl, printIntDecl]
 
--- ** Declarations
+-- | The list of standard declarations.
+stdDeclarations :: [TAst.Identifier]
+stdDeclarations = (mapper <$> typedStdDeclarations) <> operatorDecls
+  where
+    mapper (name, _) = name
+
+    operatorDecls = (binOpIdentifier <$> binOps) <> (unOpIdentifier <$> unaryOps)
+
+    binOps =
+      (Ast.BooleanOp <$> [minBound .. maxBound])
+        <> (Ast.ArithmeticOp <$> [minBound .. maxBound])
+        <> (Ast.ComparisonOp <$> [minBound .. maxBound])
+    unaryOps = [minBound .. maxBound]
+
+-- ** Function Declarations
 
 -- | The @not@ function declaration (@not : bool -> bool@).
 notDecl :: TypedStdDeclaration
@@ -36,22 +50,6 @@ printBoolDecl = ("print_bool", Ast.TFun Ast.TBool Ast.TUnit)
 -- | The @print_int@ function declaration (@print_int : int -> unit@).
 printIntDecl :: TypedStdDeclaration
 printIntDecl = ("print_int", Ast.TFun Ast.TInt Ast.TUnit)
-
--- * Standard Declarations for 'TypelessAst'
-
--- | The list of standard declarations for 'TypelessAst'.
-stdDeclarationsForTypelessAst :: [TAst.Identifier]
-stdDeclarationsForTypelessAst = (mapper <$> typedStdDeclarations) <> operatorDecls
-  where
-    mapper (name, _) = name
-
-    operatorDecls = (binOpIdentifier <$> binOps) <> (unOpIdentifier <$> unaryOps)
-
-    binOps =
-      (Ast.BooleanOp <$> [minBound .. maxBound])
-        <> (Ast.ArithmeticOp <$> [minBound .. maxBound])
-        <> (Ast.ComparisonOp <$> [minBound .. maxBound])
-    unaryOps = [minBound .. maxBound]
 
 -- ** Operator Declarations
 
