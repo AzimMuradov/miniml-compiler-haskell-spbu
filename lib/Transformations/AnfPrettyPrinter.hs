@@ -11,7 +11,14 @@ prettyPrint' :: [Statement] -> String
 prettyPrint' stmts = unlines $ map prettyStmt stmts
 
 prettyStmt :: Statement -> String
-prettyStmt (StmtDecl name expr) = "let " <> prettyIdentifier name <> " " <> prettyExpr expr
+prettyStmt (StmtDecl name expr) =
+  "let "
+    <> prettyIdentifier name
+    <> ( case expr of
+           (ExprAtom (AtomClosure _ _)) -> " "
+           _ -> " = "
+       )
+    <> prettyExpr expr
 prettyStmt (StmtExpr expr) = prettyExpr expr
 
 prettyExpr :: Expression -> String
