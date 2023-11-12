@@ -11,24 +11,21 @@ prettyPrint' :: [Statement] -> String
 prettyPrint' stmts = unlines $ map prettyStmt stmts
 
 prettyStmt :: Statement -> String
-prettyStmt (StmtDecl name expr) =
-  "let " <> prettyIdentifier name <> case expr of
-    (ExprAtom (AtomClosure _ _)) -> " " <> prettyExpr expr
-    _ -> " = " <> prettyExpr expr
+prettyStmt (StmtDecl name expr) = "let " <> prettyIdentifier name <> " " <> prettyExpr expr
 prettyStmt (StmtExpr expr) = prettyExpr expr
 
 prettyExpr :: Expression -> String
 prettyExpr (ExprAtom aexpr) = prettyAtomic aexpr
 prettyExpr (ExprComp cexpr) = prettyComplex cexpr
 prettyExpr (ExprLetIn name value expr) =
-  concat
-    [ "let ",
-      prettyIdentifier name,
-      " = ",
-      prettyExpr value,
-      " in ",
-      prettyExpr expr
-    ]
+  "let "
+    <> prettyIdentifier name
+    <> ( case value of
+           (ExprAtom aexpr@(AtomClosure _ _)) -> " " <> prettyAtomic aexpr
+           _ -> " = " <> prettyExpr value
+       )
+    <> " in "
+    <> prettyExpr expr
 
 prettyAtomic :: AtomicExpression -> String
 prettyAtomic aexpr = case aexpr of
