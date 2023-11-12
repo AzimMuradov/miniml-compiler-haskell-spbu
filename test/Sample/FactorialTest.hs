@@ -23,10 +23,13 @@ tests =
     "factorial"
     [ testParsing "recursive factorial" facRec,
       testParsing "factorial with recursive loop" facRecLoop,
+      testParsing "factorial with recursive cps" facRecCps,
       testTypeInference "recursive factorial" facRec,
       testTypeInference "factorial with recursive loop" facRecLoop,
+      testTypeInference "factorial with recursive cps" facRecCps,
       testAstToAnf "recursive factorial" facRec,
-      testAstToAnf "factorial with recursive loop" facRecLoop
+      testAstToAnf "factorial with recursive loop" facRecLoop,
+      testAstToAnf "factorial with recursive cps" facRecCps
     ]
 
 testParsing :: String -> (String -> FilePath) -> TestTree
@@ -67,6 +70,9 @@ facRec ext = testFile $ "FacRec." <> ext
 
 facRecLoop :: String -> String
 facRecLoop ext = testFile $ "FacRecLoop." <> ext
+
+facRecCps :: String -> String
+facRecCps ext = testFile $ "FacRecCps." <> ext
 
 eval :: Maybe Program -> String
 eval s = case s of
