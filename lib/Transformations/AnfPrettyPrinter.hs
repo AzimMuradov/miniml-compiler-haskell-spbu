@@ -30,7 +30,7 @@ prettyAtomic aexpr = case aexpr of
 prettyComplex :: ComplexExpression -> String
 prettyComplex cexpr = case cexpr of
   CompApp f args -> parens $ prettyAtomic f <> " " <> unwords (map prettyAtomic $ toList args)
-  CompIte c t e -> unwords [ "if", prettyAtomic c, "then", prettyExpr t, "else", prettyExpr e]
+  CompIte c t e -> unwords ["if", prettyAtomic c, "then", prettyExpr t, "else", prettyExpr e]
 
 prettyIdentifier :: Identifier -> String
 prettyIdentifier ident = "`" <> unpack ident <> "`"
