@@ -11,28 +11,13 @@ prettyPrint' :: [Statement] -> String
 prettyPrint' stmts = unlines $ map prettyStmt stmts
 
 prettyStmt :: Statement -> String
-prettyStmt (StmtDecl name expr) =
-  "let "
-    <> prettyIdentifier name
-    <> ( case expr of
-           (ExprAtom (AtomClosure _ _)) -> " "
-           _ -> " = "
-       )
-    <> prettyExpr expr
+prettyStmt (StmtDecl name expr) = "let " <> prettyIdentifier name <> " = " <> prettyExpr expr 
 prettyStmt (StmtExpr expr) = prettyExpr expr
 
 prettyExpr :: Expression -> String
 prettyExpr (ExprAtom aexpr) = prettyAtomic aexpr
 prettyExpr (ExprComp cexpr) = prettyComplex cexpr
-prettyExpr (ExprLetIn name value expr) =
-  "let "
-    <> prettyIdentifier name
-    <> ( case value of
-           (ExprAtom aexpr@(AtomClosure _ _)) -> " " <> prettyAtomic aexpr
-           _ -> " = " <> prettyExpr value
-       )
-    <> " in "
-    <> prettyExpr expr
+prettyExpr (ExprLetIn name value expr) =  "let " <> prettyIdentifier name <> " = " <> prettyExpr value <> " in " <> prettyExpr expr
 
 prettyAtomic :: AtomicExpression -> String
 prettyAtomic aexpr = case aexpr of
@@ -40,18 +25,18 @@ prettyAtomic aexpr = case aexpr of
   AtomUnit -> parens ""
   AtomBool value -> if value then "true" else "false"
   AtomInt value -> show value
-  AtomClosure args expr -> unwords (map prettyIdentifier $ toList args) <> " = " <> prettyExpr expr
+  AtomClosure args expr -> parens $ "fun " <> unwords (map prettyIdentifier $ toList args) <> " -> " <> prettyExpr expr
 
 prettyComplex :: ComplexExpression -> String
 prettyComplex cexpr = case cexpr of
-  CompApp f args -> parens $ prettyAtomic f <> unwords (map (\x -> " " <> prettyAtomic x) $ toList args)
+  CompApp f args -> parens $ prettyAtomic f <> " " <> unwords (map prettyAtomic $ toList args)
   CompIte c t e ->
-    concat
-      [ "if ",
+    unwords
+      [ "if",
         prettyAtomic c,
-        " then ",
+        "then",
         prettyExpr t,
-        " else ",
+        "else",
         prettyExpr e
       ]
 
