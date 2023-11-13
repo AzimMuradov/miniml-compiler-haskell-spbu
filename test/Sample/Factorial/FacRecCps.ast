@@ -1,0 +1,90 @@
+Just
+    ( Program
+        [ StmtUserDecl
+            ( DeclFun "id"
+                ( Fun
+                    (
+                        ( "x"
+                        , Nothing
+                        ) :| []
+                    ) Nothing
+                    ( ExprIdentifier "x" )
+                )
+            )
+        , StmtUserDecl
+            ( DeclRecFun "cps_factorial"
+                ( Fun
+                    (
+                        ( "n"
+                        , Nothing
+                        ) :|
+                        [
+                            ( "k"
+                            , Nothing
+                            )
+                        ]
+                    ) Nothing
+                    ( ExprIte
+                        ( ExprBinaryOperation ( ComparisonOp EqOp )
+                            ( ExprIdentifier "n" )
+                            ( ExprValue
+                                ( ValInt 0 )
+                            )
+                        )
+                        ( ExprApplication
+                            ( ExprIdentifier "k" )
+                            ( ExprValue
+                                ( ValInt 1 )
+                            )
+                        )
+                        ( ExprApplication
+                            ( ExprApplication
+                                ( ExprIdentifier "cps_factorial" )
+                                ( ExprBinaryOperation ( ArithmeticOp MinusOp )
+                                    ( ExprIdentifier "n" )
+                                    ( ExprValue
+                                        ( ValInt 1 )
+                                    )
+                                )
+                            )
+                            ( ExprValue
+                                ( ValFun
+                                    ( Fun
+                                        (
+                                            ( "result"
+                                            , Nothing
+                                            ) :| []
+                                        ) Nothing
+                                        ( ExprApplication
+                                            ( ExprIdentifier "k" )
+                                            ( ExprBinaryOperation ( ArithmeticOp MulOp )
+                                                ( ExprIdentifier "n" )
+                                                ( ExprIdentifier "result" )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        , StmtUserDecl
+            ( DeclFun "factorial"
+                ( Fun
+                    (
+                        ( "n"
+                        , Nothing
+                        ) :| []
+                    ) Nothing
+                    ( ExprApplication
+                        ( ExprApplication
+                            ( ExprIdentifier "cps_factorial" )
+                            ( ExprIdentifier "n" )
+                        )
+                        ( ExprIdentifier "id" )
+                    )
+                )
+            )
+        ]
+    )
