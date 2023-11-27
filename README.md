@@ -29,6 +29,14 @@ MiniML is a minimal dialect of ML (Meta Language).
   - AST simplification - [source](lib/Transformations/AstToTypelessAst.hs)
   - Identifier relabeling to avoid naming errors - [source](lib/Transformations/RelabelVars.hs)
   - Conversion to ANF - [source](lib/Transformations/TypelessAstToAnf.hs)
+- Compiler
+  - CLI
+  - CI & Build scripts
+  - LLVM
+    - Transform ANF to LLVM IR
+  - x86_64
+    - ???
+    - GC
 
 ## Developer Documentation
 

@@ -30,6 +30,8 @@ common shared-properties
 library
     import:           shared-properties
     exposed-modules:
+        CodeGen.Llvm.TastToLlvm
+        CodeGen.Tast
         Parser.Ast
         Parser.Lexer
         Parser.Parser
