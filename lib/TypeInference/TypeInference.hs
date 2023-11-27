@@ -129,3 +129,9 @@ check :: Expression -> UType -> Infer UType
 check e ty = do
   ty' <- inferExpression e
   ty =:= ty'
+
+withError :: MonadError e m => (e -> e) -> m a -> m a
+withError f action = tryError action >>= either (throwError . f) pure
+
+tryError :: MonadError e m => m a -> m (Either e a)
+tryError action = (Right <$> action) `catchError` (pure . Left)

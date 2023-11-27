@@ -1,6 +1,6 @@
 active-repositories: hackage.haskell.org:merge
-constraints: any.Cabal ==3.8.1.0,
-             any.Cabal-syntax ==3.8.1.0,
+constraints: any.Cabal ==3.6.3.0,
+             Cabal -bundled-binary-generic,
              any.ansi-terminal ==1.0,
              ansi-terminal -example,
              any.ansi-terminal-types ==0.11.5,
@@ -86,4 +86,4 @@ constraints: any.Cabal ==3.8.1.0,
              any.unordered-containers ==0.2.19.1,
              unordered-containers -debug,
              any.utf8-string ==1.0.2
-index-state: hackage.haskell.org 2023-11-26T21:52:49Z
+index-state: hackage.haskell.org 2023-11-27T21:04:21Z
