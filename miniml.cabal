@@ -18,8 +18,8 @@ extra-source-files: README.md
 common shared-properties
     default-language: Haskell2010
     build-depends:
-        , base        >=4.16.3.0
-        , bytestring  >=0.12.0.2
+        , base        >=4.14
+        , bytestring  >=0.11.2.0
         , extra       >=1.7.12
         , text        >=2.0.1
 
@@ -50,8 +50,11 @@ library
     other-extensions:
     build-depends:
         , containers          >=0.6.6
-        , megaparsec          >=9.2.2
-        , mtl                 >=2.3.1
+        , llvm-hs             >=9.0.1
+        , llvm-hs-pretty      >=0.9.0.0
+        , llvm-hs-pure        >=9.0.0
+        , megaparsec          >=9.2
+        , mtl                 >=2.2.2
         , parser-combinators  >=1.3.0
         , unification-fd      >=0.5.0
 
