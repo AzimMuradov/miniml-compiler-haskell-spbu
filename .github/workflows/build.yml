@@ -41,6 +41,10 @@ jobs:
           respect-cabal-files: false
       - name: Update packages list
         run: cabal update
+      - name: Install LLVM and Clang
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          version: "9.0.1"
       - name: Build project
         run: cabal build
       - name: Run tests
