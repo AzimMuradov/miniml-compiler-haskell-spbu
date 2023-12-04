@@ -3,6 +3,7 @@
 
 module Unit.Parser.ParserTest (tests) where
 
+import Data.List.NonEmpty (NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NonEmpty
 import Data.Text (Text, unpack)
 import Parser.Ast
@@ -62,7 +63,7 @@ testWhitespace = testCase "whitespace" $ do
                   ( DeclFun
                       "f"
                       ( Fun
-                          (NonEmpty.singleton ("a", Nothing))
+                          (("a", Nothing) :| [])
                           Nothing
                           ( ExprBinaryOperation
                               (ArithmeticOp MulOp)
@@ -83,7 +84,7 @@ testWhitespace = testCase "whitespace" $ do
                   ( DeclFun
                       "f"
                       ( Fun
-                          (NonEmpty.singleton ("a", Nothing))
+                          (("a", Nothing) :| [])
                           Nothing
                           (ExprBinaryOperation (ArithmeticOp MulOp) (ExprIdentifier "a") (ExprIdentifier "a"))
                       )

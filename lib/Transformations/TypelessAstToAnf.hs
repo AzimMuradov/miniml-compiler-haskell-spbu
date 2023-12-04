@@ -1,7 +1,8 @@
 module Transformations.TypelessAstToAnf (typelessAstToAnf) where
 
-import Control.Monad.Cont (ContT, evalContT, mapContT)
+import Control.Monad.Cont (ContT, mapContT)
 import Control.Monad.State (MonadTrans (lift), State, evalState, get, modify)
+import Control.Monad.Trans.Cont (evalContT)
 import Data.Text (Text, cons, pack)
 import qualified Transformations.Anf as Anf
 import Transformations.RelabelVars
