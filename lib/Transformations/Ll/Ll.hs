@@ -10,15 +10,26 @@ import qualified Trees.Common as Common
 import Utils (liftM2', liftM3')
 
 llAst :: Ast.Program -> Lfr.Program
-llAst (Ast.Program tlDecls cnt) = undefined -- TODO
+llAst (Ast.Program tlDecls cnt) =
+  let (tlDecls', Env _ cnt') = runState (mapM llDecl tlDecls) (Env [] cnt)
+   in Lfr.Program (concat tlDecls') cnt'
 
 -- Implementation
 
 type LlState = State Env
 
-data Env = Env {tlDecls :: [FunDeclaration], idCnt :: Int}
+data Env = Env {genFuns :: [FunDeclaration], idCnt :: Common.IdCnt}
 
 data FunDeclaration = FunDecl Common.Identifier' [Common.Identifier'] Lfr.Expression
+
+llDecl :: Ast.Declaration -> LlState [Lfr.TopLevelDeclaration]
+llDecl = \case
+  Ast.DeclVar ident ex -> sequence [ll1 (Lfr.TopLevelVarDecl . Lfr.VarDecl ident) ex]
+  Ast.DeclFun ident _ (Ast.Fun params body) -> do
+    f <- ll1 (FunDecl ident (NE.toList params)) body
+    Env genDecl _ <- get
+    modify $ \env -> env {genFuns = []}
+    return $ (\(FunDecl i ps b) -> Lfr.TopLevelFunDecl i ps b) <$> reverse (f : genDecl)
 
 llExpr :: Ast.Expression -> LlState Lfr.Expression
 llExpr = \case
@@ -32,7 +43,7 @@ llExpr = \case
     Ast.DeclVar ident value -> do
       varDecl <- Lfr.VarDecl ident <$> llExpr value
       expr' <- llExpr expr
-      return $ Lfr.ExprLetIn [varDecl] expr'
+      return $ Lfr.ExprLetIn varDecl expr'
     Ast.DeclFun ident _ fun -> llFun ident fun >> llExpr expr
   Ast.ExprFun fun -> do
     ident <- genName
@@ -42,7 +53,7 @@ llExpr = \case
 llFun :: Common.Identifier' -> Ast.Fun -> LlState ()
 llFun ident (Ast.Fun params body) = do
   funDecl <- FunDecl ident (NE.toList params) <$> llExpr body
-  modify $ \env@(Env tlds _) -> env {tlDecls = funDecl : tlds}
+  modify $ \env@(Env tlds _) -> env {genFuns = funDecl : tlds}
 
 -- Name generation
 

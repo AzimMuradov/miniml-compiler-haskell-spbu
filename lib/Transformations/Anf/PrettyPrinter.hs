@@ -1,6 +1,7 @@
 module Transformations.Anf.PrettyPrinter (prettyPrint) where
 
 import Data.Text (unpack)
+import StdLib (binOpIdentifier, unOpIdentifier)
 import Transformations.Anf.Anf
 import Trees.Common (Identifier' (Gen, Txt))
 
@@ -11,30 +12,30 @@ prettyPrint' :: [GlobalDeclaration] -> String
 prettyPrint' stmts = unlines $ map prettyStmt stmts
 
 prettyStmt :: GlobalDeclaration -> String
-prettyStmt (GlobVarDecl name value) = doubleSemicolon $ unwords ["let", prettyIdentifier name, "=", prettyExpr value]
-prettyStmt (GlobFunDecl name params body) = doubleSemicolon $ unwords ["let", prettyIdentifier name, undefined, "=", prettyExpr body]
+prettyStmt (GlobVarDecl name value) = doubleSemicolon $ unwords ["let", prettyId name, "=", prettyExpr value]
+prettyStmt (GlobFunDecl name params body) = doubleSemicolon $ unwords ["let", prettyId name, unwords (prettyId <$> params), "=", prettyExpr body]
 
 prettyExpr :: Expression -> String
 prettyExpr (ExprAtom aexpr) = prettyAtomic aexpr
 prettyExpr (ExprComp cexpr) = prettyComplex cexpr
-prettyExpr (ExprLetIn decls expr) = unwords ["let", prettyIdentifier undefined, "=", prettyExpr undefined, "in", prettyExpr expr]
+prettyExpr (ExprLetIn (ident, val) expr) = unwords ["let", prettyId ident, "=", prettyExpr val, "in", prettyExpr expr]
 
 prettyAtomic :: AtomicExpression -> String
 prettyAtomic aexpr = case aexpr of
-  AtomId name -> prettyIdentifier name
+  AtomId name -> prettyId name
   AtomBool value -> if value then "true" else "false"
   AtomInt value -> show value
-  AtomBinOp op lhs rhs -> undefined
-  AtomUnOp op x -> undefined
+  AtomBinOp op lhs rhs -> parens (unwords [unpack $ binOpIdentifier op, prettyAtomic lhs, prettyAtomic rhs])
+  AtomUnOp op x -> parens (unwords [unpack $ unOpIdentifier op, prettyAtomic x])
 
 prettyComplex :: ComplexExpression -> String
 prettyComplex cexpr = case cexpr of
   CompApp f arg -> parens $ prettyAtomic f <> " " <> prettyAtomic arg
   CompIte c t e -> unwords ["if", prettyAtomic c, "then", prettyAtomic t, "else", prettyAtomic e]
 
-prettyIdentifier :: Identifier' -> String
-prettyIdentifier (Txt n) = "`" <> unpack n <> "`"
-prettyIdentifier (Gen n) = "`$" <> show n <> "`"
+prettyId :: Identifier' -> String
+prettyId (Txt n) = "`" <> unpack n <> "`"
+prettyId (Gen n) = "`$" <> show n <> "`"
 
 parens :: String -> String
 parens val = "(" <> val <> ")"

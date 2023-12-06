@@ -6,8 +6,11 @@ import Control.Monad.State (State, evalState, get, modify)
 import Data.Foldable (Foldable (foldl'))
 import Data.List.NonEmpty (NonEmpty, (<|))
 import qualified Data.List.NonEmpty as NE
+import Data.Map (Map)
+import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
+import StdLib (stdDeclarations)
 import qualified Transformations.Simplification.SimplifiedAst as Ast
 import qualified Trees.Common as Ast
 import Utils
@@ -16,25 +19,19 @@ import Utils
 ccAst :: Ast.Program -> Ast.Program
 ccAst prg = evalState (ccProgram prg) initEnv
   where
-    initEnv = Env {freeVars = Set.empty, globals = getGlobals prg}
+    initEnv = Env {freeVars = Set.empty, globals = getGlobals prg, mapping = Map.empty}
 
-    -- TODO : Add stdlib globals
-
-    getGlobals (Ast.Program decls _) = Set.fromList $ getDeclId <$> decls
+    getGlobals (Ast.Program decls _) = Set.fromList $ (getDeclId <$> decls) <> (Ast.Txt <$> stdDeclarations)
 
     getDeclId (Ast.DeclVar ident _) = ident
     getDeclId (Ast.DeclFun ident _ _) = ident
-
--- let f p1 p2 p3 = body[p1 p2 p3] in expr[p1 p2 p3 f]
--- \a -> \b -> a + b ==> \a -> (\a b -> a + b) a
--- let f x y a b = body in expr
 
 -- Implementation
 
 data Env = Env
   { freeVars :: Set Ast.Identifier',
-    globals :: Set Ast.Identifier'
-    -- TODO : map :: Map Ast.Identifier' Ast.Expression
+    globals :: Set Ast.Identifier',
+    mapping :: Map Ast.Identifier' Ast.Expression
   }
 
 type CcState = State Env
@@ -54,28 +51,33 @@ ccProgram (Ast.Program gs cnt) = flip Ast.Program cnt <$> mapM ccTopLevelDecl gs
 
 ccExpr :: Ast.Expression -> CcState Ast.Expression
 ccExpr = \case
-  Ast.ExprId name -> do
-    modify $ \env@(Env fv gs) ->
-      let newFV = if name `Set.notMember` gs then Set.singleton name else Set.empty
-       in env {freeVars = fv `Set.union` newFV}
-    return $ Ast.ExprId name
+  Ast.ExprId ident -> do
+    Env fv gs m <- get
+    case Map.lookup ident m of
+      Just repl -> return repl
+      Nothing -> do
+        modify $ \env ->
+          let newFV = if ident `Set.notMember` gs then Set.singleton ident else Set.empty
+           in env {freeVars = fv `Set.union` newFV}
+        return $ Ast.ExprId ident
   Ast.ExprVal val -> return $ Ast.ExprVal val
   Ast.ExprBinOp op lhs rhs -> cc2 (Ast.ExprBinOp op) lhs rhs
   Ast.ExprUnOp op x -> cc1 (Ast.ExprUnOp op) x
   Ast.ExprApp f arg -> cc2 Ast.ExprApp f arg
   Ast.ExprIte c t e -> cc3 Ast.ExprIte c t e
   Ast.ExprLetIn decl expr -> case decl of
-    Ast.DeclVar name value ->
-      Ast.ExprLetIn <$> (Ast.DeclVar name <$> ccExpr value) <*> ccExpr expr
-    Ast.DeclFun name isRec (Ast.Fun params body) -> do
+    Ast.DeclVar ident value ->
+      Ast.ExprLetIn <$> (Ast.DeclVar ident <$> ccExpr value) <*> ccExpr expr
+    Ast.DeclFun ident isRec (Ast.Fun params body) -> do
       body' <- ccExpr body
 
       fv <- do
-        Env fvSet _ <- get
-        return $ toNonEmpty $ fvSet Set.\\ toSet (name <| params)
+        Env fvSet _ _ <- get
+        return $ toNonEmpty $ fvSet Set.\\ toSet (ident <| params)
 
-      let decl' = Ast.DeclFun name isRec (Ast.Fun (fv <> params) body')
-      let expr' = foldl' Ast.ExprApp expr (Ast.ExprId <$> fv)
+      let decl' = Ast.DeclFun ident isRec (Ast.Fun (fv <> params) body')
+      modify $ \env@(Env _ _ m) -> env {mapping = Map.insert ident (foldl' Ast.ExprApp (Ast.ExprId ident) (Ast.ExprId <$> fv)) m}
+      expr' <- ccExpr expr
 
       return $ Ast.ExprLetIn decl' expr'
   Ast.ExprFun (Ast.Fun params body) -> ccFun params body
@@ -85,7 +87,7 @@ ccFun params body = do
   body' <- ccExpr body
 
   fvSet <- do
-    Env fvSet _ <- get
+    Env fvSet _ _ <- get
     return $ fvSet Set.\\ toSet params
 
   let args' = prependList (Set.toList fvSet) params
@@ -97,7 +99,7 @@ ccFun params body = do
   return $
     if null fvSet
       then closedFun
-      else foldl Ast.ExprApp closedFun argsExprs
+      else foldl' Ast.ExprApp closedFun argsExprs
 
 -- Utils
 

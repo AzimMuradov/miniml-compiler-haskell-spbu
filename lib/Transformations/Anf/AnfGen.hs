@@ -53,7 +53,7 @@ normalizeExpr (Lfr.ExprIte c t e) = evalContT $ do
   e' <- normalizeName e
   returnComplex $ Anf.CompIte c' t' e'
 normalizeExpr (Lfr.ExprLetIn decls expr) = do
-  decls' <- mapM normalizeVarDecl decls
+  decls' <- normalizeVarDecl decls
   expr' <- normalizeExpr expr
   return $ Anf.ExprLetIn decls' expr'
   where
@@ -76,7 +76,7 @@ normalizeName expr = do
     _ -> do
       name <- lift genName
       mapContT
-        (\e -> Anf.ExprLetIn [(name, expr')] <$> e)
+        (\e -> Anf.ExprLetIn (name, expr') <$> e)
         (return $ Anf.AtomId name)
 
 genName :: CntState Common.Identifier'

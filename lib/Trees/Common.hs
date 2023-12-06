@@ -9,9 +9,11 @@ import Data.Text (Text)
 type Identifier = Text
 
 data Identifier'
-  = Txt Text
-  | Gen Int
+  = Txt Identifier
+  | Gen IdCnt
   deriving (Show, Eq, Ord)
+
+type IdCnt = Int
 
 -- ** Operators
 

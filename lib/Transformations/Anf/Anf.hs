@@ -27,5 +27,5 @@ data ComplexExpression
 data Expression
   = ExprAtom AtomicExpression
   | ExprComp ComplexExpression
-  | ExprLetIn [(Identifier', Expression)] Expression
+  | ExprLetIn (Identifier', Expression) Expression
   deriving (Show, Eq)

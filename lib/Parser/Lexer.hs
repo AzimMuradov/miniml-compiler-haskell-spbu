@@ -28,6 +28,7 @@ module Parser.Lexer
   )
 where
 
+import Control.Monad (when)
 import Data.Int (Int64)
 import Data.Text (Text, pack)
 import Data.Void (Void)
@@ -91,7 +92,10 @@ boolLitP = True <$ kwTrue <|> False <$ kwFalse
 
 -- | Decimal integer literal parser.
 intLitP :: Parser Int64
-intLitP = lexeme L.decimal -- TODO : signed, return Int64
+intLitP = do
+  int <- lexeme L.decimal
+  when (int > 9223372036854775808) $ fail "Error: Integer literal exceeds the range of representable integers of type int64"
+  return $ fromInteger int
 
 -- * Identifiers and keywords
 

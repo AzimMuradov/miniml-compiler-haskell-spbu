@@ -1,18 +1,18 @@
 Just
     ( Program
-        [ StmtUserDecl
-            ( DeclFun "id"
+        [ StmtDecl
+            ( DeclFun "id" False
                 ( Fun
                     (
                         ( "x"
                         , Nothing
                         ) :| []
                     ) Nothing
-                    ( ExprIdentifier "x" )
+                    ( ExprId "x" )
                 )
             )
-        , StmtUserDecl
-            ( DeclRecFun "cps_factorial"
+        , StmtDecl
+            ( DeclFun "cps_factorial" True
                 ( Fun
                     (
                         ( "n"
@@ -25,42 +25,40 @@ Just
                         ]
                     ) Nothing
                     ( ExprIte
-                        ( ExprBinaryOperation ( ComparisonOp EqOp )
-                            ( ExprIdentifier "n" )
-                            ( ExprValue
+                        ( ExprBinOp ( ComparisonOp EqOp )
+                            ( ExprId "n" )
+                            ( ExprVal
                                 ( ValInt 0 )
                             )
                         )
-                        ( ExprApplication
-                            ( ExprIdentifier "k" )
-                            ( ExprValue
+                        ( ExprApp
+                            ( ExprId "k" )
+                            ( ExprVal
                                 ( ValInt 1 )
                             )
                         )
-                        ( ExprApplication
-                            ( ExprApplication
-                                ( ExprIdentifier "cps_factorial" )
-                                ( ExprBinaryOperation ( ArithmeticOp MinusOp )
-                                    ( ExprIdentifier "n" )
-                                    ( ExprValue
+                        ( ExprApp
+                            ( ExprApp
+                                ( ExprId "cps_factorial" )
+                                ( ExprBinOp ( ArithmeticOp MinusOp )
+                                    ( ExprId "n" )
+                                    ( ExprVal
                                         ( ValInt 1 )
                                     )
                                 )
                             )
-                            ( ExprValue
-                                ( ValFun
-                                    ( Fun
-                                        (
-                                            ( "result"
-                                            , Nothing
-                                            ) :| []
-                                        ) Nothing
-                                        ( ExprApplication
-                                            ( ExprIdentifier "k" )
-                                            ( ExprBinaryOperation ( ArithmeticOp MulOp )
-                                                ( ExprIdentifier "n" )
-                                                ( ExprIdentifier "result" )
-                                            )
+                            ( ExprFun
+                                ( Fun
+                                    (
+                                        ( "result"
+                                        , Nothing
+                                        ) :| []
+                                    ) Nothing
+                                    ( ExprApp
+                                        ( ExprId "k" )
+                                        ( ExprBinOp ( ArithmeticOp MulOp )
+                                            ( ExprId "n" )
+                                            ( ExprId "result" )
                                         )
                                     )
                                 )
@@ -69,20 +67,20 @@ Just
                     )
                 )
             )
-        , StmtUserDecl
-            ( DeclFun "factorial"
+        , StmtDecl
+            ( DeclFun "factorial" False
                 ( Fun
                     (
                         ( "n"
                         , Nothing
                         ) :| []
                     ) Nothing
-                    ( ExprApplication
-                        ( ExprApplication
-                            ( ExprIdentifier "cps_factorial" )
-                            ( ExprIdentifier "n" )
+                    ( ExprApp
+                        ( ExprApp
+                            ( ExprId "cps_factorial" )
+                            ( ExprId "n" )
                         )
-                        ( ExprIdentifier "id" )
+                        ( ExprId "id" )
                     )
                 )
             )
