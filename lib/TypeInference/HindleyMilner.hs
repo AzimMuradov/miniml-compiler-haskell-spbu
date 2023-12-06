@@ -27,7 +27,7 @@ import Data.Set (Set, (\\))
 import qualified Data.Set as S
 import Data.Text (pack)
 import GHC.Generics (Generic1)
-import Parser.Ast
+import Trees.Common (Identifier, Type (..))
 import Prelude hiding (lookup)
 
 data HType a
