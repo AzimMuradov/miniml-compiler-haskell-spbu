@@ -12,6 +12,7 @@ import qualified Data.Map as M
 import Data.Maybe
 import Parser.Ast
 import StdLib
+import Trees.Common
 import TypeInference.HindleyMilner
 import Prelude hiding (lookup)
 
@@ -40,28 +41,27 @@ inferStatements' [] pr = pr
 inferStatements' ((StmtExpr e) : xs) _ = do
   res <- inferExpression e
   inferStatements' xs (return res)
-inferStatements' ((StmtUserDecl (DeclVar (ident, t) body)) : xs) _ = do
+inferStatements' ((StmtDecl (DeclVar (ident, t) body)) : xs) _ = do
   res <- inferExpression body
   vType <- maybe (return res) ((=:=) res <$> fromTypeToUType) t
   pvType <- generalize vType
   withBinding ident pvType (inferStatements' xs $ return vType)
-inferStatements' ((StmtUserDecl (DeclFun ident fun)) : xs) _ = do
+inferStatements' ((StmtDecl (DeclFun ident False fun)) : xs) _ = do
   res <- inferFun fun
   withBinding ident (Forall [] res) (inferStatements' xs $ return res)
-inferStatements' ((StmtUserDecl (DeclRecFun ident fun)) : xs) _ = do
+inferStatements' ((StmtDecl (DeclFun ident True fun)) : xs) _ = do
   preT <- fresh
   next <- withBinding ident (Forall [] preT) $ inferFun fun
   after <- withBinding ident (Forall [] next) $ inferFun fun
   withBinding ident (Forall [] after) (inferStatements' xs $ return next)
 
 inferExpression :: Expression -> Infer UType
-inferExpression (ExprIdentifier x) = lookup (Var x)
-inferExpression (ExprValue value) = case value of
+inferExpression (ExprId x) = lookup (Var x)
+inferExpression (ExprVal value) = case value of
   ValUnit -> return UTyUnit
   ValBool _ -> return UTyBool
   ValInt _ -> return UTyInt
-  ValFun fun -> inferFun fun
-inferExpression (ExprBinaryOperation op lhs rhs) = do
+inferExpression (ExprBinOp op lhs rhs) = do
   utLhs <- inferExpression lhs
   utRhs <- inferExpression rhs
   withError (const $ ImpossibleBinOpApplication utLhs utRhs) $ do
@@ -70,11 +70,11 @@ inferExpression (ExprBinaryOperation op lhs rhs) = do
       BooleanOp _ -> ut =:= UTyBool
       ArithmeticOp _ -> ut =:= UTyInt
       ComparisonOp _ -> return UTyBool
-inferExpression (ExprUnaryOperation op x) = do
+inferExpression (ExprUnOp op x) = do
   ut <- inferExpression x
   withError (const $ ImpossibleUnOpApplication ut) $ case op of
     UnaryMinusOp -> ut =:= UTyInt
-inferExpression (ExprApplication funExpr argExpr) = do
+inferExpression (ExprApp funExpr argExpr) = do
   funUT <- inferExpression funExpr
   argUT <- inferExpression argExpr
   resUT <- fresh
@@ -86,8 +86,9 @@ inferExpression (ExprIte c t e) = do
   e' <- inferExpression e
   t' =:= e'
 inferExpression (ExprLetIn decl expr) = inferLetIn decl expr
+inferExpression (ExprFun fun) = inferFun fun
 
-inferLetIn :: UserDeclaration -> Expression -> Infer UType
+inferLetIn :: Declaration -> Expression -> Infer UType
 inferLetIn (DeclVar (x, Just pty) xdef) expr = do
   let upty = toUPolytype (Forall [] $ toTypeF pty)
   upty' <- skolemize upty
@@ -98,11 +99,11 @@ inferLetIn (DeclVar (x, Nothing) xdef) expr = do
   ty <- inferExpression xdef
   pty <- generalize ty
   withBinding x pty $ inferExpression expr
-inferLetIn (DeclFun f fun) expr = do
+inferLetIn (DeclFun f False fun) expr = do
   fdef <- inferFun fun
   pfdef <- generalize fdef
   withBinding f pfdef $ inferExpression expr
-inferLetIn (DeclRecFun f fun) expr = do
+inferLetIn (DeclFun f True fun) expr = do
   preT <- fresh
   next <- withBinding f (Forall [] preT) $ inferFun fun
   after <- withBinding f (Forall [] next) $ inferFun fun

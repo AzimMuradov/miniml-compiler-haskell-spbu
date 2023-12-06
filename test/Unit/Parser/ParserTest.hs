@@ -10,6 +10,7 @@ import Parser.Ast
 import Parser.Parser (parseProgram)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (Assertion, assertEqual, testCase)
+import Trees.Common
 
 tests :: TestTree
 tests =
@@ -24,11 +25,11 @@ tests =
 
 testLetDecls :: TestTree
 testLetDecls = testCase "let declarations" $ do
-  let varDecl' x v = StmtUserDecl (DeclVar (x, Nothing) (ExprValue (ValInt v)))
+  let varDecl' x v = StmtDecl (DeclVar (x, Nothing) (ExprVal (ValInt v)))
 
   let varDecl x = varDecl' x 4
-  let funDecl x args = StmtUserDecl (DeclFun x (Fun ((,Nothing) <$> NonEmpty.fromList args) Nothing (ExprValue (ValInt 4))))
-  let recFunDecl x args = StmtUserDecl (DeclRecFun x (Fun ((,Nothing) <$> NonEmpty.fromList args) Nothing (ExprValue (ValInt 4))))
+  let funDecl x args = StmtDecl (DeclFun x False (Fun ((,Nothing) <$> NonEmpty.fromList args) Nothing (ExprVal (ValInt 4))))
+  let recFunDecl x args = StmtDecl (DeclFun x True (Fun ((,Nothing) <$> NonEmpty.fromList args) Nothing (ExprVal (ValInt 4))))
 
   let aDecl = varDecl "a"
   let bDecl = varDecl' "b" 8
@@ -36,7 +37,7 @@ testLetDecls = testCase "let declarations" $ do
   "let a = 4" ==?=> Just (Program [aDecl])
   "let a" ==?=> Nothing
   "let = 4" ==?=> Nothing
-  "leta = 4" ==?=> Just (Program [StmtExpr (ExprBinaryOperation (ComparisonOp EqOp) (ExprIdentifier "leta") (ExprValue (ValInt 4)))])
+  "leta = 4" ==?=> Just (Program [StmtExpr (ExprBinOp (ComparisonOp EqOp) (ExprId "leta") (ExprVal (ValInt 4)))])
 
   "let rec a = 4" ==?=> Nothing
   "let rec a b = 4" ==?=> Just (Program [recFunDecl "a" ["b"]])
@@ -59,18 +60,19 @@ testWhitespace = testCase "whitespace" $ do
   let decl =
         Just
           ( Program
-              [ StmtUserDecl
+              [ StmtDecl
                   ( DeclFun
                       "f"
+                      False
                       ( Fun
                           (("a", Nothing) :| [])
                           Nothing
-                          ( ExprBinaryOperation
+                          ( ExprBinOp
                               (ArithmeticOp MulOp)
-                              (ExprIdentifier "a")
-                              ( ExprApplication
-                                  (ExprApplication (ExprIdentifier "a") (ExprIdentifier "f"))
-                                  (ExprValue (ValInt 4))
+                              (ExprId "a")
+                              ( ExprApp
+                                  (ExprApp (ExprId "a") (ExprId "f"))
+                                  (ExprVal (ValInt 4))
                               )
                           )
                       )
@@ -80,16 +82,17 @@ testWhitespace = testCase "whitespace" $ do
   let declAndApp =
         Just
           ( Program
-              [ StmtUserDecl
+              [ StmtDecl
                   ( DeclFun
                       "f"
+                      False
                       ( Fun
                           (("a", Nothing) :| [])
                           Nothing
-                          (ExprBinaryOperation (ArithmeticOp MulOp) (ExprIdentifier "a") (ExprIdentifier "a"))
+                          (ExprBinOp (ArithmeticOp MulOp) (ExprId "a") (ExprId "a"))
                       )
                   ),
-                StmtExpr (ExprApplication (ExprIdentifier "f") (ExprValue (ValInt 4)))
+                StmtExpr (ExprApp (ExprId "f") (ExprVal (ValInt 4)))
               ]
           )
 
@@ -101,22 +104,22 @@ testUnaryMinusOp :: TestTree
 testUnaryMinusOp = testCase "unary minus operator" $ do
   let prgStmtExpr e = Just (Program [StmtExpr e])
 
-  let zero = ExprValue (ValInt 0)
-  let seven = ExprValue (ValInt 7)
-  let a = ExprIdentifier "a"
-  let b = ExprIdentifier "b"
+  let zero = ExprVal (ValInt 0)
+  let seven = ExprVal (ValInt 7)
+  let a = ExprId "a"
+  let b = ExprId "b"
 
-  let minus = ExprUnaryOperation UnaryMinusOp
+  let minus = ExprUnOp UnaryMinusOp
 
   "-7" ==?=> prgStmtExpr (minus seven)
   "- 7" ==?=> prgStmtExpr (minus seven)
-  "0 - 7" ==?=> prgStmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) zero seven)
-  "0 - -7" ==?=> prgStmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) zero (minus seven))
-  "0 - - 7" ==?=> prgStmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) zero (minus seven))
-  "a - 7" ==?=> prgStmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) a seven)
-  "a - b" ==?=> prgStmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) a b)
-  "a - -b" ==?=> prgStmtExpr (ExprBinaryOperation (ArithmeticOp MinusOp) a (minus b))
-  "a (-b)" ==?=> prgStmtExpr (ExprApplication a (minus b))
+  "0 - 7" ==?=> prgStmtExpr (ExprBinOp (ArithmeticOp MinusOp) zero seven)
+  "0 - -7" ==?=> prgStmtExpr (ExprBinOp (ArithmeticOp MinusOp) zero (minus seven))
+  "0 - - 7" ==?=> prgStmtExpr (ExprBinOp (ArithmeticOp MinusOp) zero (minus seven))
+  "a - 7" ==?=> prgStmtExpr (ExprBinOp (ArithmeticOp MinusOp) a seven)
+  "a - b" ==?=> prgStmtExpr (ExprBinOp (ArithmeticOp MinusOp) a b)
+  "a - -b" ==?=> prgStmtExpr (ExprBinOp (ArithmeticOp MinusOp) a (minus b))
+  "a (-b)" ==?=> prgStmtExpr (ExprApp a (minus b))
 
 (==?=>) :: Text -> Maybe Program -> Assertion
 (==?=>) text maybeAst = assertEqual ("[" <> unpack text <> "]") maybeAst (parseProgram text)
