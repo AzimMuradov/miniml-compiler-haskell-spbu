@@ -1,7 +1,7 @@
 Just
     ( Program
-        [ StmtUserDecl
-            ( DeclFun "factorial"
+        [ StmtDecl
+            ( DeclFun "factorial" False
                 ( Fun
                     (
                         ( "n"
@@ -9,7 +9,7 @@ Just
                         ) :| []
                     ) Nothing
                     ( ExprLetIn
-                        ( DeclRecFun "loop"
+                        ( DeclFun "loop" True
                             ( Fun
                                 (
                                     ( "i"
@@ -22,37 +22,37 @@ Just
                                     ]
                                 ) Nothing
                                 ( ExprIte
-                                    ( ExprBinaryOperation ( ComparisonOp GtOp )
-                                        ( ExprIdentifier "i" )
-                                        ( ExprIdentifier "n" )
+                                    ( ExprBinOp ( ComparisonOp GtOp )
+                                        ( ExprId "i" )
+                                        ( ExprId "n" )
                                     )
-                                    ( ExprIdentifier "accum" )
-                                    ( ExprApplication
-                                        ( ExprApplication
-                                            ( ExprIdentifier "loop" )
-                                            ( ExprBinaryOperation ( ArithmeticOp PlusOp )
-                                                ( ExprIdentifier "i" )
-                                                ( ExprValue
+                                    ( ExprId "accum" )
+                                    ( ExprApp
+                                        ( ExprApp
+                                            ( ExprId "loop" )
+                                            ( ExprBinOp ( ArithmeticOp PlusOp )
+                                                ( ExprId "i" )
+                                                ( ExprVal
                                                     ( ValInt 1 )
                                                 )
                                             )
                                         )
-                                        ( ExprBinaryOperation ( ArithmeticOp MulOp )
-                                            ( ExprIdentifier "accum" )
-                                            ( ExprIdentifier "i" )
+                                        ( ExprBinOp ( ArithmeticOp MulOp )
+                                            ( ExprId "accum" )
+                                            ( ExprId "i" )
                                         )
                                     )
                                 )
                             )
                         )
-                        ( ExprApplication
-                            ( ExprApplication
-                                ( ExprIdentifier "loop" )
-                                ( ExprValue
+                        ( ExprApp
+                            ( ExprApp
+                                ( ExprId "loop" )
+                                ( ExprVal
                                     ( ValInt 1 )
                                 )
                             )
-                            ( ExprValue
+                            ( ExprVal
                                 ( ValInt 1 )
                             )
                         )

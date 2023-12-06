@@ -2,10 +2,7 @@ module Transformations.Ll.Lfr where
 
 import Trees.Common
 
-data Program = Program
-  { topLevelDeclarations :: [TopLevelDeclaration],
-    idCounter :: Int
-  }
+data Program = Program [TopLevelDeclaration] IdCnt
   deriving (Show, Eq)
 
 data TopLevelDeclaration
@@ -23,5 +20,5 @@ data Expression
   | ExprUnOp UnaryOperator Expression
   | ExprApp Expression Expression
   | ExprIte Expression Expression Expression
-  | ExprLetIn [VarDeclaration] Expression
+  | ExprLetIn VarDeclaration Expression
   deriving (Show, Eq)

@@ -3,10 +3,7 @@ module Transformations.Simplification.SimplifiedAst where
 import Data.List.NonEmpty (NonEmpty)
 import Trees.Common
 
-data Program = Program
-  { topLevelDeclarations :: [Declaration],
-    idCounter :: Int
-  }
+data Program = Program [Declaration] IdCnt
   deriving (Show, Eq)
 
 data Declaration
