@@ -28,12 +28,13 @@ module Parser.Lexer
   )
 where
 
+import Data.Int (Int64)
 import Data.Text (Text, pack)
 import Data.Void (Void)
-import Parser.Ast (Identifier)
 import Text.Megaparsec (MonadParsec (..), Parsec, choice, many, (<|>))
 import Text.Megaparsec.Char (char, digitChar, letterChar, space1, string)
 import qualified Text.Megaparsec.Char.Lexer as L
+import Trees.Common (Identifier)
 
 -- * Basic lexer parts
 
@@ -89,8 +90,8 @@ boolLitP :: Parser Bool
 boolLitP = True <$ kwTrue <|> False <$ kwFalse
 
 -- | Decimal integer literal parser.
-intLitP :: Parser Integer
-intLitP = lexeme L.decimal
+intLitP :: Parser Int64
+intLitP = lexeme L.decimal -- TODO : signed, return Int64
 
 -- * Identifiers and keywords
 

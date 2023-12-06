@@ -10,6 +10,7 @@ import Parser.Ast
 import Parser.Lexer
 import Parser.Utils
 import Text.Megaparsec (MonadParsec (..), many, parseMaybe)
+import Trees.Common
 
 -- * Program Parser
 
@@ -18,19 +19,19 @@ parseProgram :: Text -> Maybe Program
 parseProgram = parseMaybe $ sc *> programP <* eof
 
 programP :: Parser Program
-programP = Program <$> (many semicolon2 *> many (statementP <* many semicolon2))
+programP = Program <$> (many semicolon2 *> many (stmtP <* many semicolon2))
 
-statementP :: Parser Statement
-statementP = choice' [StmtExpr <$> exprP, StmtUserDecl <$> userDeclP]
+stmtP :: Parser Statement
+stmtP = choice' [StmtExpr <$> exprP, StmtDecl <$> declP]
 
 -- ** User Declaration Parsers
 
-userDeclP :: Parser UserDeclaration
-userDeclP = choice' [recFunDeclP, funDeclP, varDeclP]
+declP :: Parser Declaration
+declP = choice' [recFunDeclP, funDeclP, varDeclP]
   where
     varDeclP = DeclVar <$ kwLet <*> varSigP <* eq <*> exprP
-    funDeclP = DeclFun <$ kwLet <*> identifierP <*> funP eq
-    recFunDeclP = DeclRecFun <$ kwLet <* kwRec <*> identifierP <*> funP eq
+    funDeclP = flip DeclFun False <$ kwLet <*> identifierP <*> funP eq
+    recFunDeclP = flip DeclFun True <$ kwLet <* kwRec <*> identifierP <*> funP eq
 
     varSigP = manyParens $ (,) <$> manyParens identifierP <*> optionalTypeAnnotationP
 
@@ -43,48 +44,48 @@ exprTerm :: Parser Expression
 exprTerm =
   choice'
     [ parens exprP,
-      ExprLetIn <$> userDeclP <* kwIn <*> exprP,
-      ExprValue <$> valueP,
+      ExprLetIn <$> declP <* kwIn <*> exprP,
+      valueExprP,
       ExprIte <$ kwIf <*> exprP <* kwThen <*> exprP <* kwElse <*> exprP,
-      ExprIdentifier <$> identifierP
+      ExprId <$> identifierP
     ]
 
 -- ** Operation Parsers
 
 opsTable :: [[Operator Parser Expression]]
 opsTable =
-  [ [applicationOp],
-    [unaryOp "-" UnaryMinusOp],
-    [arithmeticOp "*" MulOp, arithmeticOp "/" DivOp],
-    [arithmeticOp "+" PlusOp, arithmeticOp "-" MinusOp],
-    [ comparisonOp "=" EqOp,
-      comparisonOp "<>" NeOp,
-      comparisonOp "<=" LeOp,
-      comparisonOp "<" LtOp,
-      comparisonOp ">=" GeOp,
-      comparisonOp ">" GtOp
+  [ [appOp],
+    [unOp "-" UnaryMinusOp],
+    [arithOp "*" MulOp, arithOp "/" DivOp],
+    [arithOp "+" PlusOp, arithOp "-" MinusOp],
+    [ compOp "=" EqOp,
+      compOp "<>" NeOp,
+      compOp "<=" LeOp,
+      compOp "<" LtOp,
+      compOp ">=" GeOp,
+      compOp ">" GtOp
     ],
-    [booleanOp "&&" AndOp],
-    [booleanOp "||" OrOp]
+    [boolOp "&&" AndOp],
+    [boolOp "||" OrOp]
   ]
 
-applicationOp :: Operator Parser Expression
-applicationOp = InfixL $ return ExprApplication
+appOp :: Operator Parser Expression
+appOp = InfixL $ return ExprApp
 
-binaryLeftOp :: Text -> BinaryOperator -> Operator Parser Expression
-binaryLeftOp name op = InfixL $ ExprBinaryOperation op <$ symbol name
+binLeftOp :: Text -> BinaryOperator -> Operator Parser Expression
+binLeftOp name op = InfixL $ ExprBinOp op <$ symbol name
 
-booleanOp :: Text -> BooleanOperator -> Operator Parser Expression
-booleanOp name op = binaryLeftOp name $ BooleanOp op
+boolOp :: Text -> BooleanOperator -> Operator Parser Expression
+boolOp name op = binLeftOp name $ BooleanOp op
 
-arithmeticOp :: Text -> ArithmeticOperator -> Operator Parser Expression
-arithmeticOp name op = binaryLeftOp name $ ArithmeticOp op
+arithOp :: Text -> ArithmeticOperator -> Operator Parser Expression
+arithOp name op = binLeftOp name $ ArithmeticOp op
 
-comparisonOp :: Text -> ComparisonOperator -> Operator Parser Expression
-comparisonOp name op = binaryLeftOp name $ ComparisonOp op
+compOp :: Text -> ComparisonOperator -> Operator Parser Expression
+compOp name op = binLeftOp name $ ComparisonOp op
 
-unaryOp :: Text -> UnaryOperator -> Operator Parser Expression
-unaryOp name op = Prefix $ ExprUnaryOperation op <$ symbol name
+unOp :: Text -> UnaryOperator -> Operator Parser Expression
+unOp name op = Prefix $ ExprUnOp op <$ symbol name
 
 -- ** Type Parsers
 
@@ -105,13 +106,13 @@ typeP =
 
 -- ** Value Parsers
 
-valueP :: Parser Value
-valueP =
+valueExprP :: Parser Expression
+valueExprP =
   choice'
-    [ ValUnit <$ unitLitP,
-      ValBool <$> boolLitP,
-      ValInt <$> intLitP,
-      ValFun <$ kwFun <*> funP arrow
+    [ ExprVal ValUnit <$ unitLitP,
+      ExprVal . ValBool <$> boolLitP,
+      ExprVal . ValInt <$> intLitP,
+      ExprFun <$ kwFun <*> funP arrow
     ]
 
 -- ** Function Parser

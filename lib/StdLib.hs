@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module StdLib
@@ -10,21 +11,18 @@ module StdLib
 where
 
 import Data.Text (Text)
-import qualified Parser.Ast as Ast
-import qualified Transformations.TypelessAst as TAst
+import Trees.Common
 
 -- * Standard Library
 
-type TypedStdDeclaration = (Identifier, Ast.Type)
-
-type Identifier = Text
+type TypedStdDeclaration = (Identifier, Type)
 
 -- | The list of typed standard declarations (but without the operators).
 typedStdDeclarations :: [TypedStdDeclaration]
 typedStdDeclarations = [notDecl, printBoolDecl, printIntDecl]
 
 -- | The list of standard declarations.
-stdDeclarations :: [TAst.Identifier]
+stdDeclarations :: [Identifier]
 stdDeclarations = (mapper <$> typedStdDeclarations) <> operatorDecls
   where
     mapper (name, _) = name
@@ -32,40 +30,77 @@ stdDeclarations = (mapper <$> typedStdDeclarations) <> operatorDecls
     operatorDecls = (binOpIdentifier <$> binOps) <> (unOpIdentifier <$> unaryOps)
 
     binOps =
-      (Ast.BooleanOp <$> [minBound .. maxBound])
-        <> (Ast.ArithmeticOp <$> [minBound .. maxBound])
-        <> (Ast.ComparisonOp <$> [minBound .. maxBound])
+      (BooleanOp <$> [minBound .. maxBound])
+        <> (ArithmeticOp <$> [minBound .. maxBound])
+        <> (ComparisonOp <$> [minBound .. maxBound])
     unaryOps = [minBound .. maxBound]
 
 -- ** Function Declarations
 
 -- | The @not@ function declaration (@not : bool -> bool@).
 notDecl :: TypedStdDeclaration
-notDecl = ("not", Ast.TFun Ast.TBool Ast.TBool)
+notDecl = ("not", TFun TBool TBool)
 
 -- | The @print_bool@ function declaration (@print_bool : bool -> unit@).
 printBoolDecl :: TypedStdDeclaration
-printBoolDecl = ("print_bool", Ast.TFun Ast.TBool Ast.TUnit)
+printBoolDecl = ("print_bool", TFun TBool TUnit)
 
 -- | The @print_int@ function declaration (@print_int : int -> unit@).
 printIntDecl :: TypedStdDeclaration
-printIntDecl = ("print_int", Ast.TFun Ast.TInt Ast.TUnit)
+printIntDecl = ("print_int", TFun TInt TUnit)
 
 -- ** Operator Declarations
 
-binOpIdentifier :: Ast.BinaryOperator -> TAst.Identifier
-binOpIdentifier (Ast.BooleanOp Ast.AndOp) = "(&&)"
-binOpIdentifier (Ast.BooleanOp Ast.OrOp) = "(||)"
-binOpIdentifier (Ast.ArithmeticOp Ast.PlusOp) = "(+)"
-binOpIdentifier (Ast.ArithmeticOp Ast.MinusOp) = "(-)"
-binOpIdentifier (Ast.ArithmeticOp Ast.MulOp) = "(*)"
-binOpIdentifier (Ast.ArithmeticOp Ast.DivOp) = "(/)"
-binOpIdentifier (Ast.ComparisonOp Ast.EqOp) = "(=)"
-binOpIdentifier (Ast.ComparisonOp Ast.NeOp) = "(<>)"
-binOpIdentifier (Ast.ComparisonOp Ast.LtOp) = "(<)"
-binOpIdentifier (Ast.ComparisonOp Ast.LeOp) = "(<=)"
-binOpIdentifier (Ast.ComparisonOp Ast.GtOp) = "(>)"
-binOpIdentifier (Ast.ComparisonOp Ast.GeOp) = "(>=)"
+binOpIdentifier :: BinaryOperator -> Identifier
+binOpIdentifier (BooleanOp AndOp) = "(&&)"
+binOpIdentifier (BooleanOp OrOp) = "(||)"
+binOpIdentifier (ArithmeticOp PlusOp) = "(+)"
+binOpIdentifier (ArithmeticOp MinusOp) = "(-)"
+binOpIdentifier (ArithmeticOp MulOp) = "(*)"
+binOpIdentifier (ArithmeticOp DivOp) = "(/)"
+binOpIdentifier (ComparisonOp EqOp) = "(=)"
+binOpIdentifier (ComparisonOp NeOp) = "(<>)"
+binOpIdentifier (ComparisonOp LtOp) = "(<)"
+binOpIdentifier (ComparisonOp LeOp) = "(<=)"
+binOpIdentifier (ComparisonOp GtOp) = "(>)"
+binOpIdentifier (ComparisonOp GeOp) = "(>=)"
 
-unOpIdentifier :: Ast.UnaryOperator -> TAst.Identifier
-unOpIdentifier Ast.UnaryMinusOp = "(~-)"
+unOpIdentifier :: UnaryOperator -> Identifier
+unOpIdentifier UnaryMinusOp = "(~-)"
+
+data StdLibDecl
+  = And
+  | Or
+  | Not
+  | UnMinus
+  | Plus
+  | Minus
+  | Mul
+  | Div
+  | Eq
+  | Ne
+  | Lt
+  | Le
+  | Gt
+  | Ge
+  | PrintBool
+  | PrintInt
+
+stdDeclName :: StdLibDecl -> Text
+stdDeclName = \case
+  And -> "(&&)"
+  Or -> "(||)"
+  Not -> "not"
+  UnMinus -> "(~-)"
+  Plus -> "(+)"
+  Minus -> "(-)"
+  Mul -> "(*)"
+  Div -> "(/)"
+  Eq -> "(=)"
+  Ne -> "(<>)"
+  Lt -> "(<)"
+  Le -> "(<=)"
+  Gt -> "(>)"
+  Ge -> "(>=)"
+  PrintBool -> "print_bool"
+  PrintInt -> "print_int"
