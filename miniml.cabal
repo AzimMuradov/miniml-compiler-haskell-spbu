@@ -35,16 +35,20 @@ library
         Parser.Parser
         Parser.Utils
         StdLib
-        Transformations.Anf
-        Transformations.AnfPrettyPrinter
-        Transformations.AstToAnf
-        Transformations.AstToTypelessAst
-        Transformations.RelabelVars
-        Transformations.TypelessAst
-        Transformations.TypelessAstToAnf
+        Transformations.Anf.Anf
+        Transformations.Anf.AnfGen
+        Transformations.Anf.PrettyPrinter
+        Transformations.Cc.Cc
+        Transformations.Ll.Lfr
+        Transformations.Ll.Ll
+        Transformations.Relabeler.RelabelVars
+        Transformations.Simplification.SimplifiedAst
+        Transformations.Simplification.SimplifyAst
+        Trees.Common
         TypeInference.HindleyMilner
         TypeInference.PrettyPrint
         TypeInference.TypeInference
+        Utils
 
     other-modules:
     other-extensions:
@@ -56,6 +60,7 @@ library
         , megaparsec          >=9.2
         , mtl                 >=2.2.2
         , parser-combinators  >=1.3.0
+        , string-transform    >=1.1.1
         , transformers        >=0.5.6
         , unification-fd      >=0.5.0
 
