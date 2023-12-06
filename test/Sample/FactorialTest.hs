@@ -12,10 +12,10 @@ import Parser.Parser (parseProgram)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.Golden (goldenVsString)
 import Text.Pretty.Simple (pShowNoColor)
-import Transformations.AnfPrettyPrinter (prettyPrint)
-import Transformations.AstToAnf (astToAnf)
+import Transformations.Anf.AnfGen (astToAnf)
+import Transformations.Anf.PrettyPrinter (prettyPrint)
 import TypeInference.PrettyPrint (pretty)
-import TypeInference.TypeInference
+import TypeInference.TypeInference (inferProgram)
 
 tests :: TestTree
 tests =
