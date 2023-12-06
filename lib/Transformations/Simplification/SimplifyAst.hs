@@ -13,9 +13,7 @@ simplifyAst (Ast.Program stmts) = uncurry SAst.Program $ runState (mapM simplify
 
 -- Implementation
 
-type SimplifierState = State IdCnt
-
-type IdCnt = Int
+type SimplifierState = State Common.IdCnt
 
 simplifyStmt :: Ast.Statement -> SimplifierState SAst.Declaration
 simplifyStmt = \case

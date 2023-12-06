@@ -21,11 +21,9 @@ relabelAst (Ast.Program tlDecls cnt) =
 
 type RelabelerState = State Env
 
-data Env = Env {scopes :: [Scope], idCnt :: Int}
+data Env = Env {scopes :: [Scope], idCnt :: Ast.IdCnt}
 
 type Scope = (Ast.Identifier', Ast.Identifier')
-
--- TODO : refactor decl & fun
 
 relabelDecl :: Ast.Declaration -> RelabelerState Ast.Declaration
 relabelDecl = \case
