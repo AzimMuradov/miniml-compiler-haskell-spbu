@@ -3,6 +3,7 @@
 module Transformations.Simplification.SimplifyAst (simplifyAst) where
 
 import Control.Monad.State (State, get, modify, runState)
+import Data.Text (pack)
 import qualified Parser.Ast as Ast
 import qualified Transformations.Simplification.SimplifiedAst as SAst
 import qualified Trees.Common as Common
@@ -50,7 +51,7 @@ genName :: SimplifierState Common.Identifier'
 genName = do
   cnt <- get
   modify (+ 1)
-  return $ Common.Gen cnt
+  return $ Common.Gen cnt $ pack "simp"
 
 -- Utils
 

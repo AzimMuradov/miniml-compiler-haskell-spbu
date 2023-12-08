@@ -25,8 +25,8 @@ prettyAtomic aexpr = case aexpr of
   AtomId name -> prettyId name
   AtomBool value -> if value then "true" else "false"
   AtomInt value -> show value
-  AtomBinOp op lhs rhs -> parens (unwords [unpack $ binOpIdentifier op, prettyAtomic lhs, prettyAtomic rhs])
-  AtomUnOp op x -> parens (unwords [unpack $ unOpIdentifier op, prettyAtomic x])
+  AtomBinOp op lhs rhs -> parens (unwords [prettyAtomic lhs, unpack $ binOpIdentifier op, prettyAtomic rhs])
+  AtomUnOp op x -> parens $ unpack (unOpIdentifier op) <> prettyAtomic x
 
 prettyComplex :: ComplexExpression -> String
 prettyComplex cexpr = case cexpr of
@@ -34,11 +34,11 @@ prettyComplex cexpr = case cexpr of
   CompIte c t e -> unwords ["if", prettyAtomic c, "then", prettyAtomic t, "else", prettyAtomic e]
 
 prettyId :: Identifier' -> String
-prettyId (Txt n) = "`" <> unpack n <> "`"
-prettyId (Gen n) = "`$" <> show n <> "`"
+prettyId (Txt n) = unpack n
+prettyId (Gen n ident) = unpack ident <> "'" <> show n
 
 parens :: String -> String
 parens val = "(" <> val <> ")"
 
 doubleSemicolon :: String -> String
-doubleSemicolon val = val <> ";;"
+doubleSemicolon val = val

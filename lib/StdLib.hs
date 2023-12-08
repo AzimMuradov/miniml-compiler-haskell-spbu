@@ -52,21 +52,21 @@ printIntDecl = ("print_int", TFun TInt TUnit)
 -- ** Operator Declarations
 
 binOpIdentifier :: BinaryOperator -> Identifier
-binOpIdentifier (BooleanOp AndOp) = "(&&)"
-binOpIdentifier (BooleanOp OrOp) = "(||)"
-binOpIdentifier (ArithmeticOp PlusOp) = "(+)"
-binOpIdentifier (ArithmeticOp MinusOp) = "(-)"
-binOpIdentifier (ArithmeticOp MulOp) = "(*)"
-binOpIdentifier (ArithmeticOp DivOp) = "(/)"
-binOpIdentifier (ComparisonOp EqOp) = "(=)"
-binOpIdentifier (ComparisonOp NeOp) = "(<>)"
-binOpIdentifier (ComparisonOp LtOp) = "(<)"
-binOpIdentifier (ComparisonOp LeOp) = "(<=)"
-binOpIdentifier (ComparisonOp GtOp) = "(>)"
-binOpIdentifier (ComparisonOp GeOp) = "(>=)"
+binOpIdentifier (BooleanOp AndOp) = "&&"
+binOpIdentifier (BooleanOp OrOp) = "||"
+binOpIdentifier (ArithmeticOp PlusOp) = "+"
+binOpIdentifier (ArithmeticOp MinusOp) = "-"
+binOpIdentifier (ArithmeticOp MulOp) = "*"
+binOpIdentifier (ArithmeticOp DivOp) = "/"
+binOpIdentifier (ComparisonOp EqOp) = "="
+binOpIdentifier (ComparisonOp NeOp) = "<>"
+binOpIdentifier (ComparisonOp LtOp) = "<"
+binOpIdentifier (ComparisonOp LeOp) = "<="
+binOpIdentifier (ComparisonOp GtOp) = ">"
+binOpIdentifier (ComparisonOp GeOp) = ">="
 
 unOpIdentifier :: UnaryOperator -> Identifier
-unOpIdentifier UnaryMinusOp = "(~-)"
+unOpIdentifier UnaryMinusOp = "-"
 
 data StdLibDecl
   = And
