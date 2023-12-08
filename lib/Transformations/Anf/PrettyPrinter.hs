@@ -34,9 +34,10 @@ prettyExpr (ExprLetIn (ident, val) expr) = do
   indent <- get
   val' <- prettyExpr val
   expr' <- prettyExpr expr
-  let res = unwords ["\n" <> replicate indent ' ' <> "let", prettyId ident, "=", val', "\n" <> replicate indent ' ' <> "in", expr']
+  let declText = createIndent indent <> "let " <> prettyId ident <> " = " <> val'
+  let exprText = createIndent indent <> "in " <> expr'
   modify $ \x -> x - 2
-  return res
+  return $ declText <> exprText
 
 prettyAtomic :: AtomicExpression -> String
 prettyAtomic aexpr = case aexpr of
@@ -50,16 +51,18 @@ prettyComplex :: ComplexExpression -> IndentState String
 prettyComplex cexpr = case cexpr of
   CompApp f arg -> return $ parens $ prettyAtomic f <> " " <> prettyAtomic arg
   CompIte c t e -> do
-    modify (+ 2)
     indent <- get
-    let bindent = "\n" <> replicate (indent + 2) ' '
-    let res = unwords ["\n" <> replicate indent ' ' <> "if", prettyAtomic c, bindent <> "then", prettyAtomic t, bindent <> "else", prettyAtomic e]
-    modify $ \x -> x - 2
-    return res
+    let cText = createIndent (indent + 2) <> "if " <> prettyAtomic c
+    let tText = createIndent (indent + 4) <> "then " <> prettyAtomic t
+    let eText = createIndent (indent + 4) <> "else " <> prettyAtomic e
+    return $ cText <> tText <> eText
 
 prettyId :: Identifier' -> String
 prettyId (Txt n) = unpack n
 prettyId (Gen n ident) = unpack ident <> "'" <> show n
+
+createIndent :: Int -> String
+createIndent indent = "\n" <> replicate indent ' '
 
 parens :: String -> String
 parens val = "(" <> val <> ")"
