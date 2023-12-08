@@ -1,3 +1,10 @@
-let g'1 x'2 = let anf'6 = (g'1 (x'2 + 1)) in if (x'2 < 0) then 0 else anf'6
-let g'4 x'3 = let anf'7 = (g'1 (-5)) in (anf'7 + x'3)
-let simp'5 = (g'4 3)
+let g'1 x'2 = 
+  let anf'6 = (g'1 (x'2 + 1)) 
+  in 
+    if (x'2 < 0) 
+      then 0 
+      else anf'6;;
+let g'4 x'3 = 
+  let anf'7 = (g'1 (-5)) 
+  in (anf'7 + x'3);;
+let simp'5 = (g'4 3);;
