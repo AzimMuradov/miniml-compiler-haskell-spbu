@@ -1,6 +1,6 @@
-let `$1` `$2` `$3` = let `$16` = let `$15` = (`$1` ((-) `$2` 1)) in (`$15` ((+) `$3` 5)) in if ((||) ((=) `$2` 0) ((=) `$3` 1)) then true else `$16`;;
-let `$4` `$5` `$6` `$7` = let `$8` = ((+) `$6` `$7`) in let `$19` = let `$18` = let `$17` = (`$4` 0) in (`$17` 0) in (`$18` `$7`) in let `$21` = let `$20` = (`$1` `$8`) in (`$20` `$6`) in if ((=) `$8` 1) then `$19` else `$21`;;
-let `$9` = let `$23` = let `$22` = (`$1` 0) in (`$22` 2) in let `$26` = let `$25` = let `$24` = (`$4` 2) in (`$24` 2) in (`$25` 2) in ((+) `$23` `$26`);;
-let `$11` `$10` = ((+) `$10` 1);;
-let `$13` `$12` = let `$27` = (`$11` `$12`) in ((+) `$27` 2);;
-let `$14` = (`$13` 5);;
+let g'1 a'2 b'3 = let anf'16 = let anf'15 = (g'1 (a'2 - 1)) in (anf'15 (b'3 + 5)) in if ((a'2 = 0) || (b'3 = 1)) then true else anf'16
+let h'4 m'5 p'6 z'7 = let m'8 = (p'6 + z'7) in let anf'19 = let anf'18 = let anf'17 = (h'4 0) in (anf'17 0) in (anf'18 z'7) in let anf'21 = let anf'20 = (g'1 m'8) in (anf'20 p'6) in if (m'8 = 1) then anf'19 else anf'21
+let g'9 = let anf'23 = let anf'22 = (g'1 0) in (anf'22 2) in let anf'26 = let anf'25 = let anf'24 = (h'4 2) in (anf'24 2) in (anf'25 2) in (anf'23 + anf'26)
+let g'11 a'10 = (a'10 + 1)
+let g'13 b'12 = let anf'27 = (g'11 b'12) in (anf'27 + 2)
+let simp'14 = (g'13 5)

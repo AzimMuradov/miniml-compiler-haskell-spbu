@@ -1,3 +1,3 @@
-let `$1` `$2` = let `$6` = (`$1` ((+) `$2` 1)) in if ((<) `$2` 0) then 0 else `$6`;;
-let `$4` `$3` = let `$7` = (`$1` ((~-) 5)) in ((+) `$7` `$3`);;
-let `$5` = (`$4` 3);;
+let g'1 x'2 = let anf'6 = (g'1 (x'2 + 1)) in if (x'2 < 0) then 0 else anf'6
+let g'4 x'3 = let anf'7 = (g'1 (-5)) in (anf'7 + x'3)
+let simp'5 = (g'4 3)
