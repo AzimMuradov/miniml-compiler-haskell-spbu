@@ -37,7 +37,7 @@ testLetDecls = testCase "let declarations" $ do
   "let a = 4" ==?=> Just (Program [aDecl])
   "let a" ==?=> Nothing
   "let = 4" ==?=> Nothing
-  "leta = 4" ==?=> Just (Program [StmtExpr (ExprBinOp (ComparisonOp EqOp) (ExprId "leta") (ExprVal (ValInt 4)))])
+  "leta = 4" ==?=> Just (Program [StmtExpr (ExprBinOp (CompOp EqOp) (ExprId "leta") (ExprVal (ValInt 4)))])
 
   "let rec a = 4" ==?=> Nothing
   "let rec a b = 4" ==?=> Just (Program [recFunDecl "a" ["b"]])
@@ -68,7 +68,7 @@ testWhitespace = testCase "whitespace" $ do
                           (("a", Nothing) :| [])
                           Nothing
                           ( ExprBinOp
-                              (ArithmeticOp MulOp)
+                              (ArithOp MulOp)
                               (ExprId "a")
                               ( ExprApp
                                   (ExprApp (ExprId "a") (ExprId "f"))
@@ -89,7 +89,7 @@ testWhitespace = testCase "whitespace" $ do
                       ( Fun
                           (("a", Nothing) :| [])
                           Nothing
-                          (ExprBinOp (ArithmeticOp MulOp) (ExprId "a") (ExprId "a"))
+                          (ExprBinOp (ArithOp MulOp) (ExprId "a") (ExprId "a"))
                       )
                   ),
                 StmtExpr (ExprApp (ExprId "f") (ExprVal (ValInt 4)))
@@ -109,16 +109,16 @@ testUnaryMinusOp = testCase "unary minus operator" $ do
   let a = ExprId "a"
   let b = ExprId "b"
 
-  let minus = ExprUnOp UnaryMinusOp
+  let minus = ExprUnOp UnMinusOp
 
   "-7" ==?=> prgStmtExpr (minus seven)
   "- 7" ==?=> prgStmtExpr (minus seven)
-  "0 - 7" ==?=> prgStmtExpr (ExprBinOp (ArithmeticOp MinusOp) zero seven)
-  "0 - -7" ==?=> prgStmtExpr (ExprBinOp (ArithmeticOp MinusOp) zero (minus seven))
-  "0 - - 7" ==?=> prgStmtExpr (ExprBinOp (ArithmeticOp MinusOp) zero (minus seven))
-  "a - 7" ==?=> prgStmtExpr (ExprBinOp (ArithmeticOp MinusOp) a seven)
-  "a - b" ==?=> prgStmtExpr (ExprBinOp (ArithmeticOp MinusOp) a b)
-  "a - -b" ==?=> prgStmtExpr (ExprBinOp (ArithmeticOp MinusOp) a (minus b))
+  "0 - 7" ==?=> prgStmtExpr (ExprBinOp (ArithOp MinusOp) zero seven)
+  "0 - -7" ==?=> prgStmtExpr (ExprBinOp (ArithOp MinusOp) zero (minus seven))
+  "0 - - 7" ==?=> prgStmtExpr (ExprBinOp (ArithOp MinusOp) zero (minus seven))
+  "a - 7" ==?=> prgStmtExpr (ExprBinOp (ArithOp MinusOp) a seven)
+  "a - b" ==?=> prgStmtExpr (ExprBinOp (ArithOp MinusOp) a b)
+  "a - -b" ==?=> prgStmtExpr (ExprBinOp (ArithOp MinusOp) a (minus b))
   "a (-b)" ==?=> prgStmtExpr (ExprApp a (minus b))
 
 (==?=>) :: Text -> Maybe Program -> Assertion

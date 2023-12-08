@@ -20,17 +20,17 @@ type IdCnt = Int
 -- | Binary operator.
 data BinaryOperator
   = -- | Boolean operator, see 'BooleanOperator'.
-    BooleanOp BooleanOperator
+    BoolOp BooleanOperator
   | -- | Arithmetic operator, see 'ArithmeticOperator'.
-    ArithmeticOp ArithmeticOperator
+    ArithOp ArithmeticOperator
   | -- | Comparison operator, see 'ComparisonOperator'.
-    ComparisonOp ComparisonOperator
+    CompOp ComparisonOperator
   deriving (Show, Eq)
 
 -- | Unary operator.
 data UnaryOperator
   = -- | Unary minus operator (@-a@), works only for @int@.
-    UnaryMinusOp
+    UnMinusOp
   deriving (Show, Eq, Enum, Bounded)
 
 -- | Boolean operator.

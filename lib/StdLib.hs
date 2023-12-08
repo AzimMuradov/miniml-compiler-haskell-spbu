@@ -30,9 +30,9 @@ stdDeclarations = (mapper <$> typedStdDeclarations) <> operatorDecls
     operatorDecls = (binOpIdentifier <$> binOps) <> (unOpIdentifier <$> unaryOps)
 
     binOps =
-      (BooleanOp <$> [minBound .. maxBound])
-        <> (ArithmeticOp <$> [minBound .. maxBound])
-        <> (ComparisonOp <$> [minBound .. maxBound])
+      (BoolOp <$> [minBound .. maxBound])
+        <> (ArithOp <$> [minBound .. maxBound])
+        <> (CompOp <$> [minBound .. maxBound])
     unaryOps = [minBound .. maxBound]
 
 -- ** Function Declarations
@@ -52,21 +52,21 @@ printIntDecl = ("print_int", TFun TInt TUnit)
 -- ** Operator Declarations
 
 binOpIdentifier :: BinaryOperator -> Identifier
-binOpIdentifier (BooleanOp AndOp) = "(&&)"
-binOpIdentifier (BooleanOp OrOp) = "(||)"
-binOpIdentifier (ArithmeticOp PlusOp) = "(+)"
-binOpIdentifier (ArithmeticOp MinusOp) = "(-)"
-binOpIdentifier (ArithmeticOp MulOp) = "(*)"
-binOpIdentifier (ArithmeticOp DivOp) = "(/)"
-binOpIdentifier (ComparisonOp EqOp) = "(=)"
-binOpIdentifier (ComparisonOp NeOp) = "(<>)"
-binOpIdentifier (ComparisonOp LtOp) = "(<)"
-binOpIdentifier (ComparisonOp LeOp) = "(<=)"
-binOpIdentifier (ComparisonOp GtOp) = "(>)"
-binOpIdentifier (ComparisonOp GeOp) = "(>=)"
+binOpIdentifier (BoolOp AndOp) = "(&&)"
+binOpIdentifier (BoolOp OrOp) = "(||)"
+binOpIdentifier (ArithOp PlusOp) = "(+)"
+binOpIdentifier (ArithOp MinusOp) = "(-)"
+binOpIdentifier (ArithOp MulOp) = "(*)"
+binOpIdentifier (ArithOp DivOp) = "(/)"
+binOpIdentifier (CompOp EqOp) = "(=)"
+binOpIdentifier (CompOp NeOp) = "(<>)"
+binOpIdentifier (CompOp LtOp) = "(<)"
+binOpIdentifier (CompOp LeOp) = "(<=)"
+binOpIdentifier (CompOp GtOp) = "(>)"
+binOpIdentifier (CompOp GeOp) = "(>=)"
 
 unOpIdentifier :: UnaryOperator -> Identifier
-unOpIdentifier UnaryMinusOp = "(~-)"
+unOpIdentifier UnMinusOp = "(~-)"
 
 data StdLibDecl
   = And

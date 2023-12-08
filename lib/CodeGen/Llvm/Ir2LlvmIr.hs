@@ -36,7 +36,7 @@ ir2LlvmIr = LLVM.buildModule "example" $ do
     ourExpression <-
       genIte
         (AtomBool True)
-        (AtomBinOp (ArithmeticOp PlusOp) (AtomInt 4) (AtomInt 8))
+        (AtomBinOp (ArithOp PlusOp) (AtomInt 4) (AtomInt 8))
         (AtomInt 15)
 
     -- print our result to stdout
@@ -77,23 +77,23 @@ genAtom atom = case atom of
     lhs' <- genAtom lhs
     rhs' <- genAtom rhs
     let opF = case op of
-          BooleanOp AndOp -> LLVM.and
-          BooleanOp OrOp -> LLVM.or
-          ArithmeticOp PlusOp -> LLVM.add
-          ArithmeticOp MinusOp -> LLVM.sub
-          ArithmeticOp MulOp -> LLVM.mul
-          ArithmeticOp DivOp -> LLVM.sdiv
-          ComparisonOp EqOp -> LLVM.icmp LLVM.EQ
-          ComparisonOp NeOp -> LLVM.icmp LLVM.NE
-          ComparisonOp LtOp -> LLVM.icmp LLVM.SLT
-          ComparisonOp LeOp -> LLVM.icmp LLVM.SLE
-          ComparisonOp GtOp -> LLVM.icmp LLVM.SGT
-          ComparisonOp GeOp -> LLVM.icmp LLVM.SGE
+          BoolOp AndOp -> LLVM.and
+          BoolOp OrOp -> LLVM.or
+          ArithOp PlusOp -> LLVM.add
+          ArithOp MinusOp -> LLVM.sub
+          ArithOp MulOp -> LLVM.mul
+          ArithOp DivOp -> LLVM.sdiv
+          CompOp EqOp -> LLVM.icmp LLVM.EQ
+          CompOp NeOp -> LLVM.icmp LLVM.NE
+          CompOp LtOp -> LLVM.icmp LLVM.SLT
+          CompOp LeOp -> LLVM.icmp LLVM.SLE
+          CompOp GtOp -> LLVM.icmp LLVM.SGT
+          CompOp GeOp -> LLVM.icmp LLVM.SGE
     opF lhs' rhs'
   AtomUnOp op x -> do
     x' <- genAtom x
     let opF = case op of
-          UnaryMinusOp -> LLVM.mul (LLVM.int64 (-1))
+          UnMinusOp -> LLVM.mul (LLVM.int64 (-1))
     opF x'
 
 genComp ::

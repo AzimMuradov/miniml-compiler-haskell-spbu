@@ -55,7 +55,7 @@ exprTerm =
 opsTable :: [[Operator Parser Expression]]
 opsTable =
   [ [appOp],
-    [unOp "-" UnaryMinusOp],
+    [unOp "-" UnMinusOp],
     [arithOp "*" MulOp, arithOp "/" DivOp],
     [arithOp "+" PlusOp, arithOp "-" MinusOp],
     [ compOp "=" EqOp,
@@ -76,13 +76,13 @@ binLeftOp :: Text -> BinaryOperator -> Operator Parser Expression
 binLeftOp name op = InfixL $ ExprBinOp op <$ symbol name
 
 boolOp :: Text -> BooleanOperator -> Operator Parser Expression
-boolOp name op = binLeftOp name $ BooleanOp op
+boolOp name op = binLeftOp name $ BoolOp op
 
 arithOp :: Text -> ArithmeticOperator -> Operator Parser Expression
-arithOp name op = binLeftOp name $ ArithmeticOp op
+arithOp name op = binLeftOp name $ ArithOp op
 
 compOp :: Text -> ComparisonOperator -> Operator Parser Expression
-compOp name op = binLeftOp name $ ComparisonOp op
+compOp name op = binLeftOp name $ CompOp op
 
 unOp :: Text -> UnaryOperator -> Operator Parser Expression
 unOp name op = Prefix $ ExprUnOp op <$ symbol name
