@@ -5,8 +5,6 @@ module StdLib
   ( TypedStdDeclaration,
     typedStdDeclarations,
     stdDeclarations,
-    binOpIdentifier,
-    unOpIdentifier,
   )
 where
 
@@ -23,17 +21,7 @@ typedStdDeclarations = [notDecl, printBoolDecl, printIntDecl]
 
 -- | The list of standard declarations.
 stdDeclarations :: [Identifier]
-stdDeclarations = (mapper <$> typedStdDeclarations) <> operatorDecls
-  where
-    mapper (name, _) = name
-
-    operatorDecls = (binOpIdentifier <$> binOps) <> (unOpIdentifier <$> unaryOps)
-
-    binOps =
-      (BooleanOp <$> [minBound .. maxBound])
-        <> (ArithmeticOp <$> [minBound .. maxBound])
-        <> (ComparisonOp <$> [minBound .. maxBound])
-    unaryOps = [minBound .. maxBound]
+stdDeclarations = fst <$> typedStdDeclarations
 
 -- ** Function Declarations
 
@@ -48,25 +36,6 @@ printBoolDecl = ("print_bool", TFun TBool TUnit)
 -- | The @print_int@ function declaration (@print_int : int -> unit@).
 printIntDecl :: TypedStdDeclaration
 printIntDecl = ("print_int", TFun TInt TUnit)
-
--- ** Operator Declarations
-
-binOpIdentifier :: BinaryOperator -> Identifier
-binOpIdentifier (BooleanOp AndOp) = "(&&)"
-binOpIdentifier (BooleanOp OrOp) = "(||)"
-binOpIdentifier (ArithmeticOp PlusOp) = "(+)"
-binOpIdentifier (ArithmeticOp MinusOp) = "(-)"
-binOpIdentifier (ArithmeticOp MulOp) = "(*)"
-binOpIdentifier (ArithmeticOp DivOp) = "(/)"
-binOpIdentifier (ComparisonOp EqOp) = "(=)"
-binOpIdentifier (ComparisonOp NeOp) = "(<>)"
-binOpIdentifier (ComparisonOp LtOp) = "(<)"
-binOpIdentifier (ComparisonOp LeOp) = "(<=)"
-binOpIdentifier (ComparisonOp GtOp) = "(>)"
-binOpIdentifier (ComparisonOp GeOp) = "(>=)"
-
-unOpIdentifier :: UnaryOperator -> Identifier
-unOpIdentifier UnaryMinusOp = "(~-)"
 
 data StdLibDecl
   = And
