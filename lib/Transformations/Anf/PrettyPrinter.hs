@@ -1,30 +1,29 @@
+{-# LANGUAGE LambdaCase #-}
+
 module Transformations.Anf.PrettyPrinter (prettyPrint) where
 
 import Control.Monad.State (MonadState (get), State, evalState, modify)
 import Data.Text (unpack)
-import StdLib (binOpIdentifier, unOpIdentifier)
 import Transformations.Anf.Anf
-import Trees.Common (Identifier' (Gen, Txt))
+import Trees.Common
 
-type IndentLevel = Int
+prettyPrint :: Program -> String
+prettyPrint (Program decls) = unlines $ prettyDecl <$> decls
 
 type IndentState = State IndentLevel
 
-prettyPrint :: Program -> String
-prettyPrint (Program stmts) = prettyPrint' stmts
+type IndentLevel = Int
 
-prettyPrint' :: [GlobalDeclaration] -> String
-prettyPrint' stmts = unlines $ map (\stmt -> evalState (prettyStmt stmt) 0) stmts
-
-prettyStmt :: GlobalDeclaration -> IndentState String
-prettyStmt (GlobVarDecl name value) =
-  doubleSemicolon <$> do
-    val' <- prettyExpr value
-    return $ unwords ["let", prettyId name, "=", val']
-prettyStmt (GlobFunDecl name params body) =
-  doubleSemicolon <$> do
-    val' <- prettyExpr body
-    return $ unwords ["let", prettyId name, unwords (prettyId <$> params), "=", val']
+prettyDecl :: GlobalDeclaration -> String
+prettyDecl decl = evalState (prettyDecl' decl) 0 <> ";;"
+  where
+    prettyDecl' :: GlobalDeclaration -> IndentState String
+    prettyDecl' (GlobVarDecl name value) = do
+      val' <- prettyExpr value
+      return $ unwords ["let", prettyId name, "=", val']
+    prettyDecl' (GlobFunDecl name params body) = do
+      val' <- prettyExpr body
+      return $ unwords ["let", prettyId name, unwords (prettyId <$> params), "=", val']
 
 prettyExpr :: Expression -> IndentState String
 prettyExpr (ExprAtom aexpr) = return $ prettyAtomic aexpr
@@ -39,14 +38,6 @@ prettyExpr (ExprLetIn (ident, val) expr) = do
   modify $ \x -> x - 2
   return $ declText <> exprText
 
-prettyAtomic :: AtomicExpression -> String
-prettyAtomic aexpr = case aexpr of
-  AtomId name -> prettyId name
-  AtomBool value -> if value then "true" else "false"
-  AtomInt value -> show value
-  AtomBinOp op lhs rhs -> parens (unwords [prettyAtomic lhs, unpack $ binOpIdentifier op, prettyAtomic rhs])
-  AtomUnOp op x -> parens $ unpack (unOpIdentifier op) <> prettyAtomic x
-
 prettyComplex :: ComplexExpression -> IndentState String
 prettyComplex cexpr = case cexpr of
   CompApp f arg -> return $ parens $ prettyAtomic f <> " " <> prettyAtomic arg
@@ -57,15 +48,38 @@ prettyComplex cexpr = case cexpr of
     let eText = createIndent (indent + 4) <> "else " <> prettyAtomic e
     return $ cText <> tText <> eText
 
+prettyAtomic :: AtomicExpression -> String
+prettyAtomic = \case
+  AtomId name -> prettyId name
+  AtomBool value -> if value then "true" else "false"
+  AtomInt value -> show value
+  AtomBinOp op lhs rhs -> parens (unwords [prettyAtomic lhs, prettyBinOp op, prettyAtomic rhs])
+  AtomUnOp op x -> parens $ prettyUnOp op <> prettyAtomic x
+
 prettyId :: Identifier' -> String
 prettyId (Txt n) = unpack n
 prettyId (Gen n ident) = unpack ident <> "'" <> show n
+
+prettyBinOp :: BinaryOperator -> String
+prettyBinOp = \case
+  BooleanOp AndOp -> "&&"
+  BooleanOp OrOp -> "||"
+  ArithmeticOp PlusOp -> "+"
+  ArithmeticOp MinusOp -> "-"
+  ArithmeticOp MulOp -> "*"
+  ArithmeticOp DivOp -> "/"
+  ComparisonOp EqOp -> "="
+  ComparisonOp NeOp -> "<>"
+  ComparisonOp LtOp -> "<"
+  ComparisonOp LeOp -> "<="
+  ComparisonOp GtOp -> ">"
+  ComparisonOp GeOp -> ">="
+
+prettyUnOp :: UnaryOperator -> String
+prettyUnOp UnaryMinusOp = "-"
 
 createIndent :: Int -> String
 createIndent indent = "\n" <> replicate indent ' '
 
 parens :: String -> String
 parens val = "(" <> val <> ")"
-
-doubleSemicolon :: String -> String
-doubleSemicolon = (<> ";;")
