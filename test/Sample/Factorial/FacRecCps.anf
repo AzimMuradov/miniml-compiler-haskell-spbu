@@ -1,4 +1,21 @@
-let `$1` `$0` = `$0`;;
-let `$8` `$3` `$4` `$5` = (`$4` ((*) `$3` `$5`));;
-let `$2` `$3` `$4` = let `$9` = (`$4` 1) in let `$14` = let `$10` = (`$2` ((-) `$3` 1)) in let `$13` = let `$12` = let `$11` = (`$8` `$3`) in (`$11` `$4`) in (`$12` `$5`) in (`$10` `$13`) in if ((=) `$3` 0) then `$9` else `$14`;;
-let `$7` `$6` = let `$15` = (`$2` `$6`) in (`$15` `$1`);;
+let id'1 x'0 = x'0;;
+let ll'8 n'3 k'4 result'5 = (k'4 (n'3 * result'5));;
+let cps_factorial'2 n'3 k'4 = 
+  let anf'9 = (k'4 1)
+  in 
+    let anf'14 = 
+      let anf'10 = (cps_factorial'2 (n'3 - 1))
+      in 
+        let anf'13 = 
+          let anf'12 = 
+            let anf'11 = (ll'8 n'3)
+            in (anf'11 k'4)
+          in (anf'12 result'5)
+        in (anf'10 anf'13)
+    in 
+      if (n'3 = 0)
+        then anf'9
+        else anf'14;;
+let factorial'7 n'6 = 
+  let anf'15 = (cps_factorial'2 n'6)
+  in (anf'15 id'1);;

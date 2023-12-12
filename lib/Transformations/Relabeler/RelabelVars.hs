@@ -85,9 +85,12 @@ findLabel name = do
 pushScope :: Ast.Identifier' -> RelabelerState ()
 pushScope name = modify $ \(Env scs cnt) ->
   Env
-    { scopes = (name, Ast.Gen cnt) : scs,
+    { scopes = (name, Ast.Gen cnt (getIdentName name)) : scs,
       idCnt = cnt + 1
     }
+  where
+    getIdentName (Ast.Gen _ ident) = ident
+    getIdentName (Ast.Txt ident) = ident
 
 popScope :: RelabelerState ()
 popScope = modify $ \env@(Env scs _) -> env {scopes = tail scs}
