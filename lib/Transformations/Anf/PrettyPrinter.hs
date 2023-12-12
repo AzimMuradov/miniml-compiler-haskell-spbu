@@ -39,7 +39,7 @@ prettyExpr (ExprLetIn (ident, val) expr) = do
   return $ declText <> exprText
 
 prettyComplex :: ComplexExpression -> IndentState String
-prettyComplex cexpr = case cexpr of
+prettyComplex = \case
   CompApp f arg -> return $ parens $ prettyAtomic f <> " " <> prettyAtomic arg
   CompIte c t e -> do
     indent <- get
