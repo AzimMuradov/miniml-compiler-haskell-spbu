@@ -31,6 +31,7 @@ library
     import:           shared-properties
     exposed-modules:
         CodeGen.Llvm.Ir2LlvmIr
+        CodeGen.Module
         Parser.Ast
         Parser.Lexer
         Parser.Parser
