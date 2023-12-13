@@ -10,7 +10,7 @@ type Identifier = Text
 
 data Identifier'
   = Txt Identifier
-  | Gen IdCnt
+  | Gen IdCnt Identifier
   deriving (Show, Eq, Ord)
 
 type IdCnt = Int

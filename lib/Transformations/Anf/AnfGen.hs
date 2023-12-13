@@ -5,6 +5,7 @@ module Transformations.Anf.AnfGen (astToAnf) where
 import Control.Monad.Cont (ContT, mapContT)
 import Control.Monad.State (MonadTrans (lift), State, evalState, get, modify)
 import Control.Monad.Trans.Cont (evalContT)
+import Data.Text (pack)
 import qualified Parser.Ast as Ast
 import qualified Transformations.Anf.Anf as Anf
 import Transformations.Cc.Cc (ccAst)
@@ -83,4 +84,4 @@ genName :: CntState Common.Identifier'
 genName = do
   cnt <- get
   modify (+ 1)
-  return $ Common.Gen cnt
+  return $ Common.Gen cnt $ pack "anf"

@@ -4,6 +4,7 @@ module Transformations.Ll.Ll (llAst) where
 
 import Control.Monad.State (State, get, modify, runState)
 import qualified Data.List.NonEmpty as NE
+import Data.Text (pack)
 import qualified Transformations.Ll.Lfr as Lfr
 import qualified Transformations.Simplification.SimplifiedAst as Ast
 import qualified Trees.Common as Common
@@ -61,7 +62,7 @@ genName :: LlState Common.Identifier'
 genName = do
   Env _ cnt <- get
   modify $ \env -> env {idCnt = cnt + 1}
-  return $ Common.Gen cnt
+  return $ Common.Gen cnt $ pack "ll"
 
 -- Utils
 
