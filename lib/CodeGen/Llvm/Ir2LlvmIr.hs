@@ -4,10 +4,9 @@
 
 module CodeGen.Llvm.Ir2LlvmIr (ppLlvm, ir2LlvmIr) where
 
-import Control.Monad (void)
-import Control.Monad.State (MonadFix, MonadState (get), StateT, evalStateT)
-import Data.List.NonEmpty (toList)
-import Data.Map (Map, (!))
+import CodeGen.Module (Module (..))
+import Control.Monad.State (MonadFix)
+import Data.String.Transform (toShortByteString)
 import Data.Text.Lazy (Text)
 import Foreign (fromBool)
 import qualified LLVM.AST as LLVM hiding (function)
@@ -19,39 +18,18 @@ import qualified LLVM.IRBuilder.Module as LLVM
 import qualified LLVM.IRBuilder.Monad as LLVM
 import LLVM.Pretty (ppllvm)
 import Transformations.Anf.Anf
-import Trees.Common (ArithmeticOperator (..), BinaryOperator (..), BooleanOperator (..), ComparisonOperator (..), Identifier', UnaryOperator (..))
+import Trees.Common
 
-ppLlvm :: Text
-ppLlvm = ppllvm ir2LlvmIr
+ppLlvm :: LLVM.Module -> Text
+ppLlvm = ppllvm
 
--- ir2LlvmIr :: Program -> a
-ir2LlvmIr :: LLVM.Module
-ir2LlvmIr = LLVM.buildModule "example" $ do
-  printInt <- LLVM.extern "print_int" [LLVM.i64] LLVM.i64
-
-  -- create a function called `main` that will be the entry point to our program
-  LLVM.function "main" [] LLVM.i64 $ \_ -> do
-    -- build the LLVM AST for our expression
-    ourExpression <-
-      genIte
-        (AtomBool True)
-        (AtomBinOp (ArithOp PlusOp) (AtomInt 4) (AtomInt 8))
-        (AtomInt 15)
-
-    -- print our result to stdout
-    _ <- LLVM.call printInt [(ourExpression, [])]
-
-    -- return success exit code of `0`
-    LLVM.ret (LLVM.int64 0)
+ir2LlvmIr :: Module -> LLVM.Module
+ir2LlvmIr = genModule
 
 -- Implementation
 
-type CodeGenM a = LLVM.IRBuilder a
-
-data CompilerState = CompilerState
-  { stack :: Map Identifier' LLVM.Operand,
-    runtime :: ()
-  }
+genModule :: Module -> LLVM.Module
+genModule (Module name code) = LLVM.buildModule (toShortByteString name) undefined
 
 genExpr ::
   (LLVM.MonadIRBuilder m, LLVM.MonadModuleBuilder m, MonadFix m) =>
@@ -70,7 +48,8 @@ genAtom atom = case atom of
   AtomId ident -> undefined {- mdo
                             CompilerState map _ <- get
                             load' $ map ! name -}
-  AtomBool bool -> return $ LLVM.bit $ fromBool bool
+  AtomUnit -> return $ LLVM.int64 0
+  AtomBool bool -> return $ LLVM.int64 $ fromBool bool
   AtomInt int -> return $ LLVM.int64 $ toInteger int
   AtomBinOp op lhs rhs -> do
     lhs' <- genAtom lhs
@@ -82,12 +61,15 @@ genAtom atom = case atom of
           ArithOp MinusOp -> LLVM.sub
           ArithOp MulOp -> LLVM.mul
           ArithOp DivOp -> LLVM.sdiv
-          CompOp EqOp -> LLVM.icmp LLVM.EQ
-          CompOp NeOp -> LLVM.icmp LLVM.NE
-          CompOp LtOp -> LLVM.icmp LLVM.SLT
-          CompOp LeOp -> LLVM.icmp LLVM.SLE
-          CompOp GtOp -> LLVM.icmp LLVM.SGT
-          CompOp GeOp -> LLVM.icmp LLVM.SGE
+          CompOp cOp ->
+            let cOpF = case cOp of
+                  EqOp -> LLVM.icmp LLVM.EQ
+                  NeOp -> LLVM.icmp LLVM.NE
+                  LtOp -> LLVM.icmp LLVM.SLT
+                  LeOp -> LLVM.icmp LLVM.SLE
+                  GtOp -> LLVM.icmp LLVM.SGT
+                  GeOp -> LLVM.icmp LLVM.SGE
+             in (\a b -> cOpF a b >>= boolToInt)
     opF lhs' rhs'
   AtomUnOp op x -> do
     x' <- genAtom x
@@ -106,24 +88,21 @@ genComp comp = case comp of
 genIte ::
   (LLVM.MonadIRBuilder m, LLVM.MonadModuleBuilder m, MonadFix m) =>
   AtomicExpression ->
-  AtomicExpression ->
-  AtomicExpression ->
+  Expression ->
+  Expression ->
   m LLVM.Operand
 genIte c t e = mdo
-  LLVM.br begin
-  begin <- LLVM.block `LLVM.named` "if.begin"
-
   rv <- LLVM.alloca LLVM.i64 Nothing 0
 
-  c' <- genAtom c
+  c' <- genAtom c >>= intToBool
   LLVM.condBr c' tBlock eBlock
 
   tBlock <- LLVM.block `LLVM.named` "if.then"
-  store' rv =<< genAtom t
+  store' rv =<< genExpr t
   LLVM.br end
 
   eBlock <- LLVM.block `LLVM.named` "if.else"
-  store' rv =<< genAtom e
+  store' rv =<< genExpr e
   LLVM.br end
 
   end <- LLVM.block `LLVM.named` "if.end"
@@ -141,3 +120,15 @@ load' addr = LLVM.load addr 0
 
 store' :: (LLVM.MonadIRBuilder m) => LLVM.Operand -> LLVM.Operand -> m ()
 store' addr = LLVM.store addr 0
+
+-- Utils
+
+boolToInt ::
+  (LLVM.MonadIRBuilder m, LLVM.MonadModuleBuilder m, MonadFix m) =>
+  (LLVM.Operand -> m LLVM.Operand)
+boolToInt = flip LLVM.zext LLVM.i64
+
+intToBool ::
+  (LLVM.MonadIRBuilder m, LLVM.MonadModuleBuilder m, MonadFix m) =>
+  (LLVM.Operand -> m LLVM.Operand)
+intToBool = flip LLVM.trunc LLVM.i64
