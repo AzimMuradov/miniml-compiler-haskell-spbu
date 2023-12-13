@@ -11,8 +11,15 @@ data GlobalDeclaration
   | GlobFunDecl Identifier' [Identifier'] Expression
   deriving (Show, Eq)
 
+data Expression
+  = ExprAtom AtomicExpression
+  | ExprComp ComplexExpression
+  | ExprLetIn (Identifier', Expression) Expression
+  deriving (Show, Eq)
+
 data AtomicExpression
   = AtomId Identifier'
+  | AtomUnit
   | AtomBool Bool
   | AtomInt Int64
   | AtomBinOp BinaryOperator AtomicExpression AtomicExpression
@@ -20,12 +27,6 @@ data AtomicExpression
   deriving (Show, Eq)
 
 data ComplexExpression
-  = CompApp AtomicExpression AtomicExpression
-  | CompIte AtomicExpression AtomicExpression AtomicExpression
-  deriving (Show, Eq)
-
-data Expression
-  = ExprAtom AtomicExpression
-  | ExprComp ComplexExpression
-  | ExprLetIn (Identifier', Expression) Expression
+  = CompApp Identifier' AtomicExpression
+  | CompIte AtomicExpression Expression Expression
   deriving (Show, Eq)

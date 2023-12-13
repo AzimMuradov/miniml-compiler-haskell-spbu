@@ -40,17 +40,20 @@ prettyExpr (ExprLetIn (ident, val) expr) = do
 
 prettyComplex :: ComplexExpression -> IndentState String
 prettyComplex = \case
-  CompApp f arg -> return $ parens $ prettyAtomic f <> " " <> prettyAtomic arg
+  CompApp f arg -> return $ parens $ prettyId f <> " " <> prettyAtomic arg
   CompIte c t e -> do
     indent <- get
     let cText = createIndent (indent + 2) <> "if " <> prettyAtomic c
-    let tText = createIndent (indent + 4) <> "then " <> prettyAtomic t
-    let eText = createIndent (indent + 4) <> "else " <> prettyAtomic e
+    t' <- prettyExpr t
+    let tText = createIndent (indent + 4) <> "then " <> t'
+    e' <- prettyExpr e
+    let eText = createIndent (indent + 4) <> "else " <> e'
     return $ cText <> tText <> eText
 
 prettyAtomic :: AtomicExpression -> String
 prettyAtomic = \case
   AtomId name -> prettyId name
+  AtomUnit -> "()"
   AtomBool value -> if value then "true" else "false"
   AtomInt value -> show value
   AtomBinOp op lhs rhs -> parens (unwords [prettyAtomic lhs, prettyBinOp op, prettyAtomic rhs])
