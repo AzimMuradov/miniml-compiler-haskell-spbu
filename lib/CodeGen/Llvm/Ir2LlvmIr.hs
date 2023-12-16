@@ -40,11 +40,12 @@ type Llvm = LLVM.ModuleBuilderT (State Env)
 
 data Env = Env
   { vars :: Map Identifier' LLVM.Operand,
+    globVars :: Map Identifier' LLVM.Operand,
     funs :: Map Identifier' LLVM.Operand
   }
 
 genModule :: Module -> LLVM.Module
-genModule (Module name (Program decls)) = flip evalState (Env Map.empty Map.empty) $
+genModule (Module name (Program decls)) = flip evalState (Env Map.empty Map.empty Map.empty) $
   LLVM.buildModuleT (toShortByteString name) $ do
     notF <- LLVM.extern "not" [LLVM.i64] LLVM.i64
     printBoolF <- LLVM.extern "print_bool" [LLVM.i64] LLVM.i64
@@ -68,7 +69,7 @@ genModule (Module name (Program decls)) = flip evalState (Env Map.empty Map.empt
     gVarDef :: GlobalDeclaration -> CodeGenM ()
     gVarDef = \case
       GlobVarDecl ident value -> do
-        operand <- findVar ident
+        operand <- findGlobVar ident
         value' <- genExpr value
         store' operand value'
       _ -> return ()
@@ -77,7 +78,7 @@ genGlobDecl :: GlobalDeclaration -> Llvm ()
 genGlobDecl decl = case decl of
   GlobVarDecl ident _ -> do
     var <- LLVM.global (LLVM.mkName $ genId ident) LLVM.i64 (C.Int 64 0)
-    regVar ident var
+    regGlobVar ident var
   GlobFunDecl ident params body -> do
     fun <- LLVM.function
       (LLVM.mkName $ genId ident)
@@ -138,8 +139,9 @@ genAtom = \case
 genComp :: ComplexExpression -> CodeGenM LLVM.Operand
 genComp = \case
   CompApp f arg -> mdo
-    -- _ <- LLVM.call printInt [(ourExpression, [])]
-    undefined
+    f' <- findFun f
+    arg' <- genAtom arg
+    LLVM.call f' [(arg', [])]
   CompIte c t e -> mdo
     rv <- allocate'
 
@@ -160,11 +162,21 @@ genComp = \case
 
 -- Stack
 
-findVar :: MonadState Env m => Identifier' -> m LLVM.Operand
-findVar k = gets ((Map.! k) . vars)
+findVar :: Identifier' -> CodeGenM LLVM.Operand
+findVar k = do
+  locVar <- gets ((Map.!? k) . vars)
+  case locVar of
+    Just val -> return val
+    Nothing -> load' =<< findGlobVar k
+
+findGlobVar :: MonadState Env m => Identifier' -> m LLVM.Operand
+findGlobVar k = gets ((Map.! k) . globVars)
 
 regVar :: MonadState Env m => Identifier' -> LLVM.Operand -> m ()
 regVar k v = modify $ \env -> env {vars = Map.insert k v (vars env)}
+
+regGlobVar :: MonadState Env m => Identifier' -> LLVM.Operand -> m ()
+regGlobVar k v = modify $ \env -> env {globVars = Map.insert k v (globVars env)}
 
 findFun :: Identifier' -> CodeGenM LLVM.Operand
 findFun k = gets ((Map.! k) . funs)
