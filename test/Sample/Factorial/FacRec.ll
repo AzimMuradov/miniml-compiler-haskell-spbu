@@ -1,4 +1,4 @@
-; ModuleID = 'fac-rec'
+; ModuleID = 'factorial'
 
 
  
