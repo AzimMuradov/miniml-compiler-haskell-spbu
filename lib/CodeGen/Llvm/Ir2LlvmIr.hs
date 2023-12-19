@@ -208,4 +208,4 @@ boolToInt :: LLVM.Operand -> CodeGenM LLVM.Operand
 boolToInt = flip LLVM.zext LLVM.i64
 
 intToBool :: LLVM.Operand -> CodeGenM LLVM.Operand
-intToBool = flip LLVM.trunc LLVM.i64
+intToBool = flip LLVM.trunc LLVM.i1

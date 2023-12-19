@@ -18,8 +18,8 @@ define external ccc  i64 @"factorial'0"(i64  %"n'1_0")    {
   %1 = alloca i64 
   %2 = icmp sle i64 %"n'1_0", 0 
   %3 = zext i1 %2 to i64  
-  %4 = trunc i64 %3 to i64  
-  br i64 %4, label %if.then_0, label %if.else_0 
+  %4 = trunc i64 %3 to i1  
+  br i1 %4, label %if.then_0, label %if.else_0 
 if.then_0:
   store  i64 1, i64* %1 
   br label %if.end_0 
