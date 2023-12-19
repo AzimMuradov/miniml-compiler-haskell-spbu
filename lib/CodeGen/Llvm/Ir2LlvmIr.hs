@@ -40,7 +40,7 @@ type CodeGenM = LLVM.IRBuilderT Llvm
 type Llvm = LLVM.ModuleBuilderT (State Env)
 
 data Env = Env
-  { vars :: Map Identifier' LLVM.Operand,
+  { locVars :: Map Identifier' LLVM.Operand,
     globVars :: Map Identifier' LLVM.Operand,
     funs :: Map Identifier' LLVM.Operand
   }
@@ -167,16 +167,14 @@ genComp = \case
 
 findVar :: Identifier' -> CodeGenM LLVM.Operand
 findVar k = do
-  locVar <- gets ((Map.!? k) . vars)
-  case locVar of
-    Just val -> return val
-    Nothing -> load' =<< findGlobVar k
+  locVar <- gets ((Map.!? k) . locVars)
+  maybe (load' =<< findGlobVar k) return locVar
 
 findGlobVar :: MonadState Env m => Identifier' -> m LLVM.Operand
 findGlobVar k = gets ((Map.! k) . globVars)
 
 regVar :: MonadState Env m => Identifier' -> LLVM.Operand -> m ()
-regVar k v = modify $ \env -> env {vars = Map.insert k v (vars env)}
+regVar k v = modify $ \env -> env {locVars = Map.insert k v (locVars env)}
 
 regGlobVar :: MonadState Env m => Identifier' -> LLVM.Operand -> m ()
 regGlobVar k v = modify $ \env -> env {globVars = Map.insert k v (globVars env)}
