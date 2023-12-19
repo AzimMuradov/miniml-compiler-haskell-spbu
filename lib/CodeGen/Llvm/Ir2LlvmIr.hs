@@ -25,6 +25,7 @@ import qualified LLVM.IRBuilder.Monad as LLVM
 import LLVM.Pretty (ppllvm)
 import Transformations.Anf.Anf
 import Trees.Common
+import Utils (locally)
 
 ppLlvmModule :: LLVM.Module -> Text
 ppLlvmModule = ppllvm
@@ -75,20 +76,22 @@ genModule (Module name (Program decls)) = flip evalState (Env Map.empty Map.empt
       _ -> return ()
 
 genGlobDecl :: GlobalDeclaration -> Llvm ()
-genGlobDecl decl = case decl of
+genGlobDecl = \case
   GlobVarDecl ident _ -> do
     var <- LLVM.global (LLVM.mkName $ genId ident) LLVM.i64 (C.Int 64 0)
     regGlobVar ident var
-  GlobFunDecl ident params body -> do
-    fun <- LLVM.function
-      (LLVM.mkName $ genId ident)
-      ((LLVM.i64,) . LLVM.ParameterName . toShortByteString . genId <$> params)
-      LLVM.i64
-      $ \args -> do
-        mapM_ (uncurry regVar) (params `zip` args)
-        body' <- genExpr body
-        LLVM.ret body'
+  GlobFunDecl ident params body -> mdo
     regFun ident fun
+    fun <- locally $ do
+      LLVM.function
+        (LLVM.mkName $ genId ident)
+        ((LLVM.i64,) . LLVM.ParameterName . toShortByteString . genId <$> params)
+        LLVM.i64
+        $ \args -> do
+          mapM_ (uncurry regVar) (params `zip` args)
+          body' <- genExpr body
+          LLVM.ret body'
+    return ()
 
 genId :: Identifier' -> String
 genId = \case
