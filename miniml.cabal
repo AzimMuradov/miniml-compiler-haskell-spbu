@@ -30,6 +30,8 @@ common shared-properties
 library
     import:           shared-properties
     exposed-modules:
+        CodeGen.Llvm.Ir2LlvmIr
+        CodeGen.Module
         Parser.Ast
         Parser.Lexer
         Parser.Parser
@@ -54,15 +56,20 @@ library
     other-extensions:
     build-depends:
         , containers          >=0.6.6
+        , directory
+        , file-embed
         , llvm-hs             >=9.0.1
         , llvm-hs-pretty      >=0.9.0.0
         , llvm-hs-pure        >=9.0.0
         , megaparsec          >=9.2
         , mtl                 >=2.2.2
         , parser-combinators  >=1.3.0
-        , string-transform    >=1.1.1
+        , process
+        , string-conversions
+        , string-transform
         , transformers        >=0.5.6
         , unification-fd      >=0.5.0
+        , unix
 
     hs-source-dirs:   lib
 

@@ -22,7 +22,7 @@ Just
                                     ]
                                 ) Nothing
                                 ( ExprIte
-                                    ( ExprBinOp ( ComparisonOp GtOp )
+                                    ( ExprBinOp ( CompOp GtOp )
                                         ( ExprId "i" )
                                         ( ExprId "n" )
                                     )
@@ -30,14 +30,14 @@ Just
                                     ( ExprApp
                                         ( ExprApp
                                             ( ExprId "loop" )
-                                            ( ExprBinOp ( ArithmeticOp PlusOp )
+                                            ( ExprBinOp ( ArithOp PlusOp )
                                                 ( ExprId "i" )
                                                 ( ExprVal
                                                     ( ValInt 1 )
                                                 )
                                             )
                                         )
-                                        ( ExprBinOp ( ArithmeticOp MulOp )
+                                        ( ExprBinOp ( ArithOp MulOp )
                                             ( ExprId "accum" )
                                             ( ExprId "i" )
                                         )
