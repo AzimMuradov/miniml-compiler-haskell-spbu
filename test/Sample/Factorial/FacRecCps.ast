@@ -25,7 +25,7 @@ Just
                         ]
                     ) Nothing
                     ( ExprIte
-                        ( ExprBinOp ( ComparisonOp EqOp )
+                        ( ExprBinOp ( CompOp EqOp )
                             ( ExprId "n" )
                             ( ExprVal
                                 ( ValInt 0 )
@@ -40,7 +40,7 @@ Just
                         ( ExprApp
                             ( ExprApp
                                 ( ExprId "cps_factorial" )
-                                ( ExprBinOp ( ArithmeticOp MinusOp )
+                                ( ExprBinOp ( ArithOp MinusOp )
                                     ( ExprId "n" )
                                     ( ExprVal
                                         ( ValInt 1 )
@@ -56,7 +56,7 @@ Just
                                     ) Nothing
                                     ( ExprApp
                                         ( ExprId "k" )
-                                        ( ExprBinOp ( ArithmeticOp MulOp )
+                                        ( ExprBinOp ( ArithOp MulOp )
                                             ( ExprId "n" )
                                             ( ExprId "result" )
                                         )

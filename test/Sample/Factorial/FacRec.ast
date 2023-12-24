@@ -9,7 +9,7 @@ Just
                         ) :| []
                     ) Nothing
                     ( ExprIte
-                        ( ExprBinOp ( ComparisonOp LeOp )
+                        ( ExprBinOp ( CompOp LeOp )
                             ( ExprId "n" )
                             ( ExprVal
                                 ( ValInt 0 )
@@ -18,11 +18,11 @@ Just
                         ( ExprVal
                             ( ValInt 1 )
                         )
-                        ( ExprBinOp ( ArithmeticOp MulOp )
+                        ( ExprBinOp ( ArithOp MulOp )
                             ( ExprId "n" )
                             ( ExprApp
                                 ( ExprId "factorial" )
-                                ( ExprBinOp ( ArithmeticOp MinusOp )
+                                ( ExprBinOp ( ArithOp MinusOp )
                                     ( ExprId "n" )
                                     ( ExprVal
                                         ( ValInt 1 )

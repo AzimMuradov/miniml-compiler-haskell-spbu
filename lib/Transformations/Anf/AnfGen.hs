@@ -34,7 +34,7 @@ normalizeDecl (Lfr.TopLevelFunDecl name params body) = Anf.GlobFunDecl name para
 normalizeExpr :: Lfr.Expression -> CntState Anf.Expression
 normalizeExpr (Lfr.ExprId name) = returnAtom $ Anf.AtomId name
 normalizeExpr (Lfr.ExprVal value) = returnAtom $ case value of
-  Common.ValUnit -> Anf.AtomInt 0
+  Common.ValUnit -> Anf.AtomUnit
   Common.ValBool bool -> Anf.AtomBool bool
   Common.ValInt int -> Anf.AtomInt int
 normalizeExpr (Lfr.ExprBinOp op lhs rhs) = evalContT $ do
@@ -45,13 +45,13 @@ normalizeExpr (Lfr.ExprUnOp op x) = evalContT $ do
   x' <- normalizeName x
   returnAtom' $ Anf.AtomUnOp op x'
 normalizeExpr (Lfr.ExprApp f arg) = evalContT $ do
-  f' <- normalizeName f
+  f' <- normalizeName' f
   arg' <- normalizeName arg
   returnComplex $ Anf.CompApp f' arg'
 normalizeExpr (Lfr.ExprIte c t e) = evalContT $ do
   c' <- normalizeName c
-  t' <- normalizeName t
-  e' <- normalizeName e
+  t' <- lift $ normalizeExpr t
+  e' <- lift $ normalizeExpr e
   returnComplex $ Anf.CompIte c' t' e'
 normalizeExpr (Lfr.ExprLetIn decls expr) = do
   decls' <- normalizeVarDecl decls
@@ -79,6 +79,17 @@ normalizeName expr = do
       mapContT
         (\e -> Anf.ExprLetIn (name, expr') <$> e)
         (return $ Anf.AtomId name)
+
+normalizeName' :: Lfr.Expression -> CpsWithCnt Anf.Expression Common.Identifier'
+normalizeName' expr = do
+  expr' <- lift $ normalizeExpr expr
+  case expr' of
+    Anf.ExprAtom (Anf.AtomId ident) -> return ident
+    _ -> do
+      name <- lift genName
+      mapContT
+        (\e -> Anf.ExprLetIn (name, expr') <$> e)
+        (return name)
 
 genName :: CntState Common.Identifier'
 genName = do

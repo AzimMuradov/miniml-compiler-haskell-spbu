@@ -2,6 +2,8 @@
 
 module Sample.FactorialTest (tests) where
 
+import CodeGen.Llvm.Ir2LlvmIr (genLlvmIrModule, ppLlvmModule)
+import CodeGen.Module
 import Data.ByteString.Lazy.Char8 (ByteString, pack)
 import Data.Maybe (fromJust)
 import Data.Text (Text)
@@ -29,7 +31,10 @@ tests =
       testTypeInference "factorial with recursive cps" facRecCps,
       testAstToAnf "recursive factorial" facRec,
       testAstToAnf "factorial with recursive loop" facRecLoop,
-      testAstToAnf "factorial with recursive cps" facRecCps
+      testAstToAnf "factorial with recursive cps" facRecCps,
+      testLlvm "recursive factorial" facRec
+      -- TODO : testLlvm "factorial with recursive loop" facRecLoop,
+      -- TODO : testLlvm "factorial with recursive cps" facRecCps
     ]
 
 testParsing :: String -> (String -> FilePath) -> TestTree
@@ -53,6 +58,13 @@ testAstToAnf title testFileProvider =
     (testFileProvider "anf")
     (transformToBS <$> LBS.readFile (testFileProvider "ml"))
 
+testLlvm :: String -> (String -> FilePath) -> TestTree
+testLlvm title testFileProvider =
+  goldenVsString
+    (title <> " - LLVM")
+    (testFileProvider "ll")
+    (llvmTestActual <$> LBS.readFile (testFileProvider "ml"))
+
 parseToBS :: Text -> ByteString
 parseToBS = pack . unpack . pShowNoColor . parseProgram
 
@@ -61,6 +73,14 @@ evalToBS = pack . eval . parseProgram
 
 transformToBS :: Text -> ByteString
 transformToBS file = pack $ (prettyPrint . astToAnf) (fromJust (parseProgram file))
+
+llvmTestActual :: Text -> ByteString
+llvmTestActual file =
+  let ast = fromJust (parseProgram file)
+      anf = astToAnf ast
+      irMod = Module "factorial" anf
+      llvm = ppLlvmModule $ genLlvmIrModule irMod
+   in pack $ unpack llvm
 
 testFile :: String -> String
 testFile filename = "test/Sample/Factorial/" <> filename

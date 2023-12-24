@@ -67,13 +67,13 @@ inferExpression (ExprBinOp op lhs rhs) = do
   withError (const $ ImpossibleBinOpApplication utLhs utRhs) $ do
     ut <- utLhs =:= utRhs
     case op of
-      BooleanOp _ -> ut =:= UTyBool
-      ArithmeticOp _ -> ut =:= UTyInt
-      ComparisonOp _ -> return UTyBool
+      BoolOp _ -> ut =:= UTyBool
+      ArithOp _ -> ut =:= UTyInt
+      CompOp _ -> return UTyBool
 inferExpression (ExprUnOp op x) = do
   ut <- inferExpression x
   withError (const $ ImpossibleUnOpApplication ut) $ case op of
-    UnaryMinusOp -> ut =:= UTyInt
+    UnMinusOp -> ut =:= UTyInt
 inferExpression (ExprApp funExpr argExpr) = do
   funUT <- inferExpression funExpr
   argUT <- inferExpression argExpr
