@@ -8,6 +8,7 @@ module CodeGen.Llvm.Ir2LlvmIr (ppLlvmModule, genLlvmIrModule) where
 
 import CodeGen.Module (Module (Module))
 import Control.Monad.State (MonadState, State, evalState, gets, modify)
+import Data.Functor.Foldable (ListF (Cons, Nil), hylo)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.String.Transform (toShortByteString)
@@ -23,6 +24,7 @@ import qualified LLVM.IRBuilder.Instruction as LLVM
 import qualified LLVM.IRBuilder.Module as LLVM
 import qualified LLVM.IRBuilder.Monad as LLVM
 import LLVM.Pretty (ppllvm)
+import qualified StdLib
 import Transformations.Anf.Anf
 import Trees.Common
 import Utils (locally)
@@ -48,18 +50,7 @@ data Env = Env
 genModule :: Module -> LLVM.Module
 genModule (Module name (Program decls)) = flip evalState (Env Map.empty Map.empty Map.empty) $
   LLVM.buildModuleT (toShortByteString name) $ do
-    notF <- LLVM.extern "not" [LLVM.i64] LLVM.i64
-    printBoolF <- LLVM.extern "print_bool" [LLVM.i64] LLVM.i64
-    printIntF <- LLVM.extern "print_int" [LLVM.i64] LLVM.i64
-
-    let stdFuns =
-          [ (Txt "not", notF),
-            (Txt "print_bool", printBoolF),
-            (Txt "print_int", printIntF)
-          ]
-
-    mapM_ (uncurry regFun) stdFuns
-
+    mapM_ regStdLibDecl StdLib.allTypedDecls
     mapM_ genGlobDecl decls
 
     -- In the `main` we define our global variables.
@@ -122,7 +113,11 @@ genAtom = \case
           ArithOp PlusOp -> LLVM.add
           ArithOp MinusOp -> LLVM.sub
           ArithOp MulOp -> LLVM.mul
-          ArithOp DivOp -> LLVM.sdiv
+          ArithOp DivOp ->
+            ( \a b -> do
+                divF <- findFun (Txt "miniml_div")
+                LLVM.call divF [(a, []), (b, [])]
+            )
           CompOp cOp ->
             let cOpF = case cOp of
                   EqOp -> LLVM.icmp LLVM.EQ
@@ -184,6 +179,32 @@ findFun k = gets ((Map.! k) . funs)
 
 regFun :: MonadState Env m => Identifier' -> LLVM.Operand -> m ()
 regFun k v = modify $ \env -> env {funs = Map.insert k v (funs env)}
+
+-- StdLib utils
+
+regStdLibDecl :: StdLib.TypedDeclaration -> Llvm ()
+regStdLibDecl decl = register decl =<< declareAsExtern decl
+  where
+    declareAsExtern :: StdLib.TypedDeclaration -> Llvm LLVM.Operand
+    declareAsExtern (ident, t) =
+      LLVM.extern
+        (LLVM.mkName $ Txt.unpack ident)
+        (replicate (signatureTypesCount t - 1) LLVM.i64)
+        LLVM.i64
+
+    register :: StdLib.TypedDeclaration -> LLVM.Operand -> Llvm ()
+    register (ident, _) operand = regFun (Txt ident) operand
+
+    signatureTypesCount :: Type -> Int
+    signatureTypesCount t = hylo signatureTypesCount'' signatureTypesCount' t
+
+    signatureTypesCount' :: Type -> ListF Type Type
+    signatureTypesCount' (TFun pT retT) = Cons pT retT
+    signatureTypesCount' _ = Nil
+
+    signatureTypesCount'' :: ListF Type Int -> Int
+    signatureTypesCount'' (Cons _ n) = n + 1
+    signatureTypesCount'' Nil = 1
 
 -- Allocation utils
 
