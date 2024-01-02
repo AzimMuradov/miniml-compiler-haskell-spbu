@@ -1,20 +1,26 @@
 {-# LANGUAGE TupleSections #-}
 
-module TypeInference.TypeInference (inferProgram) where
+module TypeChecker.TypeChecker (inferProgram, checkProgram) where
 
 import Control.Category ((>>>))
 import Control.Monad.Except
 import Control.Monad.Reader
 import Control.Unification.IntVar (evalIntBindingT)
+import Data.Either.Extra (mapRight)
 import Data.Functor.Identity (Identity (runIdentity))
 import Data.List.NonEmpty (toList)
 import qualified Data.Map as M
 import Data.Maybe
 import Parser.Ast
-import StdLib
+import qualified StdLib
 import Trees.Common
-import TypeInference.HindleyMilner
+import TypeChecker.HindleyMilner
 import Prelude hiding (lookup)
+
+-- * Program Type Checker
+
+checkProgram :: Program -> Either TypeError ()
+checkProgram = mapRight (const ()) . inferProgram
 
 inferProgram :: Program -> Either TypeError Polytype
 inferProgram (Program stmts) = runInfer $ withStdLib (inferStatements stmts)
@@ -29,9 +35,11 @@ inferProgram (Program stmts) = runInfer $ withStdLib (inferStatements stmts)
         >>> runIdentity
 
     withStdLib infer = do
-      let generalizeDecl (name, t) = (name,) <$> generalize (fromTypeToUType t)
-      generalizedDecls <- mapM generalizeDecl typedStdDeclarations
+      let generalizeDecl (ident, t) = (ident,) <$> generalize (fromTypeToUType t)
+      generalizedDecls <- mapM generalizeDecl StdLib.typedDecls
       local (M.union (M.fromList generalizedDecls)) infer
+
+-- * Internal
 
 inferStatements :: [Statement] -> Infer UType
 inferStatements x = inferStatements' x (throwError Unreachable)
@@ -39,10 +47,10 @@ inferStatements x = inferStatements' x (throwError Unreachable)
 inferStatements' :: [Statement] -> Infer UType -> Infer UType
 inferStatements' [] pr = pr
 inferStatements' ((StmtExpr e) : xs) _ = do
-  res <- inferExpression e
+  res <- inferExpr e
   inferStatements' xs (return res)
 inferStatements' ((StmtDecl (DeclVar (ident, t) body)) : xs) _ = do
-  res <- inferExpression body
+  res <- inferExpr body
   vType <- maybe (return res) ((=:=) res <$> fromTypeToUType) t
   pvType <- generalize vType
   withBinding ident pvType (inferStatements' xs $ return vType)
@@ -55,59 +63,59 @@ inferStatements' ((StmtDecl (DeclFun ident True fun)) : xs) _ = do
   after <- withBinding ident (Forall [] next) $ inferFun fun
   withBinding ident (Forall [] after) (inferStatements' xs $ return next)
 
-inferExpression :: Expression -> Infer UType
-inferExpression (ExprId x) = lookup (Var x)
-inferExpression (ExprVal value) = case value of
+inferExpr :: Expression -> Infer UType
+inferExpr (ExprId x) = lookup (Var x)
+inferExpr (ExprVal value) = case value of
   ValUnit -> return UTyUnit
   ValBool _ -> return UTyBool
   ValInt _ -> return UTyInt
-inferExpression (ExprBinOp op lhs rhs) = do
-  utLhs <- inferExpression lhs
-  utRhs <- inferExpression rhs
+inferExpr (ExprBinOp op lhs rhs) = do
+  utLhs <- inferExpr lhs
+  utRhs <- inferExpr rhs
   withError (const $ ImpossibleBinOpApplication utLhs utRhs) $ do
     ut <- utLhs =:= utRhs
     case op of
       BoolOp _ -> ut =:= UTyBool
       ArithOp _ -> ut =:= UTyInt
       CompOp _ -> return UTyBool
-inferExpression (ExprUnOp op x) = do
-  ut <- inferExpression x
+inferExpr (ExprUnOp op x) = do
+  ut <- inferExpr x
   withError (const $ ImpossibleUnOpApplication ut) $ case op of
     UnMinusOp -> ut =:= UTyInt
-inferExpression (ExprApp funExpr argExpr) = do
-  funUT <- inferExpression funExpr
-  argUT <- inferExpression argExpr
+inferExpr (ExprApp funExpr argExpr) = do
+  funUT <- inferExpr funExpr
+  argUT <- inferExpr argExpr
   resUT <- fresh
   _ <- funUT =:= UTyFun argUT resUT
   return resUT
-inferExpression (ExprIte c t e) = do
+inferExpr (ExprIte c t e) = do
   _ <- check c UTyBool
-  t' <- inferExpression t
-  e' <- inferExpression e
+  t' <- inferExpr t
+  e' <- inferExpr e
   t' =:= e'
-inferExpression (ExprLetIn decl expr) = inferLetIn decl expr
-inferExpression (ExprFun fun) = inferFun fun
+inferExpr (ExprLetIn decl expr) = inferLetIn decl expr
+inferExpr (ExprFun fun) = inferFun fun
 
 inferLetIn :: Declaration -> Expression -> Infer UType
 inferLetIn (DeclVar (x, Just pty) xdef) expr = do
   let upty = toUPolytype (Forall [] $ toTypeF pty)
   upty' <- skolemize upty
-  bl <- inferExpression xdef
+  bl <- inferExpr xdef
   _ <- bl =:= upty'
-  withBinding x upty $ inferExpression expr
+  withBinding x upty $ inferExpr expr
 inferLetIn (DeclVar (x, Nothing) xdef) expr = do
-  ty <- inferExpression xdef
+  ty <- inferExpr xdef
   pty <- generalize ty
-  withBinding x pty $ inferExpression expr
+  withBinding x pty $ inferExpr expr
 inferLetIn (DeclFun f False fun) expr = do
   fdef <- inferFun fun
   pfdef <- generalize fdef
-  withBinding f pfdef $ inferExpression expr
+  withBinding f pfdef $ inferExpr expr
 inferLetIn (DeclFun f True fun) expr = do
   preT <- fresh
   next <- withBinding f (Forall [] preT) $ inferFun fun
   after <- withBinding f (Forall [] next) $ inferFun fun
-  inferredBlock <- withBinding f (Forall [] next) (inferExpression expr)
+  inferredBlock <- withBinding f (Forall [] next) (inferExpr expr)
   pfdef <- generalize after
   withBinding f pfdef (return inferredBlock)
 
@@ -116,7 +124,7 @@ inferFun (Fun args restype body) = inferFun' $ toList args
   where
     inferFun' args' = case args' of
       [] -> do
-        inferredBody <- inferExpression body
+        inferredBody <- inferExpr body
         case restype of
           Just t -> fromTypeToUType t =:= inferredBody
           Nothing -> return inferredBody
@@ -128,7 +136,7 @@ inferFun (Fun args restype body) = inferFun' $ toList args
 
 check :: Expression -> UType -> Infer UType
 check e ty = do
-  ty' <- inferExpression e
+  ty' <- inferExpr e
   ty =:= ty'
 
 withError :: MonadError e m => (e -> e) -> m a -> m a
