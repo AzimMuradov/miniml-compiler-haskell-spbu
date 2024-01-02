@@ -32,6 +32,7 @@ library
     exposed-modules:
         CodeGen.Llvm.Ir2LlvmIr
         CodeGen.Module
+        MonadUtils
         Parser.Ast
         Parser.Lexer
         Parser.Parser
@@ -50,7 +51,6 @@ library
         TypeInference.HindleyMilner
         TypeInference.PrettyPrint
         TypeInference.TypeInference
-        Utils
 
     other-modules:
     other-extensions:
