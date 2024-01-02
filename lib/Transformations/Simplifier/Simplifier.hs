@@ -27,6 +27,11 @@ simplifyStmt = \case
   Ast.StmtDecl decl -> simplifyDecl decl
   Ast.StmtExpr expr -> SAst.DeclVar <$> genId <*> simplifyExpr expr
 
+simplifyDecl :: Ast.Declaration -> SimplifierState SAst.Declaration
+simplifyDecl = \case
+  Ast.DeclVar ident value -> simplify1 (SAst.DeclVar (convertTypedId ident)) value
+  Ast.DeclFun ident isRec fun -> SAst.DeclFun (convertId ident) isRec <$> simplifyFun fun
+
 simplifyExpr :: Ast.Expression -> SimplifierState SAst.Expression
 simplifyExpr = \case
   Ast.ExprId ident -> return $ SAst.ExprId (convertId ident)
@@ -37,11 +42,6 @@ simplifyExpr = \case
   Ast.ExprIte c t e -> simplify3 SAst.ExprIte c t e
   Ast.ExprLetIn decl expr -> SAst.ExprLetIn <$> simplifyDecl decl <*> simplifyExpr expr
   Ast.ExprFun fun -> SAst.ExprFun <$> simplifyFun fun
-
-simplifyDecl :: Ast.Declaration -> SimplifierState SAst.Declaration
-simplifyDecl = \case
-  Ast.DeclVar ident value -> simplify1 (SAst.DeclVar (convertTypedId ident)) value
-  Ast.DeclFun ident isRec fun -> SAst.DeclFun (convertId ident) isRec <$> simplifyFun fun
 
 simplifyFun :: Ast.Fun -> SimplifierState SAst.Fun
 simplifyFun (Ast.Fun params _ body) = simplify1 (SAst.Fun (convertTypedId <$> params)) body

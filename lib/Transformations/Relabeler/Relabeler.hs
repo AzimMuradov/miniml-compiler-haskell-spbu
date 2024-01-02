@@ -3,7 +3,7 @@
 module Transformations.Relabeler.Relabeler (relabelAst) where
 
 import Control.Monad (replicateM_)
-import Control.Monad.State (MonadState (get), State, modify, runState)
+import Control.Monad.State (State, gets, modify, runState)
 import qualified Data.List.NonEmpty as NE
 import Data.Maybe (fromMaybe)
 import MonadUtils
@@ -16,8 +16,8 @@ import qualified Trees.Common as Ast
 -- It helps to avoid naming errors in the future.
 relabelAst :: Ast.Program -> Ast.Program
 relabelAst (Ast.Program decls cnt) =
-  let (tlDecls', Env _ cnt') = runState (mapM relabelDecl decls) (Env [] cnt)
-   in Ast.Program tlDecls' cnt'
+  let (decls', Env _ cnt') = runState (mapM relabelDecl decls) (Env [] cnt)
+   in Ast.Program decls' cnt'
 
 -- * Internal
 
@@ -25,7 +25,10 @@ relabelAst (Ast.Program decls cnt) =
 
 type RelabelerState = State Env
 
-data Env = Env {idMappings :: [IdMapping], idCnt :: Ast.IdCnt}
+data Env = Env
+  { idMappings :: [IdMapping],
+    idCnt :: Ast.IdCnt
+  }
 
 type IdMapping = (Ast.Identifier', Ast.Identifier')
 
@@ -70,7 +73,7 @@ relabelFun (Ast.Fun params body) = do
 
 mapId :: Ast.Identifier' -> RelabelerState Ast.Identifier'
 mapId ident = do
-  Env ms _ <- get
+  ms <- gets idMappings
   return $ fromMaybe ident (lookup ident ms)
 
 pushAndMapId :: Ast.Identifier' -> RelabelerState Ast.Identifier'
