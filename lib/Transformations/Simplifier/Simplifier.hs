@@ -12,7 +12,9 @@ import qualified Trees.Common as Common
 -- * AST Simplifier
 
 simplifyAst :: Ast.Program -> SAst.Program
-simplifyAst (Ast.Program stmts) = uncurry SAst.Program $ runState (mapM simplifyStmt stmts) 0
+simplifyAst (Ast.Program stmts) =
+  let (decls, cnt) = runState (mapM simplifyStmt stmts) 0
+   in SAst.Program decls cnt
 
 -- * Internal
 
