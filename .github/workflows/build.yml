@@ -12,9 +12,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-20.04]
         ghc: ["8.10.7"]
         cabal: ["3.6"]
-        os: [ubuntu-20.04]
 
     steps:
       - name: Checkout code
@@ -28,19 +28,15 @@ jobs:
           cabal-version: ${{ matrix.cabal }}
       - name: Set up HLint
         uses: haskell-actions/hlint-setup@v2
-        with:
-          version: 3.1.6
       - name: Run HLint
         uses: haskell-actions/hlint-run@v2
         with:
           fail-on: warning
       - name: Check for Ormolu formatting
-        uses: mrkkrp/ormolu-action@v9
+        uses: haskell-actions/run-ormolu@v14
         with:
           pattern: "**/*.hs"
-          respect-cabal-files: false
-      - name: Update packages list
-        run: cabal update
+          version: 0.3.1.0
       - name: Install LLVM
         run: sudo apt install -y llvm-9 llvm-9-dev
       - name: Build project
