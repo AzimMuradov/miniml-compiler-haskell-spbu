@@ -1,6 +1,9 @@
-let factorial'0 n'1 = 
-  if (n'1 <= 0)
+let factorial'1 n'2 = 
+  if (n'2 <= 0)
     then 1
     else 
-      let anf'2 = (factorial'0 (n'1 - 1))
-      in (n'1 * anf'2);;
+      let anf'4 = (factorial'1 (n'2 - 1))
+      in (n'2 * anf'4);;
+let simp'3 = 
+  let anf'5 = (factorial'1 5)
+  in (print_int anf'5);;

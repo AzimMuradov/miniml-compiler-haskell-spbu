@@ -7,17 +7,19 @@ import qualified Data.Text.IO as LBS
 import Data.Text.Lazy (unpack)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.Golden (goldenVsString)
+import Test.Tasty.HUnit (testCase, (@?=))
 import Text.Pretty.Simple (pShowNoColor)
-import Utils (processTillAnfGen, processTillLlvmIr, processTillParser, processTillTypeChecker)
+import Utils (processTillAnfGen, processTillLlvmIr, processTillLlvmRunOutput, processTillParser, processTillVerify)
 
 tests :: TestTree
 tests =
   testGroup
     "factorial"
     ( (testParsing <$> factorials)
-        <> (testTypeInference <$> factorials)
+        <> (testTypeCheck <$> factorials)
         <> (testAstToAnf <$> factorials)
         <> [testLlvm facRec] -- TODO : (testLlvm <$> factorials)
+        <> [testLlvmRun facRec] -- TODO : (testLlvmRun <$> factorials)
     )
 
 -- Test types
@@ -29,12 +31,11 @@ testParsing (title, testFileProvider) =
     (testFileProvider "ast")
     (pack . unpack . pShowNoColor . processTillParser <$> LBS.readFile (testFileProvider "ml"))
 
-testTypeInference :: TestFileProvider -> TestTree
-testTypeInference (title, testFileProvider) =
-  goldenVsString
-    (title <> " - type inference")
-    (testFileProvider "ti")
-    (pack . processTillTypeChecker <$> LBS.readFile (testFileProvider "ml"))
+testTypeCheck :: TestFileProvider -> TestTree
+testTypeCheck (title, testFileProvider) =
+  testCase (title <> " - type checking") $ do
+    isOk <- processTillVerify <$> LBS.readFile (testFileProvider "ml")
+    isOk @?= True
 
 testAstToAnf :: TestFileProvider -> TestTree
 testAstToAnf (title, testFileProvider) =
@@ -49,6 +50,13 @@ testLlvm (title, testFileProvider) =
     (title <> " - LLVM")
     (testFileProvider "ll")
     (pack . processTillLlvmIr "factorial" <$> LBS.readFile (testFileProvider "ml"))
+
+testLlvmRun :: TestFileProvider -> TestTree
+testLlvmRun (title, testFileProvider) =
+  goldenVsString
+    (title <> " - LLVM run")
+    (testFileProvider "out")
+    (pack . processTillLlvmRunOutput "factorial" <$> LBS.readFile (testFileProvider "ml"))
 
 -- Test file providers
 

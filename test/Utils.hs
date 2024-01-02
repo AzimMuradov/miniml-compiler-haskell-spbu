@@ -1,22 +1,31 @@
+{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
+
 module Utils
   ( processTillParser,
     processTillTypeChecker,
+    processTillVerify,
     processTillAstSimplifier,
     processTillRelabeler,
     processTillCc,
     processTillLl,
     processTillAnfGen,
     processTillLlvmIr,
+    processTillLlvmRunOutput,
   )
 where
 
 import CodeGen.Llvm.Ir2LlvmIr (genLlvmIrModule, ppLlvmModule)
+import CodeGen.Llvm.Runner (run)
 import CodeGen.Module (Module (Module))
+import CodeGen.RunResult (RunResult (Success))
+import Data.Either (isRight)
 import Data.Maybe (fromJust)
 import Data.Text (Text)
-import qualified Data.Text.Lazy as Txt
+import qualified Data.Text as Txt
+import qualified Data.Text.Lazy as TxtLazy
 import qualified Parser.Ast as Ast
 import Parser.Parser (parseProgram)
+import System.IO.Unsafe (unsafePerformIO)
 import qualified Transformations.Anf.Anf as Anf
 import Transformations.Anf.AnfGen (genAnf)
 import qualified Transformations.Anf.PrettyPrinter as Anf
@@ -36,6 +45,9 @@ processTillParser = processTillParser'
 processTillTypeChecker :: Text -> String
 processTillTypeChecker = either TC.pretty TC.pretty . processTillTypeChecker'
 
+processTillVerify :: Text -> Bool
+processTillVerify = isRight . processTillTypeChecker'
+
 processTillAstSimplifier :: Text -> String
 processTillAstSimplifier = show . processTillAstSimplifier'
 
@@ -52,7 +64,12 @@ processTillAnfGen :: Text -> String
 processTillAnfGen = Anf.prettyPrint . processTillAnfGen'
 
 processTillLlvmIr :: Text -> Text -> String
-processTillLlvmIr name program = Txt.unpack $ ppLlvmModule $ genLlvmIrModule (Module name (processTillAnfGen' program))
+processTillLlvmIr name program = TxtLazy.unpack $ ppLlvmModule $ genLlvmIrModule (Module name (processTillAnfGen' program))
+
+processTillLlvmRunOutput :: Text -> Text -> String
+processTillLlvmRunOutput name program =
+  let Success out _ _ = unsafePerformIO $ run name program
+   in Txt.unpack out
 
 -- Combinators
 
