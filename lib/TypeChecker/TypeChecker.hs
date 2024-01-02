@@ -65,10 +65,10 @@ inferStatements' ((StmtDecl (DeclFun ident True fun)) : xs) _ = do
 
 inferExpr :: Expression -> Infer UType
 inferExpr (ExprId x) = lookup (Var x)
-inferExpr (ExprVal value) = case value of
-  ValUnit -> return UTyUnit
-  ValBool _ -> return UTyBool
-  ValInt _ -> return UTyInt
+inferExpr (ExprPrimVal value) = case value of
+  PrimValUnit -> return UTyUnit
+  PrimValBool _ -> return UTyBool
+  PrimValInt _ -> return UTyInt
 inferExpr (ExprBinOp op lhs rhs) = do
   utLhs <- inferExpr lhs
   utRhs <- inferExpr rhs

@@ -20,7 +20,7 @@ genAnf (Lfr.Program gDecls cnt) =
 
 -- * Internal
 
--- * ANF Normalizer Continuation & Generator State
+-- ** ANF Normalizer Continuation & Generator State
 
 type NormCont r a = ContT r AnfGenState a
 
@@ -37,9 +37,9 @@ genDecl (Lfr.GlobFunDecl ident params body) = Anf.GlobFunDecl ident params <$> g
 genExpr :: Lfr.Expression -> AnfGenState Anf.Expression
 genExpr (Lfr.ExprId ident) = returnAtom $ Anf.AtomId ident
 genExpr (Lfr.ExprVal val) = returnAtom $ case val of
-  Common.ValUnit -> Anf.AtomUnit
-  Common.ValBool bool -> Anf.AtomBool bool
-  Common.ValInt int -> Anf.AtomInt int
+  Common.PrimValUnit -> Anf.AtomUnit
+  Common.PrimValBool bool -> Anf.AtomBool bool
+  Common.PrimValInt int -> Anf.AtomInt int
 genExpr (Lfr.ExprBinOp op lhs rhs) = evalContT $ do
   lhs' <- normalizeToAtom lhs
   rhs' <- normalizeToAtom rhs

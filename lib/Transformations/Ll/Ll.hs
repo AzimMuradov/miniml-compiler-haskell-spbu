@@ -47,7 +47,7 @@ llGDecl = \case
 llExpr :: Ast.Expression -> LlState Lfr.Expression
 llExpr = \case
   Ast.ExprId ident -> return $ Lfr.ExprId ident
-  Ast.ExprVal val -> return $ Lfr.ExprVal val
+  Ast.ExprPrimVal val -> return $ Lfr.ExprVal val
   Ast.ExprBinOp op lhs rhs -> ll2 (Lfr.ExprBinOp op) lhs rhs
   Ast.ExprUnOp op x -> ll1 (Lfr.ExprUnOp op) x
   Ast.ExprApp f arg -> ll2 Lfr.ExprApp f arg

@@ -8,7 +8,7 @@ import Text.Megaparsec (between, choice, optional, try)
 -- ** Backtracking support
 
 choice' :: (Foldable f, Functor f) => f (Parser a) -> Parser a
-choice' x = choice $ try <$> x
+choice' ps = choice $ try <$> ps
 
 optional' :: Parser a -> Parser (Maybe a)
 optional' = optional . try

@@ -17,7 +17,7 @@ declId (DeclFun ident _ _) = ident
 
 data Expression
   = ExprId Identifier'
-  | ExprVal Value
+  | ExprPrimVal PrimitiveValue
   | ExprBinOp BinaryOperator Expression Expression
   | ExprUnOp UnaryOperator Expression
   | ExprApp Expression Expression

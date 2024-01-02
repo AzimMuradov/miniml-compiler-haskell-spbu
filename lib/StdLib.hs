@@ -1,75 +1,46 @@
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module StdLib
-  ( TypedStdDeclaration,
-    typedStdDeclarations,
-    stdDeclarations,
+  ( TypedDeclaration,
+    allTypedDecls,
+    typedDecls,
+    decls,
   )
 where
 
-import Data.Text (Text)
-import Trees.Common
+import Trees.Common (Identifier, Type (..))
 
 -- * Standard Library
 
-type TypedStdDeclaration = (Identifier, Type)
+type TypedDeclaration = (Identifier, Type)
 
--- | The list of typed standard declarations (but without the operators).
-typedStdDeclarations :: [TypedStdDeclaration]
-typedStdDeclarations = [notDecl, printBoolDecl, printIntDecl]
+-- | The list of all (including internal) typed standard declarations.
+allTypedDecls :: [TypedDeclaration]
+allTypedDecls = typedDecls <> [divDecl]
+
+-- | The list of typed standard declarations.
+typedDecls :: [TypedDeclaration]
+typedDecls = [notDecl, printBoolDecl, printIntDecl]
 
 -- | The list of standard declarations.
-stdDeclarations :: [Identifier]
-stdDeclarations = fst <$> typedStdDeclarations
+decls :: [Identifier]
+decls = fst <$> typedDecls
 
 -- ** Function Declarations
 
 -- | The @not@ function declaration (@not : bool -> bool@).
-notDecl :: TypedStdDeclaration
+notDecl :: TypedDeclaration
 notDecl = ("not", TFun TBool TBool)
 
 -- | The @print_bool@ function declaration (@print_bool : bool -> unit@).
-printBoolDecl :: TypedStdDeclaration
+printBoolDecl :: TypedDeclaration
 printBoolDecl = ("print_bool", TFun TBool TUnit)
 
 -- | The @print_int@ function declaration (@print_int : int -> unit@).
-printIntDecl :: TypedStdDeclaration
+printIntDecl :: TypedDeclaration
 printIntDecl = ("print_int", TFun TInt TUnit)
 
-data StdLibDecl
-  = And
-  | Or
-  | Not
-  | UnMinus
-  | Plus
-  | Minus
-  | Mul
-  | Div
-  | Eq
-  | Ne
-  | Lt
-  | Le
-  | Gt
-  | Ge
-  | PrintBool
-  | PrintInt
+-- ** Internal Function Declarations
 
-stdDeclName :: StdLibDecl -> Text
-stdDeclName = \case
-  And -> "(&&)"
-  Or -> "(||)"
-  Not -> "not"
-  UnMinus -> "(~-)"
-  Plus -> "(+)"
-  Minus -> "(-)"
-  Mul -> "(*)"
-  Div -> "(/)"
-  Eq -> "(=)"
-  Ne -> "(<>)"
-  Lt -> "(<)"
-  Le -> "(<=)"
-  Gt -> "(>)"
-  Ge -> "(>=)"
-  PrintBool -> "print_bool"
-  PrintInt -> "print_int"
+divDecl :: TypedDeclaration
+divDecl = ("miniml_div", TFun TInt (TFun TInt TInt))

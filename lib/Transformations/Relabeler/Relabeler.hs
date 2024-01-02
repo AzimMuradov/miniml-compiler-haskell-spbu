@@ -13,6 +13,7 @@ import qualified Trees.Common as Ast
 -- * AST Relabeler
 
 -- | Relabel identifiers in the AST so that each declaration creates an identifier with a unique name.
+--
 -- It helps to avoid naming errors in the future.
 relabelAst :: Ast.Program -> Ast.Program
 relabelAst (Ast.Program decls cnt) =
@@ -50,7 +51,7 @@ relabelDecl = \case
 relabelExpr :: Ast.Expression -> RelabelerState Ast.Expression
 relabelExpr = \case
   Ast.ExprId ident -> Ast.ExprId <$> mapId ident
-  Ast.ExprVal val -> return $ Ast.ExprVal val
+  Ast.ExprPrimVal val -> return $ Ast.ExprPrimVal val
   Ast.ExprBinOp op lhs rhs -> relabel2 (Ast.ExprBinOp op) lhs rhs
   Ast.ExprUnOp op x -> relabel1 (Ast.ExprUnOp op) x
   Ast.ExprApp f args -> relabel2 Ast.ExprApp f args

@@ -15,7 +15,7 @@ data VarDeclaration = VarDecl Identifier' Expression
 
 data Expression
   = ExprId Identifier'
-  | ExprVal Value
+  | ExprVal PrimitiveValue
   | ExprBinOp BinaryOperator Expression Expression
   | ExprUnOp UnaryOperator Expression
   | ExprApp Expression Expression

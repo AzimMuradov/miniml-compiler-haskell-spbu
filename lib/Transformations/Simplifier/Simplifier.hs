@@ -37,7 +37,7 @@ simplifyDecl = \case
 simplifyExpr :: Ast.Expression -> SimplifierState SAst.Expression
 simplifyExpr = \case
   Ast.ExprId ident -> return $ SAst.ExprId (convertId ident)
-  Ast.ExprVal val -> return $ SAst.ExprVal val
+  Ast.ExprPrimVal val -> return $ SAst.ExprPrimVal val
   Ast.ExprBinOp op lhs rhs -> simplify2 (SAst.ExprBinOp op) lhs rhs
   Ast.ExprUnOp op x -> simplify1 (SAst.ExprUnOp op) x
   Ast.ExprApp f arg -> simplify2 SAst.ExprApp f arg

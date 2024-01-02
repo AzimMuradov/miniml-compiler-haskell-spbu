@@ -61,7 +61,7 @@ ccExpr = \case
         when (ident `Set.notMember` gs) $
           modify $ \env -> env {freeVars = ident `Set.insert` fv}
         return $ Ast.ExprId ident
-  Ast.ExprVal val -> return $ Ast.ExprVal val
+  Ast.ExprPrimVal val -> return $ Ast.ExprPrimVal val
   Ast.ExprBinOp op lhs rhs -> cc2 (Ast.ExprBinOp op) lhs rhs
   Ast.ExprUnOp op x -> cc1 (Ast.ExprUnOp op) x
   Ast.ExprApp f arg -> cc2 Ast.ExprApp f arg
