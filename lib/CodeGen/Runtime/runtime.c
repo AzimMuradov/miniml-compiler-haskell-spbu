@@ -14,7 +14,6 @@
   #error "Not a C11 standard compliant compiler"
 #endif
 
-
 // For Non-LLVM Compilers
 
 #ifndef __has_builtin
@@ -22,12 +21,13 @@
 #endif
 
 
+// The Standard Library
+
 // Standard Primitive Types
 
 #define unit_t int64_t
 #define boolean_t int64_t
 #define integer_t int64_t
-
 
 // Standard Functions
 
@@ -50,7 +50,6 @@ unit_t print_int(const integer_t a) {
 
 static _Noreturn void miniml_throw_exception(const char *msg);
 
-
 // UB-Free Arithmetic Operations
 
 integer_t miniml_div(const integer_t a, const integer_t b) {
@@ -62,7 +61,6 @@ integer_t miniml_div(const integer_t a, const integer_t b) {
   }
   return a / b;
 }
-
 
 // Exception Utils
 
