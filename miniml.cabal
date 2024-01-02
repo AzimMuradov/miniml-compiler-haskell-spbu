@@ -31,7 +31,10 @@ library
     import:           shared-properties
     exposed-modules:
         CodeGen.Llvm.Ir2LlvmIr
+        CodeGen.Llvm.Runner
         CodeGen.Module
+        CodeGen.RunResult
+        CodeGen.TimedValue
         MonadUtils
         Parser.Ast
         Parser.Lexer
