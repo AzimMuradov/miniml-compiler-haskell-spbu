@@ -27,14 +27,14 @@ Just
                     ( ExprIte
                         ( ExprBinOp ( CompOp EqOp )
                             ( ExprId "n" )
-                            ( ExprVal
-                                ( ValInt 0 )
+                            ( ExprPrimVal
+                                ( PrimValInt 0 )
                             )
                         )
                         ( ExprApp
                             ( ExprId "k" )
-                            ( ExprVal
-                                ( ValInt 1 )
+                            ( ExprPrimVal
+                                ( PrimValInt 1 )
                             )
                         )
                         ( ExprApp
@@ -42,8 +42,8 @@ Just
                                 ( ExprId "cps_factorial" )
                                 ( ExprBinOp ( ArithOp MinusOp )
                                     ( ExprId "n" )
-                                    ( ExprVal
-                                        ( ValInt 1 )
+                                    ( ExprPrimVal
+                                        ( PrimValInt 1 )
                                     )
                                 )
                             )

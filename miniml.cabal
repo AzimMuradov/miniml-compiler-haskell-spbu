@@ -44,13 +44,13 @@ library
         Transformations.Cc.Cc
         Transformations.Ll.Lfr
         Transformations.Ll.Ll
-        Transformations.Relabeler.RelabelVars
-        Transformations.Simplification.SimplifiedAst
-        Transformations.Simplification.SimplifyAst
+        Transformations.Relabeler.Relabeler
+        Transformations.Simplifier.SimplifiedAst
+        Transformations.Simplifier.Simplifier
         Trees.Common
-        TypeInference.HindleyMilner
-        TypeInference.PrettyPrint
-        TypeInference.TypeInference
+        TypeChecker.HindleyMilner
+        TypeChecker.PrettyPrinter
+        TypeChecker.TypeChecker
 
     other-modules:
     other-extensions:
@@ -95,6 +95,7 @@ test-suite tests
         Unit.Parser.ParserTest
         Unit.StdLibTest
         Unit.TypeInference.TypeInferenceTest
+        Utils
 
     build-depends:
         , mini-ml

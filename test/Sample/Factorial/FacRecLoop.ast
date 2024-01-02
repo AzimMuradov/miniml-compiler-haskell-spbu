@@ -32,8 +32,8 @@ Just
                                             ( ExprId "loop" )
                                             ( ExprBinOp ( ArithOp PlusOp )
                                                 ( ExprId "i" )
-                                                ( ExprVal
-                                                    ( ValInt 1 )
+                                                ( ExprPrimVal
+                                                    ( PrimValInt 1 )
                                                 )
                                             )
                                         )
@@ -48,12 +48,12 @@ Just
                         ( ExprApp
                             ( ExprApp
                                 ( ExprId "loop" )
-                                ( ExprVal
-                                    ( ValInt 1 )
+                                ( ExprPrimVal
+                                    ( PrimValInt 1 )
                                 )
                             )
-                            ( ExprVal
-                                ( ValInt 1 )
+                            ( ExprPrimVal
+                                ( PrimValInt 1 )
                             )
                         )
                     )

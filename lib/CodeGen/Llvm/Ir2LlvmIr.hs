@@ -12,7 +12,7 @@ import Data.Functor.Foldable (ListF (Cons, Nil), hylo)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.String.Transform (toShortByteString)
-import qualified Data.Text as Text
+import qualified Data.Text as Txt
 import Data.Text.Lazy (Text)
 import Foreign (fromBool)
 import qualified LLVM.AST as LLVM hiding (function)
@@ -24,10 +24,10 @@ import qualified LLVM.IRBuilder.Instruction as LLVM
 import qualified LLVM.IRBuilder.Module as LLVM
 import qualified LLVM.IRBuilder.Monad as LLVM
 import LLVM.Pretty (ppllvm)
+import MonadUtils (locally)
 import qualified StdLib
 import Transformations.Anf.Anf
 import Trees.Common
-import Utils (locally)
 
 ppLlvmModule :: LLVM.Module -> Text
 ppLlvmModule = ppllvm
@@ -86,14 +86,14 @@ genGlobDecl = \case
 
 genId :: Identifier' -> String
 genId = \case
-  Txt txt -> Text.unpack txt
-  Gen n txt -> Text.unpack txt <> "'" <> show n
+  Txt txt -> Txt.unpack txt
+  Gen n txt -> Txt.unpack txt <> "." <> show n
 
 genExpr :: Expression -> CodeGenM LLVM.Operand
 genExpr = \case
   ExprAtom atom -> genAtom atom
   ExprComp ce -> genComp ce
-  ExprLetIn (ident, val) expr -> mdo
+  ExprLetIn (ident, val) expr -> do
     val' <- genExpr val `LLVM.named` toShortByteString (genId ident)
     regVar ident val'
     genExpr expr
@@ -136,7 +136,7 @@ genAtom = \case
 
 genComp :: ComplexExpression -> CodeGenM LLVM.Operand
 genComp = \case
-  CompApp f arg -> mdo
+  CompApp f arg -> do
     f' <- findFun f
     arg' <- genAtom arg
     LLVM.call f' [(arg', [])]

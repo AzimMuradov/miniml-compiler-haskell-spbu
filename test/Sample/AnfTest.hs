@@ -2,15 +2,11 @@
 
 module Sample.AnfTest (tests) where
 
-import Data.ByteString.Lazy.Char8 (ByteString, pack)
-import Data.Maybe (fromJust)
-import Data.Text (Text)
+import Data.ByteString.Lazy.Char8 (pack)
 import qualified Data.Text.IO as LBS
-import Parser.Parser (parseProgram)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.Golden (goldenVsString)
-import Transformations.Anf.AnfGen (astToAnf)
-import Transformations.Anf.PrettyPrinter (prettyPrint)
+import Utils (processTillAnfGen)
 
 tests :: TestTree
 tests =
@@ -26,10 +22,7 @@ testAstToAnf title testFileProvider =
   goldenVsString
     (title <> " - ANF")
     (testFileProvider "anf")
-    (transformToBS <$> LBS.readFile (testFileProvider "ml"))
-
-transformToBS :: Text -> ByteString
-transformToBS file = pack $ (prettyPrint . astToAnf) (fromJust (parseProgram file))
+    (pack . processTillAnfGen <$> LBS.readFile (testFileProvider "ml"))
 
 testFile :: String -> String
 testFile filename = "test/Sample/Anf/" <> filename
