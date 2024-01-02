@@ -193,10 +193,10 @@ regStdLibDecl decl = register decl =<< declareAsExtern decl
         LLVM.i64
 
     register :: StdLib.TypedDeclaration -> LLVM.Operand -> Llvm ()
-    register (ident, _) operand = regFun (Txt ident) operand
+    register (ident, _) = regFun (Txt ident)
 
     signatureTypesCount :: Type -> Int
-    signatureTypesCount t = hylo signatureTypesCount'' signatureTypesCount' t
+    signatureTypesCount = hylo signatureTypesCount'' signatureTypesCount'
 
     signatureTypesCount' :: Type -> ListF Type Type
     signatureTypesCount' (TFun pT retT) = Cons pT retT
