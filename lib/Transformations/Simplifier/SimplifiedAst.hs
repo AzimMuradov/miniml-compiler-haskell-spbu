@@ -11,6 +11,10 @@ data Declaration
   | DeclFun Identifier' IsRec Fun
   deriving (Show, Eq)
 
+declId :: Declaration -> Identifier'
+declId (DeclVar ident _) = ident
+declId (DeclFun ident _ _) = ident
+
 data Expression
   = ExprId Identifier'
   | ExprVal Value

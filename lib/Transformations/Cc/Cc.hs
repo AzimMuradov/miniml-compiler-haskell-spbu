@@ -2,7 +2,8 @@
 
 module Transformations.Cc.Cc (ccAst) where
 
-import Control.Monad.State (State, evalState, get, modify)
+import Control.Monad.Reader (MonadReader (ask), Reader, runReader)
+import Control.Monad.State (StateT, evalStateT, get, gets, modify, when)
 import Data.Foldable (Foldable (foldl'))
 import Data.List.NonEmpty (NonEmpty, (<|))
 import qualified Data.List.NonEmpty as NE
@@ -10,55 +11,55 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
-import StdLib (stdDeclarations)
-import qualified Transformations.Simplification.SimplifiedAst as Ast
+import MonadUtils
+import qualified StdLib
+import qualified Transformations.Simplifier.SimplifiedAst as Ast
 import qualified Trees.Common as Ast
-import Utils
 
--- | Convert AST to Closure-Free Representation
+-- * AST Closure Converter
+
+-- | Convert AST to its closure-free representation.
 ccAst :: Ast.Program -> Ast.Program
-ccAst prg = evalState (ccProgram prg) initEnv
-  where
-    initEnv = Env {freeVars = Set.empty, globals = getGlobals prg, mapping = Map.empty}
+ccAst (Ast.Program decls cnt) =
+  let decls' = runReader (mapM ccGDecl decls) gIds
+      gIds = Set.fromList $ (Ast.Txt <$> StdLib.decls) <> (Ast.declId <$> decls)
+   in Ast.Program decls' cnt
 
-    getGlobals (Ast.Program decls _) = Set.fromList $ (getDeclId <$> decls) <> (Ast.Txt <$> stdDeclarations)
+-- * Internal
 
-    getDeclId (Ast.DeclVar ident _) = ident
-    getDeclId (Ast.DeclFun ident _ _) = ident
+-- ** Closure Converter State & Globals Info
 
--- Implementation
+type CcState = StateT Env GlobalsInfo
 
 data Env = Env
   { freeVars :: Set Ast.Identifier',
-    globals :: Set Ast.Identifier',
-    mapping :: Map Ast.Identifier' Ast.Expression
+    idMapping :: Map Ast.Identifier' Ast.Expression
   }
 
-type CcState = State Env
+type GlobalsInfo = Reader GlobalIds
 
-ccProgram :: Ast.Program -> CcState Ast.Program
-ccProgram (Ast.Program gs cnt) = flip Ast.Program cnt <$> mapM ccTopLevelDecl gs
-  where
-    ccTopLevelDecl decl = ccTopLevelDecl' decl <* clearFv
+type GlobalIds = Set Ast.Identifier'
 
-    ccTopLevelDecl' = \case
-      Ast.DeclVar name expr ->
-        cc1 (Ast.DeclVar name) expr
-      Ast.DeclFun name isRec (Ast.Fun params body) ->
-        cc1 (Ast.DeclFun name isRec . Ast.Fun params) body
+-- ** Closure Converters
 
-    clearFv = modify $ \env -> env {freeVars = Set.empty}
+ccGDecl :: Ast.Declaration -> GlobalsInfo Ast.Declaration
+ccGDecl gDecl = flip evalStateT (Env Set.empty Map.empty) $
+  case gDecl of
+    Ast.DeclVar ident val -> cc1 (Ast.DeclVar ident) val
+    Ast.DeclFun ident isRec (Ast.Fun params body) -> do
+      fun <- cc1 (Ast.Fun params) body
+      return $ Ast.DeclFun ident isRec fun
 
 ccExpr :: Ast.Expression -> CcState Ast.Expression
 ccExpr = \case
   Ast.ExprId ident -> do
-    Env fv gs m <- get
-    case Map.lookup ident m of
-      Just repl -> return repl
+    gs <- ask
+    Env fv m <- get
+    case m Map.!? ident of
+      Just app -> return app
       Nothing -> do
-        modify $ \env ->
-          let newFV = if ident `Set.notMember` gs then Set.singleton ident else Set.empty
-           in env {freeVars = fv `Set.union` newFV}
+        when (ident `Set.notMember` gs) $
+          modify $ \env -> env {freeVars = ident `Set.insert` fv}
         return $ Ast.ExprId ident
   Ast.ExprVal val -> return $ Ast.ExprVal val
   Ast.ExprBinOp op lhs rhs -> cc2 (Ast.ExprBinOp op) lhs rhs
@@ -71,37 +72,32 @@ ccExpr = \case
     Ast.DeclFun ident isRec (Ast.Fun params body) -> do
       body' <- ccExpr body
 
-      fv <- do
-        Env fvSet _ _ <- get
-        return $ toNonEmpty $ fvSet Set.\\ toSet (ident <| params)
+      fv <- gets $ \env ->
+        let fvSet = freeVars env Set.\\ toSet (ident <| params)
+         in toNonEmpty fvSet
+      modify $ \env ->
+        let app = apply (Ast.ExprId ident) (Ast.ExprId <$> fv)
+            m = Map.insert ident app (idMapping env)
+         in env {idMapping = m}
 
       let decl' = Ast.DeclFun ident isRec (Ast.Fun (fv <> params) body')
-      modify $ \env@(Env _ _ m) -> env {mapping = Map.insert ident (foldl' Ast.ExprApp (Ast.ExprId ident) (Ast.ExprId <$> fv)) m}
-      expr' <- ccExpr expr
+      Ast.ExprLetIn decl' <$> ccExpr expr
+  Ast.ExprFun (Ast.Fun params body) -> do
+    body' <- ccExpr body
 
-      return $ Ast.ExprLetIn decl' expr'
-  Ast.ExprFun (Ast.Fun params body) -> ccFun params body
+    fvSet <- gets $ \env -> freeVars env Set.\\ toSet params
+    modify $ \env -> env {freeVars = fvSet}
 
-ccFun :: NonEmpty Ast.Identifier' -> Ast.Expression -> CcState Ast.Expression
-ccFun params body = do
-  body' <- ccExpr body
+    let fv = Set.toList fvSet
+    let params' = prependList fv params
+    let closedFun = Ast.ExprFun (Ast.Fun params' body')
 
-  fvSet <- do
-    Env fvSet _ _ <- get
-    return $ fvSet Set.\\ toSet params
+    return $ apply closedFun (Ast.ExprId <$> fv)
+  where
+    apply :: Foldable t => Ast.Expression -> t Ast.Expression -> Ast.Expression
+    apply = foldl' Ast.ExprApp
 
-  let args' = prependList (Set.toList fvSet) params
-  let closedFun = Ast.ExprFun (Ast.Fun args' body')
-  let argsExprs = Ast.ExprId <$> args'
-
-  modify $ \env -> env {freeVars = fvSet}
-
-  return $
-    if null fvSet
-      then closedFun
-      else foldl' Ast.ExprApp closedFun argsExprs
-
--- Utils
+-- ** Collection Utils
 
 toSet :: Ord a => NonEmpty a -> Set a
 toSet = Set.fromList . NE.toList
@@ -112,20 +108,19 @@ toNonEmpty = NE.fromList . Set.toList
 prependList :: [a] -> NonEmpty a -> NonEmpty a
 prependList = (<>) . NE.fromList
 
-cc1 :: (Ast.Expression -> a) -> Ast.Expression -> CcState a
-cc1 f x = f <$> ccExpr x
+-- ** Utils
+
+cc1 ::
+  (Ast.Expression -> a) ->
+  (Ast.Expression -> CcState a)
+cc1 = liftM1' ccExpr
 
 cc2 ::
   (Ast.Expression -> Ast.Expression -> a) ->
-  Ast.Expression ->
-  Ast.Expression ->
-  CcState a
+  (Ast.Expression -> Ast.Expression -> CcState a)
 cc2 = liftM2' ccExpr
 
 cc3 ::
   (Ast.Expression -> Ast.Expression -> Ast.Expression -> a) ->
-  Ast.Expression ->
-  Ast.Expression ->
-  Ast.Expression ->
-  CcState a
+  (Ast.Expression -> Ast.Expression -> Ast.Expression -> CcState a)
 cc3 = liftM3' ccExpr
