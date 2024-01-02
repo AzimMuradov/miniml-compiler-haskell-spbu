@@ -1,12 +1,12 @@
 {-# LANGUAGE LambdaCase #-}
 
-module Transformations.Simplification.SimplifyAst (simplifyAst) where
+module Transformations.Simplifier.Simplifier (simplifyAst) where
 
 import Control.Monad.State (State, get, modify, runState)
 import Data.Text (pack)
 import MonadUtils
 import qualified Parser.Ast as Ast
-import qualified Transformations.Simplification.SimplifiedAst as SAst
+import qualified Transformations.Simplifier.SimplifiedAst as SAst
 import qualified Trees.Common as Common
 
 -- * AST Simplifier

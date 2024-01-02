@@ -1,4 +1,4 @@
-module Transformations.Simplification.SimplifiedAst where
+module Transformations.Simplifier.SimplifiedAst where
 
 import Data.List.NonEmpty (NonEmpty)
 import Trees.Common

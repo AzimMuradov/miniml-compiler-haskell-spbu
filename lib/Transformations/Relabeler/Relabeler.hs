@@ -7,7 +7,7 @@ import Control.Monad.State (MonadState (get), State, modify, runState)
 import qualified Data.List.NonEmpty as NE
 import Data.Maybe (fromMaybe)
 import MonadUtils
-import qualified Transformations.Simplification.SimplifiedAst as Ast
+import qualified Transformations.Simplifier.SimplifiedAst as Ast
 import qualified Trees.Common as Ast
 
 -- * AST Relabeler
