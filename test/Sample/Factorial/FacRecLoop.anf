@@ -2,8 +2,8 @@ let loop'1 n'0 i'2 accum'3 =
   if (i'2 > n'0)
     then accum'3
     else 
-  let anf'5 = (loop'1 (i'2 + 1))
-  in (anf'5 (accum'3 * i'2));;
+      let anf'5 = (loop'1 (i'2 + 1))
+      in (anf'5 (accum'3 * i'2));;
 let factorial'4 n'0 = 
   let anf'7 = 
     let anf'6 = (loop'1 n'0)

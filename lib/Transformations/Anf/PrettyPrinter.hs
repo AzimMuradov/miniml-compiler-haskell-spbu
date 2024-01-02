@@ -42,12 +42,14 @@ prettyComplex :: ComplexExpression -> IndentState String
 prettyComplex = \case
   CompApp f arg -> return $ parens $ prettyId f <> " " <> prettyAtomic arg
   CompIte c t e -> do
+    modify (+ 4)
     indent <- get
-    let cText = createIndent (indent + 2) <> "if " <> prettyAtomic c
+    let cText = createIndent (indent - 2) <> "if " <> prettyAtomic c
     t' <- prettyExpr t
-    let tText = createIndent (indent + 4) <> "then " <> t'
+    let tText = createIndent indent <> "then " <> t'
     e' <- prettyExpr e
-    let eText = createIndent (indent + 4) <> "else " <> e'
+    let eText = createIndent indent <> "else " <> e'
+    modify $ \x -> x - 4
     return $ cText <> tText <> eText
 
 prettyAtomic :: AtomicExpression -> String

@@ -4,12 +4,12 @@ let cps_factorial'2 n'3 k'4 =
   if (n'3 = 0)
     then (k'4 1)
     else 
-  let anf'9 = (cps_factorial'2 (n'3 - 1))
-  in 
-    let anf'11 = 
-      let anf'10 = (ll'8 n'3)
-      in (anf'10 k'4)
-    in (anf'9 anf'11);;
+      let anf'9 = (cps_factorial'2 (n'3 - 1))
+      in 
+        let anf'11 = 
+          let anf'10 = (ll'8 n'3)
+          in (anf'10 k'4)
+        in (anf'9 anf'11);;
 let factorial'7 n'6 = 
   let anf'12 = (cps_factorial'2 n'6)
   in (anf'12 id'1);;
