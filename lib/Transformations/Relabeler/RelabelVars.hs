@@ -67,9 +67,7 @@ relabelExpr = \case
 
 relabelFun :: Ast.Fun -> RelabelerState Ast.Fun
 relabelFun (Ast.Fun params body) = do
-  -- TODO : same name in params
-  mapM_ pushScope params
-  params' <- mapM findLabel params
+  params' <- mapM (\p -> pushScope p >> findLabel p) params
 
   body' <- relabelExpr body
 
