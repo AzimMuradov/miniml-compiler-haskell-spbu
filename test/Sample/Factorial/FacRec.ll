@@ -33,10 +33,11 @@ if.then_0:
   store  i64 1, i64* %1 
   br label %if.end_0 
 if.else_0:
-  %anf.4_0 =  call ccc  i64  @miniml_fun_to_paf(i64 (i64)*  @factorial.1, i64  1)  
-  %anf.4_1 = sub   i64 %n.2_0, 1 
-  %anf.4_2 =  call ccc  i64  @miniml_apply(i64  %anf.4_0, i64  %anf.4_1)  
-  %5 = mul   i64 %n.2_0, %anf.4_2 
+  %anf.4_0 = ptrtoint i64 (i64)* @factorial.1 to i64 
+  %anf.4_1 =  call ccc  i64  @miniml_fun_to_paf(i64  %anf.4_0, i64  1)  
+  %anf.4_2 = sub   i64 %n.2_0, 1 
+  %anf.4_3 =  call ccc  i64  @miniml_apply(i64  %anf.4_1, i64  %anf.4_2)  
+  %5 = mul   i64 %n.2_0, %anf.4_3 
   store  i64 %5, i64* %1 
   br label %if.end_0 
 if.end_0:
@@ -49,10 +50,12 @@ if.end_0:
 
 
 define external ccc  i64 @main()    {
-  %anf.5_0 =  call ccc  i64  @miniml_fun_to_paf(i64 (i64)*  @factorial.1, i64  1)  
-  %anf.5_1 =  call ccc  i64  @miniml_apply(i64  %anf.5_0, i64  5)  
-  %1 =  call ccc  i64  @miniml_fun_to_paf(i64 (i64)*  @print_int, i64  1)  
-  %2 =  call ccc  i64  @miniml_apply(i64  %1, i64  %anf.5_1)  
-  store  i64 %2, i64* @simp.3 
+  %anf.5_0 = ptrtoint i64 (i64)* @factorial.1 to i64 
+  %anf.5_1 =  call ccc  i64  @miniml_fun_to_paf(i64  %anf.5_0, i64  1)  
+  %anf.5_2 =  call ccc  i64  @miniml_apply(i64  %anf.5_1, i64  5)  
+  %1 = ptrtoint i64 (i64)* @print_int to i64 
+  %2 =  call ccc  i64  @miniml_fun_to_paf(i64  %1, i64  1)  
+  %3 =  call ccc  i64  @miniml_apply(i64  %2, i64  %anf.5_2)  
+  store  i64 %3, i64* @simp.3 
   ret i64 0 
 }

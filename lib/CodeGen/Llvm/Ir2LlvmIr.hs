@@ -175,7 +175,8 @@ findAny ident = do
       case maybeFun of
         Just (fun, pCnt) -> do
           funToPafF <- findFun (Txt "miniml_fun_to_paf")
-          LLVM.call funToPafF [(fun, []), (LLVM.int64 (toInteger pCnt), [])]
+          casted <- LLVM.ptrtoint fun LLVM.i64
+          LLVM.call funToPafF [(casted, []), (LLVM.int64 (toInteger pCnt), [])]
         Nothing -> load' =<< findGlobVar ident
 
 findGlobVar :: MonadState Env m => Identifier' -> m LLVM.Operand
