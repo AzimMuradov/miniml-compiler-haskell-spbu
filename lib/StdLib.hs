@@ -16,7 +16,7 @@ type TypedDeclaration = (Identifier, Type)
 
 -- | The list of all (including internal) typed standard declarations.
 allTypedDecls :: [TypedDeclaration]
-allTypedDecls = typedDecls <> [divDecl]
+allTypedDecls = typedDecls <> [divDecl, funToPafDecl, applyDecl]
 
 -- | The list of typed standard declarations.
 typedDecls :: [TypedDeclaration]
@@ -44,3 +44,9 @@ printIntDecl = ("print_int", TFun TInt TUnit)
 
 divDecl :: TypedDeclaration
 divDecl = ("miniml_div", TFun TInt (TFun TInt TInt))
+
+funToPafDecl :: TypedDeclaration
+funToPafDecl = ("miniml_fun_to_paf", TFun TInt (TFun TInt TInt))
+
+applyDecl :: TypedDeclaration
+applyDecl = ("miniml_apply", TFun TInt (TFun TInt TInt))

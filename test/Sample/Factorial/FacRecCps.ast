@@ -84,5 +84,15 @@ Just
                     )
                 )
             )
+        , StmtExpr
+            ( ExprApp
+                ( ExprId "print_int" )
+                ( ExprApp
+                    ( ExprId "factorial" )
+                    ( ExprPrimVal
+                        ( PrimValInt 5 )
+                    )
+                )
+            )
         ]
     )

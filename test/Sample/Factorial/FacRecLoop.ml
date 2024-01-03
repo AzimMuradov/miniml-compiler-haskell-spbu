@@ -3,4 +3,6 @@ let factorial n =
     if i > n
       then accum
       else loop (i + 1) (accum * i)
-  in loop 1 1
+  in loop 1 1;;
+
+print_int (factorial 5)

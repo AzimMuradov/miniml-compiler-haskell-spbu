@@ -29,13 +29,15 @@ import qualified StdLib
 import Transformations.Anf.Anf
 import Trees.Common
 
-ppLlvmModule :: LLVM.Module -> Text
-ppLlvmModule = ppllvm
+-- * LLVM Code Generation
 
 genLlvmIrModule :: Module -> LLVM.Module
 genLlvmIrModule = genModule
 
--- Implementation
+ppLlvmModule :: LLVM.Module -> Text
+ppLlvmModule = ppllvm
+
+-- * Implementation
 
 type CodeGenM = LLVM.IRBuilderT Llvm
 
@@ -44,8 +46,10 @@ type Llvm = LLVM.ModuleBuilderT (State Env)
 data Env = Env
   { locVars :: Map Identifier' LLVM.Operand,
     globVars :: Map Identifier' LLVM.Operand,
-    funs :: Map Identifier' LLVM.Operand
+    funs :: Map Identifier' (LLVM.Operand, ParamsCnt)
   }
+
+type ParamsCnt = Int
 
 genModule :: Module -> LLVM.Module
 genModule (Module name (Program decls)) = flip evalState (Env Map.empty Map.empty Map.empty) $
@@ -72,14 +76,14 @@ genGlobDecl = \case
     var <- LLVM.global (LLVM.mkName $ genId ident) LLVM.i64 (C.Int 64 0)
     regGlobVar ident var
   GlobFunDecl ident params body -> mdo
-    regFun ident fun
-    fun <- locally $ do
+    regFun ident fun (length params)
+    fun <- locally $ mdo
       LLVM.function
         (LLVM.mkName $ genId ident)
         ((LLVM.i64,) . LLVM.ParameterName . toShortByteString . genId <$> params)
         LLVM.i64
-        $ \args -> do
-          mapM_ (uncurry regVar) (params `zip` args)
+        $ \args -> mdo
+          mapM_ (uncurry regLocVar) (params `zip` args)
           body' <- genExpr body
           LLVM.ret body'
     return ()
@@ -95,7 +99,7 @@ genExpr = \case
   ExprComp ce -> genComp ce
   ExprLetIn (ident, val) expr -> do
     val' <- genExpr val `LLVM.named` toShortByteString (genId ident)
-    regVar ident val'
+    regLocVar ident val'
     genExpr expr
 
 genAtom :: AtomicExpression -> CodeGenM LLVM.Operand
@@ -114,9 +118,9 @@ genAtom = \case
           ArithOp MinusOp -> LLVM.sub
           ArithOp MulOp -> LLVM.mul
           ArithOp DivOp ->
-            ( \a b -> do
+            ( \lhs'' rhs'' -> do
                 divF <- findFun (Txt "miniml_div")
-                LLVM.call divF [(a, []), (b, [])]
+                LLVM.call divF [(lhs'', []), (rhs'', [])]
             )
           CompOp cOp ->
             let cOpF = case cOp of
@@ -137,9 +141,10 @@ genAtom = \case
 genComp :: ComplexExpression -> CodeGenM LLVM.Operand
 genComp = \case
   CompApp f arg -> do
-    f' <- findFun f
+    f' <- findPaf f
     arg' <- genAtom arg
-    LLVM.call f' [(arg', [])]
+    applyF <- findFun (Txt "miniml_apply")
+    LLVM.call applyF [(f', []), (arg', [])]
   CompIte c t e -> mdo
     rv <- allocate'
 
@@ -158,27 +163,59 @@ genComp = \case
 
     load' rv
 
--- Stack
+-- Vars
 
 findVar :: Identifier' -> CodeGenM LLVM.Operand
-findVar k = do
-  locVar <- gets ((Map.!? k) . locVars)
-  maybe (load' =<< findGlobVar k) return locVar
+findVar ident = do
+  locVar <- findLocVar ident
+  case locVar of
+    Just locVar' -> return locVar'
+    Nothing -> do
+      gFun <- gets ((Map.!? ident) . funs)
+      case gFun of
+        Just (fun, pCnt) -> do
+          funToPafF <- findFun (Txt "miniml_fun_to_paf")
+          LLVM.call funToPafF [(fun, []), (LLVM.int64 (toInteger pCnt), [])]
+        Nothing -> load' =<< findGlobVar ident
+
+findLocVar :: Identifier' -> CodeGenM (Maybe LLVM.Operand)
+findLocVar ident = gets ((Map.!? ident) . locVars)
 
 findGlobVar :: MonadState Env m => Identifier' -> m LLVM.Operand
-findGlobVar k = gets ((Map.! k) . globVars)
+findGlobVar ident = do
+  a <- gets ((Map.!? ident) . globVars)
+  maybe (error $ show ident) return a
 
-regVar :: MonadState Env m => Identifier' -> LLVM.Operand -> m ()
-regVar k v = modify $ \env -> env {locVars = Map.insert k v (locVars env)}
+regLocVar :: MonadState Env m => Identifier' -> LLVM.Operand -> m ()
+regLocVar ident var = modify $
+  \env -> env {locVars = Map.insert ident var (locVars env)}
 
 regGlobVar :: MonadState Env m => Identifier' -> LLVM.Operand -> m ()
-regGlobVar k v = modify $ \env -> env {globVars = Map.insert k v (globVars env)}
+regGlobVar ident gVar = modify $
+  \env -> env {globVars = Map.insert ident gVar (globVars env)}
+
+-- Funs
+
+findPaf :: Identifier' -> CodeGenM LLVM.Operand
+findPaf ident = do
+  locVar <- findLocVar ident
+  case locVar of
+    Just locVar' -> return locVar'
+    Nothing -> do
+      a <- gets ((Map.!? ident) . funs)
+      (fun, pCnt) <- maybe (error $ show ident) return a
+      funToPafF <- findFun (Txt "miniml_fun_to_paf")
+      LLVM.call funToPafF [(fun, []), (LLVM.int64 (toInteger pCnt), [])]
 
 findFun :: Identifier' -> CodeGenM LLVM.Operand
-findFun k = gets ((Map.! k) . funs)
+findFun ident = do
+  a <- gets ((Map.!? ident) . funs)
+  b <- maybe (error $ show ident) return a
+  return $ fst b
 
-regFun :: MonadState Env m => Identifier' -> LLVM.Operand -> m ()
-regFun k v = modify $ \env -> env {funs = Map.insert k v (funs env)}
+regFun :: MonadState Env m => Identifier' -> LLVM.Operand -> ParamsCnt -> m ()
+regFun ident fun paramsCnt = modify $
+  \env -> env {funs = Map.insert ident (fun, paramsCnt) (funs env)}
 
 -- StdLib utils
 
@@ -189,30 +226,24 @@ regStdLibDecl decl = register decl =<< declareAsExtern decl
     declareAsExtern (ident, t) =
       LLVM.extern
         (LLVM.mkName $ Txt.unpack ident)
-        (replicate (signatureTypesCount t - 1) LLVM.i64)
+        (replicate (paramsTypesCount t) LLVM.i64)
         LLVM.i64
 
     register :: StdLib.TypedDeclaration -> LLVM.Operand -> Llvm ()
-    register (ident, _) = regFun (Txt ident)
+    register (ident, t) fun = regFun (Txt ident) fun (paramsTypesCount t)
 
-    signatureTypesCount :: Type -> Int
-    signatureTypesCount = hylo signatureTypesCount'' signatureTypesCount'
+    paramsTypesCount :: Type -> Int
+    paramsTypesCount = hylo paramsTypesCount'' paramsTypesCount'
 
-    signatureTypesCount' :: Type -> ListF Type Type
-    signatureTypesCount' (TFun pT retT) = Cons pT retT
-    signatureTypesCount' _ = Nil
+    paramsTypesCount' :: Type -> ListF Type Type
+    paramsTypesCount' (TFun pT retT) = Cons pT retT
+    paramsTypesCount' _ = Nil
 
-    signatureTypesCount'' :: ListF Type Int -> Int
-    signatureTypesCount'' (Cons _ n) = n + 1
-    signatureTypesCount'' Nil = 1
+    paramsTypesCount'' :: ListF Type Int -> Int
+    paramsTypesCount'' (Cons _ n) = n + 1
+    paramsTypesCount'' Nil = 0
 
 -- Allocation utils
-
-allocate :: LLVM.Operand -> CodeGenM LLVM.Operand
-allocate value = do
-  addr <- LLVM.alloca LLVM.i64 Nothing 0
-  store' addr value
-  return addr
 
 allocate' :: CodeGenM LLVM.Operand
 allocate' = LLVM.alloca LLVM.i64 Nothing 0

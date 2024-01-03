@@ -18,8 +18,8 @@ tests =
     ( (testParsing <$> factorials)
         <> (testTypeCheck <$> factorials)
         <> (testAstToAnf <$> factorials)
-        <> [testLlvm facRec] -- TODO : (testLlvm <$> factorials)
-        <> [testLlvmRun facRec] -- TODO : (testLlvmRun <$> factorials)
+        <> (testLlvm <$> factorials)
+        <> (testLlvmRun <$> factorials)
     )
 
 -- Test types

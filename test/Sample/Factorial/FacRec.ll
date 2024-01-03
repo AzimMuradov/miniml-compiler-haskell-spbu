@@ -16,6 +16,12 @@ declare external ccc  i64 @print_int(i64)
 declare external ccc  i64 @miniml_div(i64, i64)    
 
 
+declare external ccc  i64 @miniml_fun_to_paf(i64, i64)    
+
+
+declare external ccc  i64 @miniml_apply(i64, i64)    
+
+
 define external ccc  i64 @factorial.1(i64  %n.2_0)    {
 ; <label>:0:
   %1 = alloca i64 
@@ -27,9 +33,10 @@ if.then_0:
   store  i64 1, i64* %1 
   br label %if.end_0 
 if.else_0:
-  %anf.4_0 = sub   i64 %n.2_0, 1 
-  %anf.4_1 =  call ccc  i64  @factorial.1(i64  %anf.4_0)  
-  %5 = mul   i64 %n.2_0, %anf.4_1 
+  %anf.4_0 =  call ccc  i64  @miniml_fun_to_paf(i64 (i64)*  @factorial.1, i64  1)  
+  %anf.4_1 = sub   i64 %n.2_0, 1 
+  %anf.4_2 =  call ccc  i64  @miniml_apply(i64  %anf.4_0, i64  %anf.4_1)  
+  %5 = mul   i64 %n.2_0, %anf.4_2 
   store  i64 %5, i64* %1 
   br label %if.end_0 
 if.end_0:
@@ -42,8 +49,10 @@ if.end_0:
 
 
 define external ccc  i64 @main()    {
-  %anf.5_0 =  call ccc  i64  @factorial.1(i64  5)  
-  %1 =  call ccc  i64  @print_int(i64  %anf.5_0)  
-  store  i64 %1, i64* @simp.3 
+  %anf.5_0 =  call ccc  i64  @miniml_fun_to_paf(i64 (i64)*  @factorial.1, i64  1)  
+  %anf.5_1 =  call ccc  i64  @miniml_apply(i64  %anf.5_0, i64  5)  
+  %1 =  call ccc  i64  @miniml_fun_to_paf(i64 (i64)*  @print_int, i64  1)  
+  %2 =  call ccc  i64  @miniml_apply(i64  %1, i64  %anf.5_1)  
+  store  i64 %2, i64* @simp.3 
   ret i64 0 
 }

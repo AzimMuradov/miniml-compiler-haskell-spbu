@@ -1,11 +1,16 @@
-let loop'1 n'0 i'2 accum'3 = 
-  if (i'2 > n'0)
-    then accum'3
+let loop'2 n'1 i'3 accum'4 = 
+  if (i'3 > n'1)
+    then accum'4
     else 
-      let anf'5 = (loop'1 (i'2 + 1))
-      in (anf'5 (accum'3 * i'2));;
-let factorial'4 n'0 = 
-  let anf'7 = 
-    let anf'6 = (loop'1 n'0)
-    in (anf'6 1)
-  in (anf'7 1);;
+      let anf'8 = 
+        let anf'7 = (loop'2 n'1)
+        in (anf'7 (i'3 + 1))
+      in (anf'8 (accum'4 * i'3));;
+let factorial'5 n'1 = 
+  let anf'10 = 
+    let anf'9 = (loop'2 n'1)
+    in (anf'9 1)
+  in (anf'10 1);;
+let simp'6 = 
+  let anf'11 = (factorial'5 5)
+  in (print_int anf'11);;
