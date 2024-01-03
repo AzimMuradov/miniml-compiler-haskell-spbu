@@ -77,12 +77,12 @@ genGlobDecl = \case
     regGlobVar ident var
   GlobFunDecl ident params body -> mdo
     regFun ident fun (length params)
-    fun <- locally $ mdo
+    fun <- locally $ do
       LLVM.function
         (LLVM.mkName $ genId ident)
         ((LLVM.i64,) . LLVM.ParameterName . toShortByteString . genId <$> params)
         LLVM.i64
-        $ \args -> mdo
+        $ \args -> do
           mapM_ (uncurry regLocVar) (params `zip` args)
           body' <- genExpr body
           LLVM.ret body'
@@ -104,7 +104,7 @@ genExpr = \case
 
 genAtom :: AtomicExpression -> CodeGenM LLVM.Operand
 genAtom = \case
-  AtomId ident -> findVar ident
+  AtomId ident -> findAny ident
   AtomUnit -> return $ LLVM.int64 0
   AtomBool bool -> return $ LLVM.int64 $ fromBool bool
   AtomInt int -> return $ LLVM.int64 $ toInteger int
@@ -141,7 +141,7 @@ genAtom = \case
 genComp :: ComplexExpression -> CodeGenM LLVM.Operand
 genComp = \case
   CompApp f arg -> do
-    f' <- findPaf f
+    f' <- findAny f
     arg' <- genAtom arg
     applyF <- findFun (Txt "miniml_apply")
     LLVM.call applyF [(f', []), (arg', [])]
@@ -163,28 +163,26 @@ genComp = \case
 
     load' rv
 
--- Vars
+-- Vars & Funs
 
-findVar :: Identifier' -> CodeGenM LLVM.Operand
-findVar ident = do
-  locVar <- findLocVar ident
-  case locVar of
-    Just locVar' -> return locVar'
+findAny :: Identifier' -> CodeGenM LLVM.Operand
+findAny ident = do
+  maybeLocVar <- gets ((Map.!? ident) . locVars)
+  case maybeLocVar of
+    Just locVar -> return locVar
     Nothing -> do
-      gFun <- gets ((Map.!? ident) . funs)
-      case gFun of
+      maybeFun <- gets ((Map.!? ident) . funs)
+      case maybeFun of
         Just (fun, pCnt) -> do
           funToPafF <- findFun (Txt "miniml_fun_to_paf")
           LLVM.call funToPafF [(fun, []), (LLVM.int64 (toInteger pCnt), [])]
         Nothing -> load' =<< findGlobVar ident
 
-findLocVar :: Identifier' -> CodeGenM (Maybe LLVM.Operand)
-findLocVar ident = gets ((Map.!? ident) . locVars)
-
 findGlobVar :: MonadState Env m => Identifier' -> m LLVM.Operand
-findGlobVar ident = do
-  a <- gets ((Map.!? ident) . globVars)
-  maybe (error $ show ident) return a
+findGlobVar ident = gets ((Map.! ident) . globVars)
+
+findFun :: Identifier' -> CodeGenM LLVM.Operand
+findFun ident = gets (fst . (Map.! ident) . funs)
 
 regLocVar :: MonadState Env m => Identifier' -> LLVM.Operand -> m ()
 regLocVar ident var = modify $
@@ -193,25 +191,6 @@ regLocVar ident var = modify $
 regGlobVar :: MonadState Env m => Identifier' -> LLVM.Operand -> m ()
 regGlobVar ident gVar = modify $
   \env -> env {globVars = Map.insert ident gVar (globVars env)}
-
--- Funs
-
-findPaf :: Identifier' -> CodeGenM LLVM.Operand
-findPaf ident = do
-  locVar <- findLocVar ident
-  case locVar of
-    Just locVar' -> return locVar'
-    Nothing -> do
-      a <- gets ((Map.!? ident) . funs)
-      (fun, pCnt) <- maybe (error $ show ident) return a
-      funToPafF <- findFun (Txt "miniml_fun_to_paf")
-      LLVM.call funToPafF [(fun, []), (LLVM.int64 (toInteger pCnt), [])]
-
-findFun :: Identifier' -> CodeGenM LLVM.Operand
-findFun ident = do
-  a <- gets ((Map.!? ident) . funs)
-  b <- maybe (error $ show ident) return a
-  return $ fst b
 
 regFun :: MonadState Env m => Identifier' -> LLVM.Operand -> ParamsCnt -> m ()
 regFun ident fun paramsCnt = modify $

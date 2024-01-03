@@ -71,6 +71,7 @@ ccExpr = \case
     Ast.DeclVar ident value ->
       Ast.ExprLetIn <$> (Ast.DeclVar ident <$> ccExpr value) <*> ccExpr expr
     Ast.DeclFun ident isRec (Ast.Fun params body) -> do
+      -- Find all free variables in body.
       void $ ccExpr body
       fv <- gets $ \env ->
         let fvSet = freeVars env Set.\\ toSet (ident <| params)
