@@ -2,6 +2,7 @@
 
 module Transformations.Cc.Cc (ccAst) where
 
+import Control.Monad (void)
 import Control.Monad.Reader (MonadReader (ask), Reader, runReader)
 import Control.Monad.State (StateT, evalStateT, get, gets, modify, when)
 import Data.Foldable (Foldable (foldl'))
@@ -70,8 +71,7 @@ ccExpr = \case
     Ast.DeclVar ident value ->
       Ast.ExprLetIn <$> (Ast.DeclVar ident <$> ccExpr value) <*> ccExpr expr
     Ast.DeclFun ident isRec (Ast.Fun params body) -> do
-      body' <- ccExpr body
-
+      void $ ccExpr body
       fv <- gets $ \env ->
         let fvSet = freeVars env Set.\\ toSet (ident <| params)
          in toNonEmpty fvSet
@@ -80,6 +80,7 @@ ccExpr = \case
             m = Map.insert ident app (idMapping env)
          in env {idMapping = m}
 
+      body' <- ccExpr body
       let decl' = Ast.DeclFun ident isRec (Ast.Fun (fv <> params) body')
       Ast.ExprLetIn decl' <$> ccExpr expr
   Ast.ExprFun (Ast.Fun params body) -> do
