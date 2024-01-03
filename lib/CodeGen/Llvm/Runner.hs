@@ -94,4 +94,4 @@ compile llvmModule moduleName outputFilePath =
       Txt.hPutStrLn runtimeHandle runtimeFileText
       hClose runtimeHandle
 
-      callProcess "clang" ["-Wno-override-module", "-O0", "-lm", llvm, runtime, "-o", "../" <> outputFilePath]
+      callProcess "clang" ["-Wno-override-module", "-O3", "-lm", llvm, runtime, "-o", "../" <> outputFilePath]
