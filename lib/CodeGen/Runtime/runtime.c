@@ -15,12 +15,6 @@
   #error "Not a C11 standard compliant compiler"
 #endif
 
-// For Non-LLVM Compilers
-
-#ifndef __has_builtin
-  #define __has_builtin(a) 0
-#endif
-
 
 // The Standard Library
 
@@ -66,6 +60,7 @@ integer_t miniml_div(const integer_t a, const integer_t b) {
 // Partial Application
 
 #define any_t int64_t
+#define paf_ptr_t int64_t
 
 struct MiniMlPartAppFun {
   void* fun;
@@ -74,7 +69,7 @@ struct MiniMlPartAppFun {
   size_t args_cnt;
 };
 
-any_t miniml_fun_to_paf(any_t fun, const integer_t params_cnt) {
+paf_ptr_t miniml_fun_to_paf(any_t fun, const integer_t params_cnt) {
   struct MiniMlPartAppFun* paf = malloc(sizeof(struct MiniMlPartAppFun));
   *paf = (struct MiniMlPartAppFun){
     .fun = (struct MiniMlPartAppFun*) fun,
@@ -82,7 +77,7 @@ any_t miniml_fun_to_paf(any_t fun, const integer_t params_cnt) {
     .args = NULL,
     .args_cnt = 0,
   };
-  return (any_t) paf;
+  return (paf_ptr_t) paf;
 }
 
 static any_t miniml_apply_stored_args_1(const struct MiniMlPartAppFun paf, const any_t arg);
@@ -94,7 +89,7 @@ static any_t miniml_apply_stored_args_6(const struct MiniMlPartAppFun paf, const
 static any_t miniml_apply_stored_args_7(const struct MiniMlPartAppFun paf, const any_t arg);
 static any_t miniml_apply_stored_args_8(const struct MiniMlPartAppFun paf, const any_t arg);
 
-any_t miniml_apply(any_t _paf, const any_t arg) {
+any_t miniml_apply(paf_ptr_t _paf, const any_t arg) {
   struct MiniMlPartAppFun* paf = (struct MiniMlPartAppFun*) _paf;
 
   if (paf->params_cnt == paf->args_cnt + 1) {
@@ -107,7 +102,7 @@ any_t miniml_apply(any_t _paf, const any_t arg) {
       case 6: return miniml_apply_stored_args_6(*paf, arg);
       case 7: return miniml_apply_stored_args_7(*paf, arg);
       case 8: return miniml_apply_stored_args_8(*paf, arg);
-      default: miniml_throw_exception("ups...");
+      default: miniml_throw_exception("Too many arguments!");
     }
   }
 
