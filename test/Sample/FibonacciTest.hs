@@ -63,13 +63,16 @@ testLlvmRun (title, testFileProvider) =
 type TestFileProvider = (String, String -> FilePath)
 
 fibs :: [TestFileProvider]
-fibs = [fibRec, fibRecLoop]
+fibs = [fibRec, fibRecLoop, fibRecCps]
 
 fibRec :: TestFileProvider
 fibRec = ("recursive fibonacci", \ext -> testFile $ "FibRec." <> ext)
 
 fibRecLoop :: TestFileProvider
 fibRecLoop = ("fibonacci with recursive loop", \ext -> testFile $ "FibRecLoop." <> ext)
+
+fibRecCps :: TestFileProvider
+fibRecCps = ("fibonacci with recursive cps", \ext -> testFile $ "FibRecCps." <> ext)
 
 testFile :: String -> String
 testFile filename = "test/Sample/Fibonacci/" <> filename
