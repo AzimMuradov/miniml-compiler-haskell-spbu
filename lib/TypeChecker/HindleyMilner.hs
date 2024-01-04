@@ -10,7 +10,7 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module TypeInference.HindleyMilner where
+module TypeChecker.HindleyMilner where
 
 import Control.Monad.Except
 import Control.Monad.Reader
@@ -143,6 +143,7 @@ data TypeError where
   ImpossibleBinOpApplication :: UType -> UType -> TypeError
   ImpossibleUnOpApplication :: UType -> TypeError
   Mismatch :: HType UType -> HType UType -> TypeError
+  deriving (Show)
 
 instance Fallible HType IntVar TypeError where
   occursFailure = Infinite

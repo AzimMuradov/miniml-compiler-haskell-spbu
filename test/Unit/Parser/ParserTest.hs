@@ -7,10 +7,10 @@ import Data.List.NonEmpty (NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NonEmpty
 import Data.Text (Text, unpack)
 import Parser.Ast
-import Parser.Parser (parseProgram)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (Assertion, assertEqual, testCase)
 import Trees.Common
+import Utils (processTillParser)
 
 tests :: TestTree
 tests =
@@ -25,11 +25,11 @@ tests =
 
 testLetDecls :: TestTree
 testLetDecls = testCase "let declarations" $ do
-  let varDecl' x v = StmtDecl (DeclVar (x, Nothing) (ExprVal (ValInt v)))
+  let varDecl' x v = StmtDecl (DeclVar (x, Nothing) (ExprPrimVal (PrimValInt v)))
 
   let varDecl x = varDecl' x 4
-  let funDecl x args = StmtDecl (DeclFun x False (Fun ((,Nothing) <$> NonEmpty.fromList args) Nothing (ExprVal (ValInt 4))))
-  let recFunDecl x args = StmtDecl (DeclFun x True (Fun ((,Nothing) <$> NonEmpty.fromList args) Nothing (ExprVal (ValInt 4))))
+  let funDecl x args = StmtDecl (DeclFun x False (Fun ((,Nothing) <$> NonEmpty.fromList args) Nothing (ExprPrimVal (PrimValInt 4))))
+  let recFunDecl x args = StmtDecl (DeclFun x True (Fun ((,Nothing) <$> NonEmpty.fromList args) Nothing (ExprPrimVal (PrimValInt 4))))
 
   let aDecl = varDecl "a"
   let bDecl = varDecl' "b" 8
@@ -37,7 +37,7 @@ testLetDecls = testCase "let declarations" $ do
   "let a = 4" ==?=> Just (Program [aDecl])
   "let a" ==?=> Nothing
   "let = 4" ==?=> Nothing
-  "leta = 4" ==?=> Just (Program [StmtExpr (ExprBinOp (CompOp EqOp) (ExprId "leta") (ExprVal (ValInt 4)))])
+  "leta = 4" ==?=> Just (Program [StmtExpr (ExprBinOp (CompOp EqOp) (ExprId "leta") (ExprPrimVal (PrimValInt 4)))])
 
   "let rec a = 4" ==?=> Nothing
   "let rec a b = 4" ==?=> Just (Program [recFunDecl "a" ["b"]])
@@ -72,7 +72,7 @@ testWhitespace = testCase "whitespace" $ do
                               (ExprId "a")
                               ( ExprApp
                                   (ExprApp (ExprId "a") (ExprId "f"))
-                                  (ExprVal (ValInt 4))
+                                  (ExprPrimVal (PrimValInt 4))
                               )
                           )
                       )
@@ -92,7 +92,7 @@ testWhitespace = testCase "whitespace" $ do
                           (ExprBinOp (ArithOp MulOp) (ExprId "a") (ExprId "a"))
                       )
                   ),
-                StmtExpr (ExprApp (ExprId "f") (ExprVal (ValInt 4)))
+                StmtExpr (ExprApp (ExprId "f") (ExprPrimVal (PrimValInt 4)))
               ]
           )
 
@@ -100,12 +100,14 @@ testWhitespace = testCase "whitespace" $ do
   "let f a = a * a\nf 4" ==?=> decl
   "let f a = a * a;;f 4" ==?=> declAndApp
 
+-- TODO : abs_max
+
 testUnaryMinusOp :: TestTree
 testUnaryMinusOp = testCase "unary minus operator" $ do
   let prgStmtExpr e = Just (Program [StmtExpr e])
 
-  let zero = ExprVal (ValInt 0)
-  let seven = ExprVal (ValInt 7)
+  let zero = ExprPrimVal (PrimValInt 0)
+  let seven = ExprPrimVal (PrimValInt 7)
   let a = ExprId "a"
   let b = ExprId "b"
 
@@ -122,4 +124,4 @@ testUnaryMinusOp = testCase "unary minus operator" $ do
   "a (-b)" ==?=> prgStmtExpr (ExprApp a (minus b))
 
 (==?=>) :: Text -> Maybe Program -> Assertion
-(==?=>) text maybeAst = assertEqual ("[" <> unpack text <> "]") maybeAst (parseProgram text)
+(==?=>) text maybeAst = assertEqual ("[" <> unpack text <> "]") maybeAst (processTillParser text)

@@ -3,9 +3,10 @@ module Trees.Common where
 import Data.Int (Int64)
 import Data.Text (Text)
 
+-- * Common Components of Program Representations
+
 -- ** Identifier
 
--- | Any valid identifier (e.g., @he42llo@, @_42@).
 type Identifier = Text
 
 data Identifier'
@@ -85,18 +86,19 @@ data Type
     TInt
   | -- | Function type.
     --
-    -- It contains the type of the first parameter and the result of the function (e.g., @int -> (int -> bool -> bool)@).
+    -- It contains the type of the first parameter and the result of the function
+    -- (e.g., @int -> (int -> bool -> bool)@).
     TFun Type Type
   deriving (Show, Eq, Ord)
 
 -- ** Values
 
 -- | Primitive value.
-data Value
-  = -- | Unit literal (@()@).
-    ValUnit
-  | -- | Boolean literal (@true@, @false@).
-    ValBool Bool
-  | -- | Int literal (e.g., @0@, @4@, @15@, @23@).
-    ValInt Int64
+data PrimitiveValue
+  = -- | Unit value (@()@).
+    PrimValUnit
+  | -- | Boolean value (@true@, @false@).
+    PrimValBool Bool
+  | -- | Int value (e.g., @0@, @4@, @15@, @23@).
+    PrimValInt Int64
   deriving (Show, Eq)

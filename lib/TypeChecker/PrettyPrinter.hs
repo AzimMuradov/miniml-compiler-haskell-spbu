@@ -1,17 +1,15 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module TypeInference.PrettyPrint where
+module TypeChecker.PrettyPrinter (pretty) where
 
 import Control.Unification hiding (applyBindings, (=:=))
 import Control.Unification.IntVar
 import Data.Functor.Fixedpoint
 import Data.Text (unpack)
-import Text.Printf
-import TypeInference.HindleyMilner
+import Text.Printf (printf)
+import TypeChecker.HindleyMilner
 import Prelude hiding (lookup)
-
-type Prec = Int
 
 class Pretty p where
   pretty :: p -> String
@@ -19,6 +17,8 @@ class Pretty p where
 
   prettyPrec :: Prec -> p -> String
   prettyPrec _ = pretty
+
+type Prec = Int
 
 instance (Pretty (t (Fix t))) => Pretty (Fix t) where
   prettyPrec p = prettyPrec p . unFix

@@ -1,4 +1,4 @@
-module Transformations.Simplification.SimplifiedAst where
+module Transformations.Simplifier.SimplifiedAst where
 
 import Data.List.NonEmpty (NonEmpty)
 import Trees.Common
@@ -11,9 +11,13 @@ data Declaration
   | DeclFun Identifier' IsRec Fun
   deriving (Show, Eq)
 
+declId :: Declaration -> Identifier'
+declId (DeclVar ident _) = ident
+declId (DeclFun ident _ _) = ident
+
 data Expression
   = ExprId Identifier'
-  | ExprVal Value
+  | ExprPrimVal PrimitiveValue
   | ExprBinOp BinaryOperator Expression Expression
   | ExprUnOp UnaryOperator Expression
   | ExprApp Expression Expression

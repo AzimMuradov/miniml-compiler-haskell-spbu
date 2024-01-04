@@ -6,4 +6,6 @@ let rec cps_factorial n k =
   else
     cps_factorial (n - 1) (fun result -> k (n * result))
 
-let factorial n = cps_factorial n id
+let factorial n = cps_factorial n id;;
+
+print_int (factorial 5)

@@ -2,12 +2,9 @@
 
 module Unit.TypeInference.TypeInferenceTest (tests) where
 
-import Parser.Ast
-import Parser.Parser (parseProgram)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@=?))
-import TypeInference.PrettyPrint (pretty)
-import TypeInference.TypeInference
+import Utils (processTillTypeChecker)
 
 tests :: TestTree
 tests =
@@ -45,7 +42,7 @@ test0 :: TestTree
 test0 =
   testCase "[1 + 1]" $ do
     let expected = "int"
-    let actual = eval $ parseProgram "1 + 1"
+    let actual = processTillTypeChecker "1 + 1"
 
     expected @=? actual
 
@@ -54,7 +51,7 @@ test1 =
   testCase "[false = true]" $
     do
       let expected = "bool"
-      let actual = eval $ parseProgram "false = true"
+      let actual = processTillTypeChecker "false = true"
 
       expected @=? actual
 
@@ -64,7 +61,7 @@ test2 =
     "[false = 1]"
     $ do
       let expected = "It is not possible to apply this operation between 'bool' and 'int'"
-      let actual = eval $ parseProgram "false = 1"
+      let actual = processTillTypeChecker "false = 1"
 
       expected @=? actual
 
@@ -74,7 +71,7 @@ test3 =
     "[let x = 1]"
     $ do
       let expected = "int"
-      let actual = eval $ parseProgram "let x = 1"
+      let actual = processTillTypeChecker "let x = 1"
 
       expected @=? actual
 
@@ -84,7 +81,7 @@ test4 =
     "[let f x = x + 1]"
     $ do
       let expected = "int -> int"
-      let actual = eval $ parseProgram "let f x = x + 1"
+      let actual = processTillTypeChecker "let f x = x + 1"
 
       expected @=? actual
 
@@ -94,7 +91,7 @@ test5 =
     "[let f x = x + true]"
     $ do
       let expected = "It is not possible to apply this operation between 'u0' and 'bool'"
-      let actual = eval $ parseProgram "let f x = x + true"
+      let actual = processTillTypeChecker "let f x = x + true"
 
       expected @=? actual
 
@@ -104,7 +101,7 @@ test6 =
     "[let rec f x = x + 1]"
     $ do
       let expected = "int -> int"
-      let actual = eval $ parseProgram "let rec f x = x + 1"
+      let actual = processTillTypeChecker "let rec f x = x + 1"
 
       expected @=? actual
 
@@ -114,7 +111,7 @@ test7 =
     "[let x = 1 in x + 1]"
     $ do
       let expected = "int"
-      let actual = eval $ parseProgram "let x = 1 in x + 1"
+      let actual = processTillTypeChecker "let x = 1 in x + 1"
 
       expected @=? actual
 
@@ -124,7 +121,7 @@ test8 =
     "[let rec f x = true in f 5 <> false]"
     $ do
       let expected = "bool"
-      let actual = eval $ parseProgram "let rec f x = true in f 5 <> false"
+      let actual = processTillTypeChecker "let rec f x = true in f 5 <> false"
 
       expected @=? actual
 
@@ -134,7 +131,7 @@ test9 =
     "[fun x y -> x + y]"
     $ do
       let expected = "int -> int -> int"
-      let actual = eval $ parseProgram "fun x y -> x + y"
+      let actual = processTillTypeChecker "fun x y -> x + y"
 
       expected @=? actual
 
@@ -144,7 +141,7 @@ test10 =
     "[let x = 1]"
     $ do
       let expected = "int"
-      let actual = eval $ parseProgram "let x = 1"
+      let actual = processTillTypeChecker "let x = 1"
 
       expected @=? actual
 
@@ -154,7 +151,7 @@ test11 =
     "[let f x = y + x]"
     $ do
       let expected = "Unbound variable 'y'"
-      let actual = eval $ parseProgram "let f x = y + x"
+      let actual = processTillTypeChecker "let f x = y + x"
 
       expected @=? actual
 
@@ -164,7 +161,7 @@ test12 =
     "[let f x = f (x - 1)]"
     $ do
       let expected = "Unbound variable 'f'"
-      let actual = eval $ parseProgram "let f x = f (x - 1)"
+      let actual = processTillTypeChecker "let f x = f (x - 1)"
 
       expected @=? actual
 
@@ -174,7 +171,7 @@ test13 =
     "[1 && (false || true)]"
     $ do
       let expected = "It is not possible to apply this operation between 'int' and 'bool'"
-      let actual = eval $ parseProgram "1 && (false || true)"
+      let actual = processTillTypeChecker "1 && (false || true)"
 
       expected @=? actual
 
@@ -184,7 +181,7 @@ testredecalaration =
     "[let x = true;; let f x = x + 1]"
     $ do
       let expected = "int -> int"
-      let actual = eval $ parseProgram "let x = true;; let f x = x + 1"
+      let actual = processTillTypeChecker "let x = true;; let f x = x + 1"
 
       expected @=? actual
 
@@ -194,7 +191,7 @@ testfib =
     "[let n = 30;; let rec fib n = if n <= 1 then 1 else fib (n - 1) + fib (n - 2);; fib (n - 2)]"
     $ do
       let expected = "int"
-      let actual = eval $ parseProgram "let n = 30;; let rec fib n = if n <= 1 then 1 else fib (n - 1) + fib (n - 2);; fib (n - 2)"
+      let actual = processTillTypeChecker "let n = 30;; let rec fib n = if n <= 1 then 1 else fib (n - 1) + fib (n - 2);; fib (n - 2)"
 
       expected @=? actual
 
@@ -204,7 +201,7 @@ testrec =
     "[let rec f x = if x = 0 then 0 else let g x = if x = 0 then 0 else f (x - 1) in g (x - 1)]"
     $ do
       let expected = "int -> int"
-      let actual = eval $ parseProgram "let rec f x = if x = 0 then 0 else let g x = if x = 0 then 0 else f (x - 1) in g (x - 1)"
+      let actual = processTillTypeChecker "let rec f x = if x = 0 then 0 else let g x = if x = 0 then 0 else f (x - 1) in g (x - 1)"
 
       expected @=? actual
 
@@ -214,7 +211,7 @@ testduplicate0 =
     "[let f = 5 let f = 6]"
     $ do
       let expected = "int"
-      let actual = eval $ parseProgram "let f = 5 let f = 6"
+      let actual = processTillTypeChecker "let f = 5 let f = 6"
 
       expected @=? actual
 
@@ -224,7 +221,7 @@ testduplicate1 =
     "[let f = 5 let f = fun x y -> x + y]"
     $ do
       let expected = "int -> int -> int"
-      let actual = eval $ parseProgram "let f = 5 let f = fun x y -> x + y"
+      let actual = processTillTypeChecker "let f = 5 let f = fun x y -> x + y"
 
       expected @=? actual
 
@@ -234,7 +231,7 @@ testduplicate2 =
     "[let f = 5 let f = fun x -> x = 2 let k = f (fun x -> x + 1)]"
     $ do
       let expected = "The type 'int' does not match the type 'u1 -> u1'"
-      let actual = eval $ parseProgram "let f = 5 let f = fun x -> x = 2 let k = f (fun x -> x + 1)"
+      let actual = processTillTypeChecker "let f = 5 let f = fun x -> x = 2 let k = f (fun x -> x + 1)"
 
       expected @=? actual
 
@@ -242,7 +239,7 @@ test_same_name_arg :: TestTree
 test_same_name_arg =
   testCase "[let f x x = x + x]" $ do
     let expected = "forall a0. a0 -> int -> int"
-    let actual = eval $ parseProgram "let f x x = x + x"
+    let actual = processTillTypeChecker "let f x x = x + x"
 
     expected @=? actual
 
@@ -252,7 +249,7 @@ testfix0 =
     "[let rec fix f = f (fix f)]"
     $ do
       let expected = "forall a6. (a6 -> a6) -> a6"
-      let actual = eval $ parseProgram "let rec fix f = f (fix f)"
+      let actual = processTillTypeChecker "let rec fix f = f (fix f)"
 
       expected @=? actual
 
@@ -262,7 +259,7 @@ testfix1 =
     "[let rec fix f x = f (fix f) x;; fix (fun re n -> if n <= 1 then 1 else n * re (n - 1))]"
     $ do
       let expected = "int -> int"
-      let actual = eval $ parseProgram "let rec fix f x = f (fix f) x;; fix (fun re n -> if n <= 1 then 1 else n * re (n - 1))"
+      let actual = processTillTypeChecker "let rec fix f x = f (fix f) x;; fix (fun re n -> if n <= 1 then 1 else n * re (n - 1))"
 
       expected @=? actual
 
@@ -272,15 +269,6 @@ testfix2 =
     "[let rec fix f x = f (fix f) x;; fix (fun re n -> if n <= 1 then 1 else n * re (n - 1)) 10]"
     $ do
       let expected = "int"
-      let actual = eval $ parseProgram "let rec fix f x = f (fix f) x;; fix (fun re n -> if n <= 1 then 1 else n * re (n - 1)) 10"
+      let actual = processTillTypeChecker "let rec fix f x = f (fix f) x;; fix (fun re n -> if n <= 1 then 1 else n * re (n - 1)) 10"
 
       expected @=? actual
-
--- Utils
-
-eval :: Maybe Program -> String
-eval s = case s of
-  Nothing -> "Please, try again. Can't parse your program."
-  Just p -> case inferProgram p of
-    Left tyerr -> pretty tyerr
-    Right ty -> pretty ty
