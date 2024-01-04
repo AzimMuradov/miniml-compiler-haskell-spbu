@@ -95,6 +95,7 @@ test-suite tests
     other-modules:
         Sample.AnfTest
         Sample.FactorialTest
+        Sample.FibonacciTest
         Unit.Parser.ParserTest
         Unit.StdLibTest
         Unit.TypeInference.TypeInferenceTest
