@@ -2,12 +2,12 @@ module Transformations.Ll.Lfr where
 
 import Trees.Common
 
-data Program = Program [TopLevelDeclaration] IdCnt
+data Program = Program [GlobalDeclaration] IdCnt
   deriving (Show, Eq)
 
-data TopLevelDeclaration
-  = TopLevelVarDecl VarDeclaration
-  | TopLevelFunDecl Identifier' [Identifier'] Expression
+data GlobalDeclaration
+  = GlobVarDecl VarDeclaration
+  | GlobFunDecl Identifier' [Identifier'] Expression
   deriving (Show, Eq)
 
 data VarDeclaration = VarDecl Identifier' Expression
@@ -15,7 +15,7 @@ data VarDeclaration = VarDecl Identifier' Expression
 
 data Expression
   = ExprId Identifier'
-  | ExprVal Value
+  | ExprVal PrimitiveValue
   | ExprBinOp BinaryOperator Expression Expression
   | ExprUnOp UnaryOperator Expression
   | ExprApp Expression Expression

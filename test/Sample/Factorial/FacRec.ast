@@ -11,12 +11,12 @@ Just
                     ( ExprIte
                         ( ExprBinOp ( CompOp LeOp )
                             ( ExprId "n" )
-                            ( ExprVal
-                                ( ValInt 0 )
+                            ( ExprPrimVal
+                                ( PrimValInt 0 )
                             )
                         )
-                        ( ExprVal
-                            ( ValInt 1 )
+                        ( ExprPrimVal
+                            ( PrimValInt 1 )
                         )
                         ( ExprBinOp ( ArithOp MulOp )
                             ( ExprId "n" )
@@ -24,12 +24,22 @@ Just
                                 ( ExprId "factorial" )
                                 ( ExprBinOp ( ArithOp MinusOp )
                                     ( ExprId "n" )
-                                    ( ExprVal
-                                        ( ValInt 1 )
+                                    ( ExprPrimVal
+                                        ( PrimValInt 1 )
                                     )
                                 )
                             )
                         )
+                    )
+                )
+            )
+        , StmtExpr
+            ( ExprApp
+                ( ExprId "print_int" )
+                ( ExprApp
+                    ( ExprId "factorial" )
+                    ( ExprPrimVal
+                        ( PrimValInt 5 )
                     )
                 )
             )

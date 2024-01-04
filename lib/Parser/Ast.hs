@@ -52,15 +52,21 @@ data Declaration
 data Expression
   = -- | Identifier expression, see 'Identifier'.
     ExprId Identifier
-  | -- | Value expression, see 'Value'.
-    ExprVal Value
+  | -- | Primitive value expression, see 'PrimitiveValue'.
+    ExprPrimVal PrimitiveValue
   | -- | Binary operation, see 'BinaryOperator'.
     ExprBinOp BinaryOperator Expression Expression
   | -- | Unary operation, see 'UnaryOperator'.
     ExprUnOp UnaryOperator Expression
-  | -- | Function application expression (e.g., @f 6@, @(fun x y = x + y) 5@).
+  | -- | Function application expression.
+    --
+    -- > f 6
+    --
+    -- > (fun x y = x + y) 5
     ExprApp Expression Expression
-  | -- | If-then-else expression (e.g., @if x > 4 then x * 8 else x / 15@).
+  | -- | If-then-else expression.
+    --
+    -- > if x > 4 then x * 8 else x / 15
     ExprIte Expression Expression Expression
   | -- | Let expression.
     --

@@ -94,8 +94,11 @@ boolLitP = True <$ kwTrue <|> False <$ kwFalse
 intLitP :: Parser Int64
 intLitP = do
   int <- lexeme L.decimal
-  when (int > 9223372036854775808) $ fail "Error: Integer literal exceeds the range of representable integers of type int64"
+  when (int > absMax) $
+    fail "Error: Integer literal exceeds the range of representable integers of type int64"
   return $ fromInteger int
+  where
+    absMax = 9223372036854775808
 
 -- * Identifiers and keywords
 
@@ -120,31 +123,31 @@ identifierChar = letterChar <|> char '_' <|> digitChar
 
 -- ** Keywords
 
--- @let@ keyword parser.
+-- | @let@ keyword parser.
 kwLet :: Parser Text
 kwLet = keyword "let"
 
--- @rec@ keyword parser.
+-- | @rec@ keyword parser.
 kwRec :: Parser Text
 kwRec = keyword "rec"
 
--- @in@ keyword parser.
+-- | @in@ keyword parser.
 kwIn :: Parser Text
 kwIn = keyword "in"
 
--- @if@ keyword parser.
+-- | @if@ keyword parser.
 kwIf :: Parser Text
 kwIf = keyword "if"
 
--- @then@ keyword parser.
+-- | @then@ keyword parser.
 kwThen :: Parser Text
 kwThen = keyword "then"
 
--- @else@ keyword parser.
+-- | @else@ keyword parser.
 kwElse :: Parser Text
 kwElse = keyword "else"
 
--- @fun@ keyword parser.
+-- | @fun@ keyword parser.
 kwFun :: Parser Text
 kwFun = keyword "fun"
 

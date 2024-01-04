@@ -3,9 +3,9 @@ module Main where
 import Data.Text (pack)
 import Options.Applicative
 import Parser.Ast (Program (Program))
-import Parser.Parser
-import TypeInference.PrettyPrint (pretty)
-import TypeInference.TypeInference
+import Parser.Parser (parseProgram)
+import TypeChecker.PrettyPrinter (pretty)
+import TypeChecker.TypeChecker (inferProgram)
 
 -- * Main
 

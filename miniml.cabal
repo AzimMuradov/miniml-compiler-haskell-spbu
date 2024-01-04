@@ -31,7 +31,11 @@ library
     import:           shared-properties
     exposed-modules:
         CodeGen.Llvm.Ir2LlvmIr
+        CodeGen.Llvm.Runner
         CodeGen.Module
+        CodeGen.RunResult
+        CodeGen.TimedValue
+        MonadUtils
         Parser.Ast
         Parser.Lexer
         Parser.Parser
@@ -43,14 +47,13 @@ library
         Transformations.Cc.Cc
         Transformations.Ll.Lfr
         Transformations.Ll.Ll
-        Transformations.Relabeler.RelabelVars
-        Transformations.Simplification.SimplifiedAst
-        Transformations.Simplification.SimplifyAst
+        Transformations.Relabeler.Relabeler
+        Transformations.Simplifier.SimplifiedAst
+        Transformations.Simplifier.Simplifier
         Trees.Common
-        TypeInference.HindleyMilner
-        TypeInference.PrettyPrint
-        TypeInference.TypeInference
-        Utils
+        TypeChecker.HindleyMilner
+        TypeChecker.PrettyPrinter
+        TypeChecker.TypeChecker
 
     other-modules:
     other-extensions:
@@ -65,6 +68,7 @@ library
         , mtl                 >=2.2.2
         , parser-combinators  >=1.3.0
         , process
+        , recursion-schemes
         , string-conversions
         , string-transform
         , transformers        >=0.5.6
@@ -94,6 +98,7 @@ test-suite tests
         Unit.Parser.ParserTest
         Unit.StdLibTest
         Unit.TypeInference.TypeInferenceTest
+        Utils
 
     build-depends:
         , mini-ml

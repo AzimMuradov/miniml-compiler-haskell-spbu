@@ -18,6 +18,8 @@ import Trees.Common
 parseProgram :: Text -> Maybe Program
 parseProgram = parseMaybe $ sc *> programP <* eof
 
+-- * Internal
+
 programP :: Parser Program
 programP = Program <$> (many semicolon2 *> many (stmtP <* many semicolon2))
 
@@ -45,7 +47,8 @@ exprTerm =
   choice'
     [ parens exprP,
       ExprLetIn <$> declP <* kwIn <*> exprP,
-      valueExprP,
+      ExprPrimVal <$> primValExprP,
+      ExprFun <$ kwFun <*> funP arrow,
       ExprIte <$ kwIf <*> exprP <* kwThen <*> exprP <* kwElse <*> exprP,
       ExprId <$> identifierP
     ]
@@ -104,15 +107,14 @@ typeP =
           TInt <$ kwInt
         ]
 
--- ** Value Parsers
+-- ** Primitive Value Parser
 
-valueExprP :: Parser Expression
-valueExprP =
+primValExprP :: Parser PrimitiveValue
+primValExprP =
   choice'
-    [ ExprVal ValUnit <$ unitLitP,
-      ExprVal . ValBool <$> boolLitP,
-      ExprVal . ValInt <$> intLitP,
-      ExprFun <$ kwFun <*> funP arrow
+    [ PrimValUnit <$ unitLitP,
+      PrimValBool <$> boolLitP,
+      PrimValInt <$> intLitP
     ]
 
 -- ** Function Parser
