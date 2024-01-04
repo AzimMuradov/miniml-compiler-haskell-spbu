@@ -1,0 +1,85 @@
+Just
+    ( Program
+        [ StmtDecl
+            ( DeclFun "fib" False
+                ( Fun
+                    (
+                        ( "n"
+                        , Nothing
+                        ) :| []
+                    ) Nothing
+                    ( ExprLetIn
+                        ( DeclFun "loop" True
+                            ( Fun
+                                (
+                                    ( "i"
+                                    , Nothing
+                                    ) :|
+                                    [
+                                        ( "a"
+                                        , Nothing
+                                        )
+                                    ,
+                                        ( "b"
+                                        , Nothing
+                                        )
+                                    ]
+                                ) Nothing
+                                ( ExprIte
+                                    ( ExprBinOp ( CompOp EqOp )
+                                        ( ExprId "i" )
+                                        ( ExprPrimVal
+                                            ( PrimValInt 0 )
+                                        )
+                                    )
+                                    ( ExprId "a" )
+                                    ( ExprApp
+                                        ( ExprApp
+                                            ( ExprApp
+                                                ( ExprId "loop" )
+                                                ( ExprBinOp ( ArithOp MinusOp )
+                                                    ( ExprId "i" )
+                                                    ( ExprPrimVal
+                                                        ( PrimValInt 1 )
+                                                    )
+                                                )
+                                            )
+                                            ( ExprId "b" )
+                                        )
+                                        ( ExprBinOp ( ArithOp PlusOp )
+                                            ( ExprId "a" )
+                                            ( ExprId "b" )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                        ( ExprApp
+                            ( ExprApp
+                                ( ExprApp
+                                    ( ExprId "loop" )
+                                    ( ExprId "n" )
+                                )
+                                ( ExprPrimVal
+                                    ( PrimValInt 0 )
+                                )
+                            )
+                            ( ExprPrimVal
+                                ( PrimValInt 1 )
+                            )
+                        )
+                    )
+                )
+            )
+        , StmtExpr
+            ( ExprApp
+                ( ExprId "print_int" )
+                ( ExprApp
+                    ( ExprId "fib" )
+                    ( ExprPrimVal
+                        ( PrimValInt 10 )
+                    )
+                )
+            )
+        ]
+    )
