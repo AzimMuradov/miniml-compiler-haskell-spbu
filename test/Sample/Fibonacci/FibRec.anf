@@ -1,0 +1,11 @@
+let fib'1 n'2 = 
+  if (n'2 < 2)
+    then n'2
+    else 
+      let anf'4 = (fib'1 (n'2 - 1))
+      in 
+        let anf'5 = (fib'1 (n'2 - 2))
+        in (anf'4 + anf'5);;
+let simp'3 = 
+  let anf'6 = (fib'1 10)
+  in (print_int anf'6);;

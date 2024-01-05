@@ -1,0 +1,27 @@
+let id'2 x'1 = x'1;;
+let ll'12 k'6 a'7 b'8 = (k'6 (a'7 + b'8));;
+let ll'11 fib_cps'4 n'5 k'6 a'7 = 
+  let anf'13 = (fib_cps'4 (n'5 - 2))
+  in 
+    let anf'15 = 
+      let anf'14 = (ll'12 k'6)
+      in (anf'14 a'7)
+    in (anf'13 anf'15);;
+let fib_cps'4 n'5 k'6 = 
+  if (n'5 < 3)
+    then (k'6 1)
+    else 
+      let anf'16 = (fib_cps'4 (n'5 - 1))
+      in 
+        let anf'19 = 
+          let anf'18 = 
+            let anf'17 = (ll'11 fib_cps'4)
+            in (anf'17 n'5)
+          in (anf'18 k'6)
+        in (anf'16 anf'19);;
+let fib'9 n'3 = 
+  let anf'20 = (fib_cps'4 n'3)
+  in (anf'20 id'2);;
+let simp'10 = 
+  let anf'21 = (fib'9 10)
+  in (print_int anf'21);;
