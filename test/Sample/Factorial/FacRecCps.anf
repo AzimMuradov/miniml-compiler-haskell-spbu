@@ -1,18 +1,24 @@
 let id'2 x'1 = x'1;;
-let ll'10 n'4 k'5 result'6 = (k'5 (n'4 * result'6));;
+let ll'10 n'4 k'5 result'6 = 
+  let anf'11 = (n'4 * result'6)
+  in (k'5 anf'11);;
 let cps_factorial'3 n'4 k'5 = 
-  if (n'4 = 0)
-    then (k'5 1)
-    else 
-      let anf'11 = (cps_factorial'3 (n'4 - 1))
-      in 
-        let anf'13 = 
-          let anf'12 = (ll'10 n'4)
-          in (anf'12 k'5)
-        in (anf'11 anf'13);;
+  let anf'12 = (n'4 = 0)
+  in 
+    if anf'12
+      then (k'5 1)
+      else 
+        let anf'14 = 
+          let anf'13 = (n'4 - 1)
+          in (cps_factorial'3 anf'13)
+        in 
+          let anf'16 = 
+            let anf'15 = (ll'10 n'4)
+            in (anf'15 k'5)
+          in (anf'14 anf'16);;
 let factorial'8 n'7 = 
-  let anf'14 = (cps_factorial'3 n'7)
-  in (anf'14 id'2);;
+  let anf'17 = (cps_factorial'3 n'7)
+  in (anf'17 id'2);;
 let simp'9 = 
-  let anf'15 = (factorial'8 5)
-  in (print_int anf'15);;
+  let anf'18 = (factorial'8 5)
+  in (print_int anf'18);;

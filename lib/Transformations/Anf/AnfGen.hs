@@ -43,10 +43,10 @@ genExpr (Lfr.ExprVal val) = returnAtom $ case val of
 genExpr (Lfr.ExprBinOp op lhs rhs) = evalContT $ do
   lhs' <- normalizeToAtom lhs
   rhs' <- normalizeToAtom rhs
-  returnAtom $ Anf.AtomBinOp op lhs' rhs'
+  returnComplex $ Anf.CompBinOp op lhs' rhs'
 genExpr (Lfr.ExprUnOp op x) = evalContT $ do
   x' <- normalizeToAtom x
-  returnAtom $ Anf.AtomUnOp op x'
+  returnComplex $ Anf.CompUnOp op x'
 genExpr (Lfr.ExprApp f arg) = evalContT $ do
   f' <- normalizeToId f
   arg' <- normalizeToAtom arg

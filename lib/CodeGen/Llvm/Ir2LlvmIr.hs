@@ -108,35 +108,6 @@ genAtom = \case
   AtomUnit -> return $ LLVM.int64 0
   AtomBool bool -> return $ LLVM.int64 $ fromBool bool
   AtomInt int -> return $ LLVM.int64 $ toInteger int
-  AtomBinOp op lhs rhs -> do
-    lhs' <- genAtom lhs
-    rhs' <- genAtom rhs
-    let opF = case op of
-          BoolOp AndOp -> LLVM.and
-          BoolOp OrOp -> LLVM.or
-          ArithOp PlusOp -> LLVM.add
-          ArithOp MinusOp -> LLVM.sub
-          ArithOp MulOp -> LLVM.mul
-          ArithOp DivOp ->
-            ( \lhs'' rhs'' -> do
-                divF <- findFun (Txt "miniml_div")
-                LLVM.call divF [(lhs'', []), (rhs'', [])]
-            )
-          CompOp cOp ->
-            let cOpF = case cOp of
-                  EqOp -> LLVM.icmp LLVM.EQ
-                  NeOp -> LLVM.icmp LLVM.NE
-                  LtOp -> LLVM.icmp LLVM.SLT
-                  LeOp -> LLVM.icmp LLVM.SLE
-                  GtOp -> LLVM.icmp LLVM.SGT
-                  GeOp -> LLVM.icmp LLVM.SGE
-             in (\a b -> cOpF a b >>= boolToInt)
-    opF lhs' rhs'
-  AtomUnOp op x -> do
-    x' <- genAtom x
-    let opF = case op of
-          UnMinusOp -> LLVM.mul (LLVM.int64 (-1))
-    opF x'
 
 genComp :: ComplexExpression -> CodeGenM LLVM.Operand
 genComp = \case
@@ -162,6 +133,35 @@ genComp = \case
     end <- LLVM.block `LLVM.named` "if.end"
 
     load' rv
+  CompBinOp op lhs rhs -> do
+    lhs' <- genAtom lhs
+    rhs' <- genAtom rhs
+    let opF = case op of
+          BoolOp AndOp -> LLVM.and
+          BoolOp OrOp -> LLVM.or
+          ArithOp PlusOp -> LLVM.add
+          ArithOp MinusOp -> LLVM.sub
+          ArithOp MulOp -> LLVM.mul
+          ArithOp DivOp ->
+            ( \lhs'' rhs'' -> do
+                divF <- findFun (Txt "miniml_div")
+                LLVM.call divF [(lhs'', []), (rhs'', [])]
+            )
+          CompOp cOp ->
+            let cOpF = case cOp of
+                  EqOp -> LLVM.icmp LLVM.EQ
+                  NeOp -> LLVM.icmp LLVM.NE
+                  LtOp -> LLVM.icmp LLVM.SLT
+                  LeOp -> LLVM.icmp LLVM.SLE
+                  GtOp -> LLVM.icmp LLVM.SGT
+                  GeOp -> LLVM.icmp LLVM.SGE
+             in (\a b -> cOpF a b >>= boolToInt)
+    opF lhs' rhs'
+  CompUnOp op x -> do
+    x' <- genAtom x
+    let opF = case op of
+          UnMinusOp -> LLVM.mul (LLVM.int64 (-1))
+    opF x'
 
 -- Vars & Funs
 

@@ -1,35 +1,47 @@
 let g'1 a'2 b'3 = 
-  if ((a'2 = 0) || (b'3 = 1))
-    then true
-    else 
-      let anf'18 = (g'1 (a'2 - 1))
-      in (anf'18 (b'3 + 5));;
+  let anf'20 = 
+    let anf'18 = (a'2 = 0)
+    in 
+      let anf'19 = (b'3 = 1)
+      in (anf'18 || anf'19)
+  in 
+    if anf'20
+      then true
+      else 
+        let anf'22 = 
+          let anf'21 = (a'2 - 1)
+          in (g'1 anf'21)
+        in 
+          let anf'23 = (b'3 + 5)
+          in (anf'22 anf'23);;
 let h'4 m'5 p'6 z'7 = 
   let m'8 = (p'6 + z'7)
   in 
-    if (m'8 = 1)
-      then 
-        let anf'20 = 
-          let anf'19 = (h'4 0)
-          in (anf'19 0)
-        in (anf'20 z'7)
-      else 
-        let anf'21 = (g'1 m'8)
-        in (anf'21 p'6);;
+    let anf'24 = (m'8 = 1)
+    in 
+      if anf'24
+        then 
+          let anf'26 = 
+            let anf'25 = (h'4 0)
+            in (anf'25 0)
+          in (anf'26 z'7)
+        else 
+          let anf'27 = (g'1 m'8)
+          in (anf'27 p'6);;
 let g'9 = 
-  let anf'23 = 
-    let anf'22 = (g'1 0)
-    in (anf'22 2)
+  let anf'29 = 
+    let anf'28 = (g'1 0)
+    in (anf'28 2)
   in 
-    let anf'26 = 
-      let anf'25 = 
-        let anf'24 = (h'4 2)
-        in (anf'24 2)
-      in (anf'25 2)
-    in (anf'23 + anf'26);;
+    let anf'32 = 
+      let anf'31 = 
+        let anf'30 = (h'4 2)
+        in (anf'30 2)
+      in (anf'31 2)
+    in (anf'29 + anf'32);;
 let g'11 a'10 = (a'10 + 1);;
 let g'13 b'12 = 
-  let anf'27 = (g'11 b'12)
-  in (anf'27 + 2);;
+  let anf'33 = (g'11 b'12)
+  in (anf'33 + 2);;
 let simp'14 = (g'13 5);;
 let k'17 x'15 x'16 = x'16;;

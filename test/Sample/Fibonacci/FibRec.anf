@@ -1,11 +1,17 @@
 let fib'1 n'2 = 
-  if (n'2 < 2)
-    then n'2
-    else 
-      let anf'4 = (fib'1 (n'2 - 1))
-      in 
-        let anf'5 = (fib'1 (n'2 - 2))
-        in (anf'4 + anf'5);;
+  let anf'4 = (n'2 < 2)
+  in 
+    if anf'4
+      then n'2
+      else 
+        let anf'6 = 
+          let anf'5 = (n'2 - 1)
+          in (fib'1 anf'5)
+        in 
+          let anf'8 = 
+            let anf'7 = (n'2 - 2)
+            in (fib'1 anf'7)
+          in (anf'6 + anf'8);;
 let simp'3 = 
-  let anf'6 = (fib'1 10)
-  in (print_int anf'6);;
+  let anf'9 = (fib'1 10)
+  in (print_int anf'9);;
