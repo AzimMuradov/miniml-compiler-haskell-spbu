@@ -1,0 +1,39 @@
+Just
+    ( Program
+        [ StmtDecl
+            ( DeclFun "id" False
+                ( Fun
+                    (
+                        ( "x"
+                        , Nothing
+                        ) :| []
+                    ) Nothing
+                    ( ExprId "x" )
+                )
+            )
+        , StmtDecl
+            ( DeclFun "k" False
+                ( Fun
+                    (
+                        ( "x"
+                        , Nothing
+                        ) :| []
+                    ) Nothing
+                    ( ExprApp
+                        ( ExprId "x" )
+                        ( ExprPrimVal
+                            ( PrimValInt 42 )
+                        )
+                    )
+                )
+            )
+        , StmtExpr
+            ( ExprApp
+                ( ExprId "print_int" )
+                ( ExprApp
+                    ( ExprId "k" )
+                    ( ExprId "id" )
+                )
+            )
+        ]
+    )
