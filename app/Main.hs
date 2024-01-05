@@ -1,16 +1,25 @@
+{-# LANGUAGE NumericUnderscores #-}
+{-# LANGUAGE OverloadedStrings #-}
+
 module Main where
 
-import Data.Text (pack)
-import Options.Applicative
-import Parser.Ast (Program (Program))
-import Parser.Parser (parseProgram)
-import TypeChecker.PrettyPrinter (pretty)
-import TypeChecker.TypeChecker (inferProgram)
+import qualified CodeGen.Llvm.Runner as Llvm
+import CodeGen.RunResult (RunResult (CompilationError, RuntimeError, Success))
+import CodeGen.TimedValue (Nanoseconds (..))
+import Control.Monad (when)
+import Data.Text (Text)
+import qualified Data.Text as Txt
+import Options.Applicative hiding (Success)
+import System.Exit (ExitCode (..), die, exitWith)
+import System.FilePath (takeBaseName)
+import System.IO (hPutStr)
+import qualified System.IO as Sys
+import qualified Text.Printf as Printf
 
 -- * Main
 
 main :: IO ()
-main = runApp =<< execParser opts
+main = run True =<< execParser opts
   where
     opts =
       info
@@ -22,26 +31,55 @@ main = runApp =<< execParser opts
 
 -- ** Run app
 
-runApp :: App -> IO ()
-runApp App {input = i} = runApp' runAndShow i
-  where
-    runApp' :: (String -> String) -> Input -> IO ()
-    runApp' f (FileInput path) = readFile path >>= \s -> putStr (f s)
-    runApp' f StdInput = interact f
+run :: Bool -> App -> IO ()
+run debug (App input) = do
+  text <- readText input
 
-runAndShow :: String -> String
-runAndShow fileText = runAndShow' <> "\n"
-  where
-    runAndShow' = case parseProgram (pack fileText) of
-      Nothing -> "Please, try again. Can't parse your program."
-      Just (Program []) -> ""
-      Just p -> case inferProgram p of
-        Left err -> pretty err
-        Right pt -> pretty pt
+  let moduleName = case input of
+        StdInput -> "unnamed"
+        FileInput s -> Txt.pack $ takeBaseName s
+  runLlvm debug moduleName text
+
+runLlvm :: Bool -> Text -> Text -> IO ()
+runLlvm debug moduleName text = do
+  runResult <- Llvm.run moduleName text
+
+  case runResult of
+    Success stdout compTime runTime -> do
+      when debug $ do
+        putStrLn $ Printf.printf "Finished compiling in %0.5f sec" (ns2s compTime)
+        putStrLn $ Printf.printf "Finished running in %0.5f sec" (ns2s runTime)
+        putStrLn ""
+
+      putStr $ Txt.unpack stdout
+    CompilationError compErrMsg compTime -> do
+      when debug $ do
+        putStrLn $ Printf.printf "Finished compiling in %0.5f sec" (ns2s compTime)
+        putStrLn ""
+
+      die $ Txt.unpack compErrMsg
+    RuntimeError stdout stderr exitCode compTime runTime -> do
+      when debug $ do
+        putStrLn $ Printf.printf "Finished compiling in %0.5f sec" (ns2s compTime)
+        putStrLn $ Printf.printf "Finished running in %0.5f sec" (ns2s runTime)
+        putStrLn ""
+
+      putStr $ Txt.unpack stdout
+
+      hPutStr Sys.stderr (Txt.unpack stderr)
+
+      exitWith $ ExitFailure exitCode
+
+readText :: Input -> IO Text
+readText (FileInput path) = Txt.pack <$> readFile path
+readText StdInput = Txt.pack <$> getContents
+
+ns2s :: Nanoseconds -> Double
+ns2s ns = let Nanoseconds ns' = ns in fromInteger ns' / 1_000_000_000
 
 -- ** App configuration
 
-newtype App = App {input :: Input}
+newtype App = App Input
   deriving (Show)
 
 data Input

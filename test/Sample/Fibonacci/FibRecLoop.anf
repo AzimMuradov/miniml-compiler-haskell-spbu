@@ -1,0 +1,16 @@
+let loop'2 i'3 a'4 b'5 = 
+  if (i'3 = 0)
+    then a'4
+    else 
+      let anf'9 = 
+        let anf'8 = (loop'2 (i'3 - 1))
+        in (anf'8 b'5)
+      in (anf'9 (a'4 + b'5));;
+let fib'6 n'1 = 
+  let anf'11 = 
+    let anf'10 = (loop'2 n'1)
+    in (anf'10 0)
+  in (anf'11 1);;
+let simp'7 = 
+  let anf'12 = (fib'6 10)
+  in (print_int anf'12);;

@@ -83,6 +83,7 @@ executable miniml
     other-modules:
     other-extensions:
     build-depends:
+        , filepath
         , mini-ml
         , optparse-applicative  >=0.18
 
@@ -95,6 +96,7 @@ test-suite tests
     other-modules:
         Sample.AnfTest
         Sample.FactorialTest
+        Sample.FibonacciTest
         Unit.Parser.ParserTest
         Unit.StdLibTest
         Unit.TypeInference.TypeInferenceTest

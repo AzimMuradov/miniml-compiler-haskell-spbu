@@ -1,0 +1,53 @@
+Just
+    ( Program
+        [ StmtDecl
+            ( DeclFun "fib" True
+                ( Fun
+                    (
+                        ( "n"
+                        , Nothing
+                        ) :| []
+                    ) Nothing
+                    ( ExprIte
+                        ( ExprBinOp ( CompOp LtOp )
+                            ( ExprId "n" )
+                            ( ExprPrimVal
+                                ( PrimValInt 2 )
+                            )
+                        )
+                        ( ExprId "n" )
+                        ( ExprBinOp ( ArithOp PlusOp )
+                            ( ExprApp
+                                ( ExprId "fib" )
+                                ( ExprBinOp ( ArithOp MinusOp )
+                                    ( ExprId "n" )
+                                    ( ExprPrimVal
+                                        ( PrimValInt 1 )
+                                    )
+                                )
+                            )
+                            ( ExprApp
+                                ( ExprId "fib" )
+                                ( ExprBinOp ( ArithOp MinusOp )
+                                    ( ExprId "n" )
+                                    ( ExprPrimVal
+                                        ( PrimValInt 2 )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        , StmtExpr
+            ( ExprApp
+                ( ExprId "print_int" )
+                ( ExprApp
+                    ( ExprId "fib" )
+                    ( ExprPrimVal
+                        ( PrimValInt 10 )
+                    )
+                )
+            )
+        ]
+    )

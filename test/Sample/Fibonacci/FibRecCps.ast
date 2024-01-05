@@ -1,0 +1,119 @@
+Just
+    ( Program
+        [ StmtDecl
+            ( DeclFun "id" False
+                ( Fun
+                    (
+                        ( "x"
+                        , Nothing
+                        ) :| []
+                    ) Nothing
+                    ( ExprId "x" )
+                )
+            )
+        , StmtDecl
+            ( DeclFun "fib" False
+                ( Fun
+                    (
+                        ( "n"
+                        , Nothing
+                        ) :| []
+                    ) Nothing
+                    ( ExprLetIn
+                        ( DeclFun "fib_cps" True
+                            ( Fun
+                                (
+                                    ( "n"
+                                    , Nothing
+                                    ) :|
+                                    [
+                                        ( "k"
+                                        , Nothing
+                                        )
+                                    ]
+                                ) Nothing
+                                ( ExprIte
+                                    ( ExprBinOp ( CompOp LtOp )
+                                        ( ExprId "n" )
+                                        ( ExprPrimVal
+                                            ( PrimValInt 3 )
+                                        )
+                                    )
+                                    ( ExprApp
+                                        ( ExprId "k" )
+                                        ( ExprPrimVal
+                                            ( PrimValInt 1 )
+                                        )
+                                    )
+                                    ( ExprApp
+                                        ( ExprApp
+                                            ( ExprId "fib_cps" )
+                                            ( ExprBinOp ( ArithOp MinusOp )
+                                                ( ExprId "n" )
+                                                ( ExprPrimVal
+                                                    ( PrimValInt 1 )
+                                                )
+                                            )
+                                        )
+                                        ( ExprFun
+                                            ( Fun
+                                                (
+                                                    ( "a"
+                                                    , Nothing
+                                                    ) :| []
+                                                ) Nothing
+                                                ( ExprApp
+                                                    ( ExprApp
+                                                        ( ExprId "fib_cps" )
+                                                        ( ExprBinOp ( ArithOp MinusOp )
+                                                            ( ExprId "n" )
+                                                            ( ExprPrimVal
+                                                                ( PrimValInt 2 )
+                                                            )
+                                                        )
+                                                    )
+                                                    ( ExprFun
+                                                        ( Fun
+                                                            (
+                                                                ( "b"
+                                                                , Nothing
+                                                                ) :| []
+                                                            ) Nothing
+                                                            ( ExprApp
+                                                                ( ExprId "k" )
+                                                                ( ExprBinOp ( ArithOp PlusOp )
+                                                                    ( ExprId "a" )
+                                                                    ( ExprId "b" )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                        ( ExprApp
+                            ( ExprApp
+                                ( ExprId "fib_cps" )
+                                ( ExprId "n" )
+                            )
+                            ( ExprId "id" )
+                        )
+                    )
+                )
+            )
+        , StmtExpr
+            ( ExprApp
+                ( ExprId "print_int" )
+                ( ExprApp
+                    ( ExprId "fib" )
+                    ( ExprPrimVal
+                        ( PrimValInt 10 )
+                    )
+                )
+            )
+        ]
+    )
