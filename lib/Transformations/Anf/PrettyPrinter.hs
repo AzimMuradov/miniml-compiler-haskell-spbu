@@ -51,6 +51,8 @@ prettyComplex = \case
     let eText = createIndent indent <> "else " <> e'
     modify $ \x -> x - 4
     return $ cText <> tText <> eText
+  CompBinOp op lhs rhs -> return $ parens (unwords [prettyAtomic lhs, prettyBinOp op, prettyAtomic rhs])
+  CompUnOp op x -> return $ parens $ prettyUnOp op <> prettyAtomic x
 
 prettyAtomic :: AtomicExpression -> String
 prettyAtomic = \case
@@ -58,8 +60,6 @@ prettyAtomic = \case
   AtomUnit -> "()"
   AtomBool value -> if value then "true" else "false"
   AtomInt value -> show value
-  AtomBinOp op lhs rhs -> parens (unwords [prettyAtomic lhs, prettyBinOp op, prettyAtomic rhs])
-  AtomUnOp op x -> parens $ prettyUnOp op <> prettyAtomic x
 
 prettyId :: Identifier' -> String
 prettyId (Txt n) = unpack n

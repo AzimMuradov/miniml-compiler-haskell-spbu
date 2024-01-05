@@ -1,8 +1,14 @@
 let g'1 x'2 = 
-  if (x'2 < 0)
-    then 0
-    else (g'1 (x'2 + 1));;
+  let anf'6 = (x'2 < 0)
+  in 
+    if anf'6
+      then 0
+      else 
+        let anf'7 = (x'2 + 1)
+        in (g'1 anf'7);;
 let g'4 x'3 = 
-  let anf'6 = (g'1 (-5))
-  in (anf'6 + x'3);;
+  let anf'9 = 
+    let anf'8 = (-5)
+    in (g'1 anf'8)
+  in (anf'9 + x'3);;
 let simp'5 = (g'4 3);;

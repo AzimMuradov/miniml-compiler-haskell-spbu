@@ -1,16 +1,22 @@
 let loop'2 i'3 a'4 b'5 = 
-  if (i'3 = 0)
-    then a'4
-    else 
-      let anf'9 = 
-        let anf'8 = (loop'2 (i'3 - 1))
-        in (anf'8 b'5)
-      in (anf'9 (a'4 + b'5));;
+  let anf'8 = (i'3 = 0)
+  in 
+    if anf'8
+      then a'4
+      else 
+        let anf'11 = 
+          let anf'10 = 
+            let anf'9 = (i'3 - 1)
+            in (loop'2 anf'9)
+          in (anf'10 b'5)
+        in 
+          let anf'12 = (a'4 + b'5)
+          in (anf'11 anf'12);;
 let fib'6 n'1 = 
-  let anf'11 = 
-    let anf'10 = (loop'2 n'1)
-    in (anf'10 0)
-  in (anf'11 1);;
+  let anf'14 = 
+    let anf'13 = (loop'2 n'1)
+    in (anf'13 0)
+  in (anf'14 1);;
 let simp'7 = 
-  let anf'12 = (fib'6 10)
-  in (print_int anf'12);;
+  let anf'15 = (fib'6 10)
+  in (print_int anf'15);;

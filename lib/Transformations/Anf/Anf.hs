@@ -22,11 +22,11 @@ data AtomicExpression
   | AtomUnit
   | AtomBool Bool
   | AtomInt Int64
-  | AtomBinOp BinaryOperator AtomicExpression AtomicExpression
-  | AtomUnOp UnaryOperator AtomicExpression
   deriving (Show, Eq)
 
 data ComplexExpression
   = CompApp Identifier' AtomicExpression
   | CompIte AtomicExpression Expression Expression
+  | CompBinOp BinaryOperator AtomicExpression AtomicExpression
+  | CompUnOp UnaryOperator AtomicExpression
   deriving (Show, Eq)
