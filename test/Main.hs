@@ -5,6 +5,7 @@ module Main where
 import qualified Sample.AnfTest
 import qualified Sample.FactorialTest
 import qualified Sample.FibonacciTest
+import qualified Sample.SimpleTest
 import Test.Tasty (TestTree, defaultMain, testGroup)
 import qualified Unit.Parser.ParserTest as Unit.ParserTest
 import qualified Unit.StdLibTest
@@ -28,5 +29,6 @@ sampleTests =
     "sample tests (Golden)"
     [ Sample.FactorialTest.tests,
       Sample.FibonacciTest.tests,
-      Sample.AnfTest.tests
+      Sample.AnfTest.tests,
+      Sample.SimpleTest.tests
     ]

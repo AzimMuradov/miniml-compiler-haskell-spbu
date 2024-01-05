@@ -1,0 +1,5 @@
+let id'2 x'1 = x'1;;
+let k'4 x'3 = (x'3 42);;
+let simp'5 = 
+  let anf'6 = (k'4 id'2)
+  in (print_int anf'6);;

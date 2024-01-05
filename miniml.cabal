@@ -97,6 +97,7 @@ test-suite tests
         Sample.AnfTest
         Sample.FactorialTest
         Sample.FibonacciTest
+        Sample.SimpleTest
         Unit.Parser.ParserTest
         Unit.StdLibTest
         Unit.TypeInference.TypeInferenceTest
