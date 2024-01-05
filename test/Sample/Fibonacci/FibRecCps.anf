@@ -1,27 +1,35 @@
 let id'2 x'1 = x'1;;
-let ll'12 k'6 a'7 b'8 = (k'6 (a'7 + b'8));;
+let ll'12 k'6 a'7 b'8 = 
+  let anf'13 = (a'7 + b'8)
+  in (k'6 anf'13);;
 let ll'11 fib_cps'4 n'5 k'6 a'7 = 
-  let anf'13 = (fib_cps'4 (n'5 - 2))
+  let anf'15 = 
+    let anf'14 = (n'5 - 2)
+    in (fib_cps'4 anf'14)
   in 
-    let anf'15 = 
-      let anf'14 = (ll'12 k'6)
-      in (anf'14 a'7)
-    in (anf'13 anf'15);;
+    let anf'17 = 
+      let anf'16 = (ll'12 k'6)
+      in (anf'16 a'7)
+    in (anf'15 anf'17);;
 let fib_cps'4 n'5 k'6 = 
-  if (n'5 < 3)
-    then (k'6 1)
-    else 
-      let anf'16 = (fib_cps'4 (n'5 - 1))
-      in 
-        let anf'19 = 
-          let anf'18 = 
-            let anf'17 = (ll'11 fib_cps'4)
-            in (anf'17 n'5)
-          in (anf'18 k'6)
-        in (anf'16 anf'19);;
+  let anf'18 = (n'5 < 3)
+  in 
+    if anf'18
+      then (k'6 1)
+      else 
+        let anf'20 = 
+          let anf'19 = (n'5 - 1)
+          in (fib_cps'4 anf'19)
+        in 
+          let anf'23 = 
+            let anf'22 = 
+              let anf'21 = (ll'11 fib_cps'4)
+              in (anf'21 n'5)
+            in (anf'22 k'6)
+          in (anf'20 anf'23);;
 let fib'9 n'3 = 
-  let anf'20 = (fib_cps'4 n'3)
-  in (anf'20 id'2);;
+  let anf'24 = (fib_cps'4 n'3)
+  in (anf'24 id'2);;
 let simp'10 = 
-  let anf'21 = (fib'9 10)
-  in (print_int anf'21);;
+  let anf'25 = (fib'9 10)
+  in (print_int anf'25);;

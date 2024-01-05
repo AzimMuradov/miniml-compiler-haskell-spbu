@@ -1,9 +1,13 @@
 let factorial'1 n'2 = 
-  if (n'2 <= 0)
-    then 1
-    else 
-      let anf'4 = (factorial'1 (n'2 - 1))
-      in (n'2 * anf'4);;
+  let anf'4 = (n'2 <= 0)
+  in 
+    if anf'4
+      then 1
+      else 
+        let anf'6 = 
+          let anf'5 = (n'2 - 1)
+          in (factorial'1 anf'5)
+        in (n'2 * anf'6);;
 let simp'3 = 
-  let anf'5 = (factorial'1 5)
-  in (print_int anf'5);;
+  let anf'7 = (factorial'1 5)
+  in (print_int anf'7);;
