@@ -1,26 +1,30 @@
 module Configuration.Commands.Compile (compile) where
 
 import Configuration.AppConfiguration
-import Configuration.CommonParsers (inputP)
+import Configuration.CommonParsers (inputParser)
 import Data.Foldable (find)
 import Data.List (intercalate)
 import Options.Applicative
 
 compile :: Mod CommandFields Command
-compile =
-  command "compile" $
-    info
-      (CmdCompile <$> compileP)
-      ( fullDesc
-          <> header "Compile MiniML program"
-          <> progDesc "Compile MiniML program to the provided target"
-      )
+compile = command "compile" compileParserInfo
 
-compileP :: Parser Compile
-compileP = Compile <$> inputP <*> targetP <*> outputP
+compileParserInfo :: ParserInfo Command
+compileParserInfo = info compileParser compileInfoMod
 
-targetP :: Parser CompilationTarget
-targetP =
+compileParser :: Parser Command
+compileParser =
+  CmdCompile
+    <$> (Compile <$> inputParser <*> targetParser <*> outputParser)
+
+compileInfoMod :: InfoMod a
+compileInfoMod =
+  fullDesc
+    <> header "Compile MiniML program"
+    <> progDesc "Compile MiniML program to the provided target"
+
+targetParser :: Parser CompilationTarget
+targetParser =
   option
     (maybeReader reader)
     ( long "target"
@@ -38,8 +42,8 @@ targetP =
     targets :: [CompilationTarget]
     targets = [minBound .. maxBound]
 
-outputP :: Parser Output
-outputP = fileOutputP <|> defaultP
+outputParser :: Parser Output
+outputParser = fileOutputP <|> defaultP
   where
     fileOutputP =
       FileOutput
@@ -47,7 +51,7 @@ outputP = fileOutputP <|> defaultP
           ( long "output"
               <> short 'o'
               <> metavar "OUTPUT"
-              <> help "Output file"
+              <> help "Output file (todo---optional)"
           )
 
     defaultP = pure AutoFileOutput

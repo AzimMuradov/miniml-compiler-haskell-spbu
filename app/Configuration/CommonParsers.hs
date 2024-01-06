@@ -3,14 +3,14 @@ module Configuration.CommonParsers where
 import Configuration.AppConfiguration (Input (..))
 import Options.Applicative
 
-inputP :: Parser Input
-inputP = fileInputP <|> defaultP
+inputParser :: Parser Input
+inputParser = fileInputP <|> defaultP
   where
     fileInputP =
       FileInput
         <$> strArgument
           ( metavar "FILENAME"
-              <> help "Read from the file (optional)"
+              <> help "Read from the provided file (optional)"
           )
 
     defaultP = pure StdInput

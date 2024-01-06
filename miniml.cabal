@@ -30,7 +30,7 @@ common shared-properties
 library
     import:           shared-properties
     exposed-modules:
-        CodeGen.Llvm.Ir2LlvmIr
+        CodeGen.Llvm.LlvmIrGen
         CodeGen.Llvm.Runner
         CodeGen.Module
         CodeGen.RunResult
@@ -81,15 +81,16 @@ executable miniml
     import:           shared-properties
     main-is:          Main.hs
     other-modules:
-        Components.Compile
-        Components.Run
-        Components.Verify
+        Commands.Compile
+        Commands.Run
+        Commands.Verify
         Configuration.AppConfiguration
         Configuration.Commands.Compile
         Configuration.Commands.MiniMl
         Configuration.Commands.Run
         Configuration.Commands.Verify
         Configuration.CommonParsers
+        Utils
 
     other-extensions:
     build-depends:

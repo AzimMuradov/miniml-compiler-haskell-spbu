@@ -1,11 +1,8 @@
-{-# LANGUAGE NumericUnderscores #-}
-{-# LANGUAGE OverloadedStrings #-}
-
 module Main where
 
-import Components.Compile (compile)
-import Components.Run (run)
-import Components.Verify (verify)
+import Commands.Compile (compile)
+import Commands.Run (run)
+import Commands.Verify (verify)
 import Configuration.AppConfiguration (Command (..), Debug (Yes), MiniMl (MiniMl))
 import Configuration.Commands.MiniMl (miniml)
 import Control.Monad (when)

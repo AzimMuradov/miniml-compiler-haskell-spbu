@@ -1,26 +1,28 @@
 module Configuration.Commands.Run (run) where
 
 import Configuration.AppConfiguration
-import Configuration.CommonParsers (inputP)
+import Configuration.CommonParsers (inputParser)
 import Data.Foldable (find)
 import Data.List (intercalate)
 import Options.Applicative
 
 run :: Mod CommandFields Command
-run =
-  command "run" $
-    info
-      (CmdRun <$> runP)
-      ( fullDesc
-          <> header "Run MiniML program"
-          <> progDesc "Run MiniML program with the provided backend"
-      )
+run = command "run" runParserInfo
 
-runP :: Parser Run
-runP = Run <$> inputP <*> backendP
+runParserInfo :: ParserInfo Command
+runParserInfo = info runParser runInfoMod
 
-backendP :: Parser RunnerBackend
-backendP =
+runParser :: Parser Command
+runParser = CmdRun <$> (Run <$> inputParser <*> backendParser)
+
+runInfoMod :: InfoMod a
+runInfoMod =
+  fullDesc
+    <> header "Run MiniML program"
+    <> progDesc "Run MiniML program with the provided backend"
+
+backendParser :: Parser RunnerBackend
+backendParser =
   option
     (maybeReader reader)
     ( long "backend"

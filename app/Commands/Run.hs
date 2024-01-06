@@ -1,11 +1,9 @@
-{-# LANGUAGE NumericUnderscores #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Components.Run (run) where
+module Commands.Run (run) where
 
 import qualified CodeGen.Llvm.Runner as Llvm
 import CodeGen.RunResult (RunResult (CompilationError, RuntimeError, Success))
-import CodeGen.TimedValue (Nanoseconds (Nanoseconds))
 import Configuration.AppConfiguration (Debug (Yes), Input (..), Run (Run), RunnerBackend (..))
 import Control.Monad (when)
 import Data.Text (Text)
@@ -15,6 +13,7 @@ import System.FilePath (takeBaseName)
 import System.IO (hPutStr)
 import qualified System.IO as Sys
 import qualified Text.Printf as Printf
+import Utils (ns2s, readText)
 
 run :: Run -> Debug -> IO ()
 run (Run input backend) debug = do
@@ -57,10 +56,3 @@ runLlvm moduleName text debug = do
       hPutStr Sys.stderr (Txt.unpack stderr)
 
       exitWith $ ExitFailure exitCode
-
-readText :: Input -> IO Text
-readText (FileInput path) = Txt.pack <$> readFile path
-readText StdInput = Txt.pack <$> getContents
-
-ns2s :: Nanoseconds -> Double
-ns2s ns = let Nanoseconds ns' = ns in fromInteger ns' / 1_000_000_000
