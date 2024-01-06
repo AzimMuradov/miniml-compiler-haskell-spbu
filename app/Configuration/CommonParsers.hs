@@ -9,8 +9,8 @@ inputParser = fileInputP <|> defaultP
     fileInputP =
       FileInput
         <$> strArgument
-          ( metavar "FILENAME"
-              <> help "Read from the provided file (optional)"
+          ( metavar "FILE"
+              <> help "Program file path (optional)"
           )
 
     defaultP = pure StdInput

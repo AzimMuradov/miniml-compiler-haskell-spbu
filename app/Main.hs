@@ -3,14 +3,14 @@ module Main where
 import Commands.Compile (compile)
 import Commands.Run (run)
 import Configuration.AppConfiguration (Command (..), Debug (Yes), MiniMl (MiniMl))
-import Configuration.Commands.MiniMl (miniml)
+import Configuration.Commands.MiniMl (miniMl)
 import Control.Monad (when)
 
 -- * Main
 
 main :: IO ()
 main = do
-  MiniMl cmd d <- miniml
+  MiniMl cmd d <- miniMl
 
   when (d == Yes) $ do
     putStrLn $ "MiniML Configuration: " <> show cmd

@@ -51,7 +51,7 @@ outputParser = fileOutputP <|> defaultP
           ( long "output"
               <> short 'o'
               <> metavar "OUTPUT"
-              <> help "Output filename (default: taken from input filename)"
+              <> help "Output file path (default: filename taken from the MiniML program)"
           )
 
     defaultP = pure AutoFileOutput
