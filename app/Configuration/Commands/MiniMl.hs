@@ -19,7 +19,7 @@ parserPrefs =
 parserInfo :: ParserInfo MiniMl
 parserInfo =
   info
-    (appP <**> simpleVersioner "v0.1.0.0" <**> helper)
+    (appP <**> helper)
     ( fullDesc
         <> header "-- MiniML Runner & Compiler --"
         <> progDesc "MiniML is a minimal dialect of ML (Meta Language)"
