@@ -4,28 +4,20 @@ module Commands.Run (run) where
 
 import qualified CodeGen.Llvm.Runner as Llvm
 import CodeGen.RunResult (RunResult (CompilationError, RuntimeError, Success))
-import Configuration.AppConfiguration (Debug (Yes), Input (..), Run (Run))
+import Configuration.AppConfiguration (Debug (Yes), Run (Run))
 import Control.Monad (when)
-import Data.Text (Text)
 import qualified Data.Text as Txt
 import System.Exit (ExitCode (..), die, exitWith)
-import System.FilePath (takeBaseName)
 import System.IO (hPutStr)
 import qualified System.IO as Sys
 import qualified Text.Printf as Printf
-import Utils (ns2s, readText)
+import Utils (inputToModuleName, ns2s, readText)
 
 run :: Run -> Debug -> IO ()
 run (Run input) debug = do
+  let moduleName = inputToModuleName input
   text <- readText input
 
-  let moduleName = case input of
-        StdInput -> "unnamed"
-        FileInput s -> Txt.pack $ takeBaseName s
-  runLlvm moduleName text debug
-
-runLlvm :: Text -> Text -> Debug -> IO ()
-runLlvm moduleName text debug = do
   runResult <- Llvm.run moduleName text
 
   case runResult of
