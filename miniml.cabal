@@ -81,11 +81,22 @@ executable miniml
     import:           shared-properties
     main-is:          Main.hs
     other-modules:
+        Components.Compile
+        Components.Run
+        Components.Verify
+        Configuration.AppConfiguration
+        Configuration.Commands.Compile
+        Configuration.Commands.MiniMl
+        Configuration.Commands.Run
+        Configuration.Commands.Verify
+        Configuration.CommonParsers
+
     other-extensions:
     build-depends:
         , filepath
         , mini-ml
         , optparse-applicative  >=0.18
+        , pretty-simple         >=4.1.2.0
 
     hs-source-dirs:   app
 
