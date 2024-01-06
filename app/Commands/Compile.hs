@@ -22,10 +22,10 @@ compile (Compile input target output) debug = do
         FileInput filePath -> Txt.pack $ takeBaseName filePath
 
   TimedValue res compTime <- case target of
-    CompileToBinary -> do
+    TargetBinary -> do
       let out = outputToFilePath output moduleName "out"
       compileToBin moduleName text out
-    CompileToLlvmIr -> do
+    TargetLlvmIr -> do
       let out = outputToFilePath output moduleName "ll"
       compileToIr moduleName text out
 

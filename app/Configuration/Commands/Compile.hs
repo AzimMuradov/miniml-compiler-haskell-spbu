@@ -32,7 +32,7 @@ targetParser =
         <> metavar "TARGET"
         <> help helpMsg
         <> showDefault
-        <> value CompileToBinary
+        <> value TargetBinary
     )
   where
     reader s = find (\e -> show e == s) targets

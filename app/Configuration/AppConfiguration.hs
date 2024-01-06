@@ -22,13 +22,13 @@ data Compile = Compile Input CompilationTarget Output
   deriving (Show)
 
 data CompilationTarget
-  = CompileToBinary
-  | CompileToLlvmIr
+  = TargetBinary
+  | TargetLlvmIr
   deriving (Enum, Bounded)
 
 instance Show CompilationTarget where
-  show CompileToBinary = "binary"
-  show CompileToLlvmIr = "llvm-ir"
+  show TargetBinary = "binary"
+  show TargetLlvmIr = "llvm-ir"
 
 data Output
   = FileOutput FilePath
