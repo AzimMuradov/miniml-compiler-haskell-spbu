@@ -19,7 +19,7 @@ import Transformations.Ll.Ll (llAst)
 import Transformations.Relabeler.Relabeler (relabelAst)
 import Transformations.Simplifier.Simplifier (simplifyAst)
 import qualified TypeChecker.PrettyPrinter as TC
-import qualified TypeChecker.TypeChecker as TC
+import TypeChecker.TypeChecker (checkProgram)
 
 data Module = Module
   { name :: Text,
@@ -37,7 +37,7 @@ compileToModule moduleName text = do
 
 parseAndVerify :: Text -> Except Text Program
 parseAndVerify text = case parseProgram text of
-  Just program -> case TC.checkProgram program of
+  Just program -> case checkProgram program of
     Right () -> return program
     Left e -> throwE $ "Error: " <> Txt.pack (TC.pretty e)
   Nothing -> throwE "Error: Syntax error"

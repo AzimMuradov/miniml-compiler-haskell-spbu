@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module CodeGen.Llvm.Runner (run, compileToIr, compileToBin) where
+module CodeGen.Llvm.Runner (run, compileToBinary, compileToLlvmIr) where
 
 import CodeGen.Llvm.LlvmIrGen (genLlvmIrModule, ppLlvmModule)
 import CodeGen.Module (compileToModule)
@@ -22,7 +22,7 @@ import System.Process (callProcess, readProcessWithExitCode)
 
 run :: Text -> Text -> IO RR.RunResult
 run moduleName text = do
-  TimedValue compResult compTime <- compileToBin moduleName text outputFilePath
+  TimedValue compResult compTime <- compileToBinary moduleName text outputFilePath
 
   case compResult of
     Right () -> do
@@ -64,20 +64,11 @@ run moduleName text = do
 
       return measuredResult
 
-compileToIr :: Text -> Text -> FilePath -> IO (TimedValue (Either Text ()))
-compileToIr moduleName text outputFilePath = measureTimedValue $
+compileToBinary :: Text -> Text -> FilePath -> IO (TimedValue (Either Text ()))
+compileToBinary moduleName text outputFilePath = measureTimedValue $
   sequenceA $
     runExcept $ do
-      llvmIrText <- compileToLlvmIrText moduleName text
-      return $
-        withFile outputFilePath WriteMode $ \handle -> do
-          Txt.hPutStrLn handle llvmIrText
-
-compileToBin :: Text -> Text -> FilePath -> IO (TimedValue (Either Text ()))
-compileToBin moduleName text outputFilePath = measureTimedValue $
-  sequenceA $
-    runExcept $ do
-      llvmIrText <- compileToLlvmIrText moduleName text
+      llvmIrText <- compileToLlvmIr' moduleName text
       return $
         bracket (mkdtemp "build") removePathForcibly $ \buildDir ->
           withCurrentDirectory buildDir $ do
@@ -92,9 +83,18 @@ compileToBin moduleName text outputFilePath = measureTimedValue $
 
             callProcess "clang" ["-Wno-override-module", "-O3", "-lm", llvm, runtime, "-o", "../" <> outputFilePath]
 
+compileToLlvmIr :: Text -> Text -> FilePath -> IO (TimedValue (Either Text ()))
+compileToLlvmIr moduleName text outputFilePath = measureTimedValue $
+  sequenceA $
+    runExcept $ do
+      llvmIrText <- compileToLlvmIr' moduleName text
+      return $
+        withFile outputFilePath WriteMode $ \handle -> do
+          Txt.hPutStrLn handle llvmIrText
+
 -- * Internal
 
-compileToLlvmIrText :: Text -> Text -> Except Text Text
-compileToLlvmIrText moduleName text = do
+compileToLlvmIr' :: Text -> Text -> Except Text Text
+compileToLlvmIr' moduleName text = do
   irModule <- compileToModule moduleName text
   return $ ppLlvmModule $ genLlvmIrModule irModule

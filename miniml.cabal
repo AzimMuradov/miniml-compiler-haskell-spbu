@@ -95,7 +95,6 @@ executable miniml
         , filepath
         , mini-ml
         , optparse-applicative  >=0.18
-        , pretty-simple         >=4.1.2.0
 
     hs-source-dirs:   app
 

@@ -2,7 +2,7 @@
 
 module Commands.Compile (compile) where
 
-import CodeGen.Llvm.Runner (compileToBin, compileToIr)
+import CodeGen.Llvm.Runner (compileToBinary, compileToLlvmIr)
 import CodeGen.TimedValue (TimedValue (TimedValue))
 import Configuration.AppConfiguration (CompilationTarget (..), Compile (..), Debug (Yes), Output (..))
 import Control.Monad (when)
@@ -20,10 +20,10 @@ compile (Compile input target output) debug = do
   TimedValue res compTime <- case target of
     TargetBinary -> do
       let outputFilePath = outputToFilePath output moduleName "out"
-      compileToBin moduleName text outputFilePath
+      compileToBinary moduleName text outputFilePath
     TargetLlvmIr -> do
       let outputFilePath = outputToFilePath output moduleName "ll"
-      compileToIr moduleName text outputFilePath
+      compileToLlvmIr moduleName text outputFilePath
 
   when (debug == Yes) $ do
     putStrLn $ Printf.printf "Finished compiling in %0.5f sec" (ns2s compTime)
