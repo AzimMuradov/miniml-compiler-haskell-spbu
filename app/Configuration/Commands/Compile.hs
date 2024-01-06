@@ -51,7 +51,7 @@ outputParser = fileOutputP <|> defaultP
           ( long "output"
               <> short 'o'
               <> metavar "OUTPUT"
-              <> help "Output file (todo---optional)"
+              <> help "Output filename (default: taken from input filename)"
           )
 
     defaultP = pure AutoFileOutput

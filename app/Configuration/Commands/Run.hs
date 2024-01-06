@@ -17,4 +17,4 @@ runInfoMod :: InfoMod a
 runInfoMod =
   fullDesc
     <> header "Run MiniML program"
-    <> progDesc "Run MiniML program with the provided backend"
+    <> progDesc "Run MiniML program"
