@@ -6,15 +6,19 @@ data MiniMl = MiniMl Command Debug
   deriving (Show)
 
 data Command
-  = CmdCompile Compile
-  | CmdRun Run
-  | CmdVerify Verify
+  = CmdRun Run
+  | CmdCompile Compile
   deriving (Show)
 
 data Debug
   = Yes
   | No
   deriving (Show, Eq)
+
+-- ** Run Configuration
+
+newtype Run = Run Input
+  deriving (Show)
 
 -- ** Compile Configuration
 
@@ -33,16 +37,6 @@ instance Show CompilationTarget where
 data Output
   = FileOutput FilePath
   | AutoFileOutput
-  deriving (Show)
-
--- ** Run Configuration
-
-newtype Run = Run Input
-  deriving (Show)
-
--- ** Verify Configuration
-
-newtype Verify = Verify Input
   deriving (Show)
 
 -- ** Common Configuration

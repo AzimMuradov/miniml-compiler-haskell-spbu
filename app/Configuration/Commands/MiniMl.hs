@@ -3,7 +3,6 @@ module Configuration.Commands.MiniMl (miniml) where
 import Configuration.AppConfiguration (Debug (..), MiniMl (MiniMl))
 import Configuration.Commands.Compile (compile)
 import Configuration.Commands.Run (run)
-import Configuration.Commands.Verify (verify)
 import Options.Applicative
 
 miniml :: IO MiniMl
@@ -27,7 +26,7 @@ parserInfo =
     )
 
 appP :: Parser MiniMl
-appP = MiniMl <$> hsubparser (run <> compile <> verify) <*> debugP
+appP = MiniMl <$> hsubparser (run <> compile) <*> debugP
 
 debugP :: Parser Debug
 debugP = flag defaultValue activeValue modifier

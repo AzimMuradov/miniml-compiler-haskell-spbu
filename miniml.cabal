@@ -83,12 +83,10 @@ executable miniml
     other-modules:
         Commands.Compile
         Commands.Run
-        Commands.Verify
         Configuration.AppConfiguration
         Configuration.Commands.Compile
         Configuration.Commands.MiniMl
         Configuration.Commands.Run
-        Configuration.Commands.Verify
         Configuration.CommonParsers
         Utils
 

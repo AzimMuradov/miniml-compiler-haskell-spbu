@@ -2,7 +2,6 @@ module Main where
 
 import Commands.Compile (compile)
 import Commands.Run (run)
-import Commands.Verify (verify)
 import Configuration.AppConfiguration (Command (..), Debug (Yes), MiniMl (MiniMl))
 import Configuration.Commands.MiniMl (miniml)
 import Control.Monad (when)
@@ -18,6 +17,5 @@ main = do
     putStrLn ""
 
   case cmd of
-    CmdCompile c -> compile c d
     CmdRun r -> run r d
-    CmdVerify v -> verify v d
+    CmdCompile c -> compile c d
