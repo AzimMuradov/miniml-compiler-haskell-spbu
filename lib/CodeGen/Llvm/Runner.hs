@@ -1,12 +1,9 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module CodeGen.Llvm.Runner (run) where
 
 import CodeGen.Llvm.Ir2LlvmIr (genLlvmIrModule)
 import CodeGen.Module (compileToModule)
-import qualified CodeGen.Module as M
 import qualified CodeGen.RunResult as RR
 import CodeGen.TimedValue (TimedValue (TimedValue), measureTimedValue)
 import Control.Exception (bracket)
@@ -23,7 +20,6 @@ import System.Exit (ExitCode (..))
 import System.IO (hClose)
 import System.Posix.Temp (mkdtemp, mkstemps)
 import System.Process (callProcess, readProcessWithExitCode)
-import qualified TypeChecker.PrettyPrinter as TC
 
 run :: Text -> Text -> IO RR.RunResult
 run moduleName text = do
@@ -61,11 +57,10 @@ run moduleName text = do
     runCompilation = do
       measureTimedValue $ do
         case compileToModule moduleName text of
-          M.Success irModule -> do
+          Right irModule -> do
             let llvmModule = genLlvmIrModule irModule
             Right () <$ compile llvmModule moduleName outputFilePath
-          M.SyntaxError -> return $ Left "Error: Syntax error"
-          M.SemanticError te -> return $ Left $ Txt.pack $ TC.pretty te
+          Left te -> return $ Left te
 
     runCompiledModule :: IO (TimedValue (Either (String, String, Int) String))
     runCompiledModule = do
