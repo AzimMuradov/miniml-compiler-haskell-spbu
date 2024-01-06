@@ -1,6 +1,6 @@
 module Configuration.Commands.MiniMl (miniml) where
 
-import Configuration.AppConfiguration (MiniMl (MiniMl), Debug (..))
+import Configuration.AppConfiguration (Debug (..), MiniMl (MiniMl))
 import Configuration.Commands.Compile (compile)
 import Configuration.Commands.Run (run)
 import Configuration.Commands.Verify (verify)
