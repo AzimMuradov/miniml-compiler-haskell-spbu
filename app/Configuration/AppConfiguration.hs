@@ -37,17 +37,8 @@ data Output
 
 -- ** Run Configuration
 
-data Run = Run Input RunnerBackend
+newtype Run = Run Input
   deriving (Show)
-
-data RunnerBackend
-  = BackendLlvm
-  | BackendInterpreter
-  deriving (Enum, Bounded)
-
-instance Show RunnerBackend where
-  show BackendLlvm = "llvm"
-  show BackendInterpreter = "interpreter"
 
 -- ** Verify Configuration
 

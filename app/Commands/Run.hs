@@ -4,7 +4,7 @@ module Commands.Run (run) where
 
 import qualified CodeGen.Llvm.Runner as Llvm
 import CodeGen.RunResult (RunResult (CompilationError, RuntimeError, Success))
-import Configuration.AppConfiguration (Debug (Yes), Input (..), Run (Run), RunnerBackend (..))
+import Configuration.AppConfiguration (Debug (Yes), Input (..), Run (Run))
 import Control.Monad (when)
 import Data.Text (Text)
 import qualified Data.Text as Txt
@@ -16,16 +16,13 @@ import qualified Text.Printf as Printf
 import Utils (ns2s, readText)
 
 run :: Run -> Debug -> IO ()
-run (Run input backend) debug = do
+run (Run input) debug = do
   text <- readText input
 
-  case backend of
-    BackendLlvm -> do
-      let moduleName = case input of
-            StdInput -> "unnamed"
-            FileInput s -> Txt.pack $ takeBaseName s
-      runLlvm moduleName text debug
-    BackendInterpreter -> error "Not Yet Implemented"
+  let moduleName = case input of
+        StdInput -> "unnamed"
+        FileInput s -> Txt.pack $ takeBaseName s
+  runLlvm moduleName text debug
 
 runLlvm :: Text -> Text -> Debug -> IO ()
 runLlvm moduleName text debug = do
