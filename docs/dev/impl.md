@@ -7,18 +7,19 @@ Initial - Text of the Program
 | Phase                             | Resulting Representation |           Properties            |
 | :-------------------------------- | :----------------------: | :-----------------------------: |
 | Parsing                           |           AST            |    **SYNTACTICALLY CORRECT**    |
-| Type Check                        |           AST            |    **SEMANTICALLY CORRECT**     |
+| Type Checking                     |           AST            |    **SEMANTICALLY CORRECT**     |
 | Simplification                    |      Simplified AST      |          **NO TYPES**           |
 | Identifier Relabeling             |      Simplified AST      | **ALL IDENTIFIERS ARE UNIQUE**  |
 | Closure Conversion (CC)           |      Simplified AST      |        **CLOSURE FREE**         |
 | Lambda Lifting (LL)               |           LFR            | **ALL FUNCTIONS ARE TOP-LEVEL** |
 | Conversion to A-Normal Form (ANF) |           ANF            |                                 |
+| LLVM IR Code Generation           |         LLVM IR          |                                 |
 
 ### Parsing
 
 Source: [lib/Parser/](../../lib/Parser/).
 
-### Type Check
+### Type Checking
 
 Source: [lib/TypeChecker/](../../lib/TypeChecker/).
 
@@ -54,6 +55,6 @@ Source: [lib/Transformations/Anf/](../../lib/Transformations/Anf/).
 
 [A-Normalization: Why and How](https://matt.might.net/articles/a-normalization/)
 
-### Code Generation
+### LLVM IR Code Generation
 
-#### CodeGen to LLVM IR
+Source: [lib/CodeGen/Ll/](../../lib/CodeGen/).
