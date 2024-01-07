@@ -31,7 +31,7 @@ Source: [lib/Transformations/](../../lib/Transformations/).
 
 #### AST Simplification
 
-Source: [lib/Transformations/Simplification/](../../lib/Transformations/Simplifier/).
+Source: [lib/Transformations/Simplifier/](../../lib/Transformations/Simplifier/).
 
 #### Identifier Relabeling
 
@@ -57,4 +57,4 @@ Source: [lib/Transformations/Anf/](../../lib/Transformations/Anf/).
 
 ### LLVM IR Code Generation
 
-Source: [lib/CodeGen/Ll/](../../lib/CodeGen/).
+Source: [lib/CodeGen/](../../lib/CodeGen/).
