@@ -4,16 +4,17 @@
 {-# LANGUAGE RecursiveDo #-}
 {-# LANGUAGE TupleSections #-}
 
-module CodeGen.Llvm.Ir2LlvmIr (ppLlvmModule, genLlvmIrModule) where
+module CodeGen.Llvm.LlvmIrGen (ppLlvmModule, genLlvmIrModule) where
 
 import CodeGen.Module (Module (Module))
 import Control.Monad.State (MonadState, State, evalState, gets, modify)
 import Data.Functor.Foldable (ListF (Cons, Nil), hylo)
 import Data.Map (Map)
 import qualified Data.Map as Map
+import Data.String.Conversions (cs)
 import Data.String.Transform (toShortByteString)
+import Data.Text (Text)
 import qualified Data.Text as Txt
-import Data.Text.Lazy (Text)
 import Foreign (fromBool)
 import qualified LLVM.AST as LLVM hiding (function)
 import qualified LLVM.AST.Constant as C
@@ -35,7 +36,7 @@ genLlvmIrModule :: Module -> LLVM.Module
 genLlvmIrModule = genModule
 
 ppLlvmModule :: LLVM.Module -> Text
-ppLlvmModule = ppllvm
+ppLlvmModule = cs . ppllvm
 
 -- * Implementation
 
