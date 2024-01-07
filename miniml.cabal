@@ -2,7 +2,7 @@ cabal-version:      3.6
 name:               mini-ml
 version:            0.1.0.0
 synopsis:           MiniML compiler
-description:        MiniML compiler
+description:        MiniML is a minimal dialect of ML (Meta Language).
 homepage:           https://github.com/AzimMuradov/miniml-compiler-haskell-spbu
 bug-reports:
     https://github.com/AzimMuradov/miniml-compiler-haskell-spbu/issues
@@ -11,9 +11,8 @@ license:            MIT
 license-file:       LICENSE
 author:             Azim Muradov, Alexander Zadorozhnyy
 maintainer:         azim.muradov.dev@gmail.com, alexander.zadorozhnyy@yandex.ru
-copyright:          Copyright © 2023 Azim Muradov, Alexander Zadorozhnyy
+copyright:          Copyright (c) 2023 Azim Muradov, Alexander Zadorozhnyy
 category:           Language
-extra-source-files: README.md
 
 common shared-properties
     default-language: Haskell2010
