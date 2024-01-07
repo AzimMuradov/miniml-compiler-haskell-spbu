@@ -30,9 +30,9 @@ MiniML is a minimal dialect of ML (Meta Language).
 
 ### Examples of Usage
 
-**fibonacci.ml**
-
 ```ocaml
+(* fibonacci.ml *)
+
 let rec fib n =
   if n < 2
     then n
