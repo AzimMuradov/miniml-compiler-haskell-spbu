@@ -2,7 +2,14 @@
 
 MiniML is a minimal dialect of ML (Meta Language).
 
-**work in progress (see [supported features](#supported-features) and [implemented modules](#implemented-modules))**
+> [!NOTE]
+> Work In Progress
+>
+> See [supported features](#supported-features) and [CLI app docs](#command-line-interface-application).
+
+## Command-Line Interface Application
+
+For help: `miniml --help`
 
 ## Supported Features
 
@@ -21,15 +28,7 @@ MiniML is a minimal dialect of ML (Meta Language).
 - Currying
 - Conditionals (`if x > 15 then x * 16 else x / 23`)
 
-## Implemented Modules
-
-- Parser - [source](lib/Parser/)
-- Type Inference ([Hindley–Milner type system](https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system)) - [source](lib/TypeInference/)
-- Abstract Syntax Tree (AST) to A-Normal Form (ANF) Transformations ([The Essence of Compiling with Continuations](https://www.cs.tufts.edu/~nr/cs257/archive/cormac-flanagan/anormal.pdf), [A-Normalization: Why and How](https://matt.might.net/articles/a-normalization/)) - [source](lib/Transformations/)
-  - AST simplification - [source](lib/Transformations/AstToTypelessAst.hs)
-  - Identifier relabeling to avoid naming errors - [source](lib/Transformations/RelabelVars.hs)
-  - Conversion to ANF - [source](lib/Transformations/TypelessAstToAnf.hs)
-
 ## Developer Documentation
 
+- Implementation details - [impl](docs/dev/impl.md)
 - Development workflow - [flow](docs/dev/flow.md)
