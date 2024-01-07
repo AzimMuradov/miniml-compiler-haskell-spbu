@@ -14,7 +14,7 @@ module Utils
   )
 where
 
-import CodeGen.Llvm.Ir2LlvmIr (genLlvmIrModule, ppLlvmModule)
+import CodeGen.Llvm.LlvmIrGen (genLlvmIrModule, ppLlvmModule)
 import CodeGen.Llvm.Runner (run)
 import CodeGen.Module (Module (Module))
 import CodeGen.RunResult (RunResult (Success))
@@ -22,7 +22,6 @@ import Data.Either (isRight)
 import Data.Maybe (fromJust)
 import Data.Text (Text)
 import qualified Data.Text as Txt
-import qualified Data.Text.Lazy as TxtLazy
 import qualified Parser.Ast as Ast
 import Parser.Parser (parseProgram)
 import System.IO.Unsafe (unsafePerformIO)
@@ -64,7 +63,7 @@ processTillAnfGen :: Text -> String
 processTillAnfGen = Anf.prettyPrint . processTillAnfGen'
 
 processTillLlvmIr :: Text -> Text -> String
-processTillLlvmIr name program = TxtLazy.unpack $ ppLlvmModule $ genLlvmIrModule (Module name (processTillAnfGen' program))
+processTillLlvmIr name program = Txt.unpack $ ppLlvmModule $ genLlvmIrModule (Module name (processTillAnfGen' program))
 
 processTillLlvmRunOutput :: Text -> Text -> String
 processTillLlvmRunOutput name program =

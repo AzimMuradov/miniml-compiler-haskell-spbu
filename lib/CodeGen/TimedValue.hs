@@ -9,6 +9,7 @@ data TimedValue a = TimedValue
     time :: Nanoseconds
   }
 
+-- | Nanoseconds, son!
 newtype Nanoseconds = Nanoseconds Integer
   deriving (Show)
 
