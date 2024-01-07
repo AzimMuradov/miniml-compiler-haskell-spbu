@@ -36,7 +36,7 @@ genDecl (Lfr.GlobFunDecl ident params body) = Anf.GlobFunDecl ident params <$> g
 
 genExpr :: Lfr.Expression -> AnfGenState Anf.Expression
 genExpr (Lfr.ExprId ident) = returnAtom $ Anf.AtomId ident
-genExpr (Lfr.ExprVal val) = returnAtom $ case val of
+genExpr (Lfr.ExprPrimVal val) = returnAtom $ case val of
   Common.PrimValUnit -> Anf.AtomUnit
   Common.PrimValBool bool -> Anf.AtomBool bool
   Common.PrimValInt int -> Anf.AtomInt int

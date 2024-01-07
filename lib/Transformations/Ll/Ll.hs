@@ -12,6 +12,7 @@ import qualified Trees.Common as Common
 
 -- * AST Lambda Lifter
 
+-- | Convert AST to its lambda-free representation.
 llAst :: Ast.Program -> Lfr.Program
 llAst (Ast.Program gDecls cnt) =
   let (gDecls', Env _ cnt') = runState (mapM llGDecl gDecls) (Env [] cnt)
@@ -47,7 +48,7 @@ llGDecl = \case
 llExpr :: Ast.Expression -> LlState Lfr.Expression
 llExpr = \case
   Ast.ExprId ident -> return $ Lfr.ExprId ident
-  Ast.ExprPrimVal val -> return $ Lfr.ExprVal val
+  Ast.ExprPrimVal val -> return $ Lfr.ExprPrimVal val
   Ast.ExprBinOp op lhs rhs -> ll2 (Lfr.ExprBinOp op) lhs rhs
   Ast.ExprUnOp op x -> ll1 (Lfr.ExprUnOp op) x
   Ast.ExprApp f arg -> ll2 Lfr.ExprApp f arg
