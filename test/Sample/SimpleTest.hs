@@ -14,7 +14,7 @@ import Utils (processTillAnfGen, processTillLlvmIr, processTillLlvmRunOutput, pr
 tests :: TestTree
 tests =
   testGroup
-    "simpleTest"
+    "simple test"
     [ testParsing simpleTest,
       testTypeCheck simpleTest,
       testAstToAnf simpleTest,
@@ -25,45 +25,45 @@ tests =
 -- Test types
 
 testParsing :: TestFileProvider -> TestTree
-testParsing (title, testFileProvider) =
+testParsing testFileProvider =
   goldenVsString
-    (title <> " - parsing")
+    "parsing"
     (testFileProvider "ast")
     (pack . unpack . pShowNoColor . processTillParser <$> LBS.readFile (testFileProvider "ml"))
 
 testTypeCheck :: TestFileProvider -> TestTree
-testTypeCheck (title, testFileProvider) =
-  testCase (title <> " - type checking") $ do
+testTypeCheck testFileProvider =
+  testCase "type checking" $ do
     isOk <- processTillVerify <$> LBS.readFile (testFileProvider "ml")
     isOk @?= True
 
 testAstToAnf :: TestFileProvider -> TestTree
-testAstToAnf (title, testFileProvider) =
+testAstToAnf testFileProvider =
   goldenVsString
-    (title <> " - ANF")
+    "ANF"
     (testFileProvider "anf")
     (pack . processTillAnfGen <$> LBS.readFile (testFileProvider "ml"))
 
 testLlvm :: TestFileProvider -> TestTree
-testLlvm (title, testFileProvider) =
+testLlvm testFileProvider =
   goldenVsString
-    (title <> " - LLVM")
+    "LLVM"
     (testFileProvider "ll")
     (pack . processTillLlvmIr "simpleTest" <$> LBS.readFile (testFileProvider "ml"))
 
 testLlvmRun :: TestFileProvider -> TestTree
-testLlvmRun (title, testFileProvider) =
+testLlvmRun testFileProvider =
   goldenVsString
-    (title <> " - LLVM run")
+    "LLVM run"
     (testFileProvider "out")
     (pack . processTillLlvmRunOutput "simpleTest" <$> LBS.readFile (testFileProvider "ml"))
 
 -- Test file providers
 
-type TestFileProvider = (String, String -> FilePath)
+type TestFileProvider = String -> FilePath
 
 simpleTest :: TestFileProvider
-simpleTest = ("simple test", \ext -> testFile $ "SimpleTest." <> ext)
+simpleTest ext = testFile $ "SimpleTest." <> ext
 
 testFile :: String -> String
 testFile filename = "test/Sample/Simple/" <> filename

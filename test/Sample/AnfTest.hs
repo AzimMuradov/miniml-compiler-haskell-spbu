@@ -11,16 +11,16 @@ import Utils (processTillAnfGen)
 tests :: TestTree
 tests =
   testGroup
-    "anf"
-    [ testAstToAnf "simpleTest" simpleTest,
-      testAstToAnf "hardTest" hardTest,
-      testAstToAnf "duplicateTest" testDuplicate
+    "ANF"
+    [ testAstToAnf "simple test" simpleTest,
+      testAstToAnf "hard test" hardTest,
+      testAstToAnf "duplicate test" testDuplicate
     ]
 
 testAstToAnf :: String -> (String -> FilePath) -> TestTree
 testAstToAnf title testFileProvider =
   goldenVsString
-    (title <> " - ANF")
+    title
     (testFileProvider "anf")
     (pack . processTillAnfGen <$> LBS.readFile (testFileProvider "ml"))
 

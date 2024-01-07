@@ -15,46 +15,46 @@ tests :: TestTree
 tests =
   testGroup
     "fibonacci"
-    ( (testParsing <$> fibs)
-        <> (testTypeCheck <$> fibs)
-        <> (testAstToAnf <$> fibs)
-        <> (testLlvm <$> fibs)
-        <> (testLlvmRun <$> fibs)
-    )
+    [ testGroup "parsing" (testParsing <$> fibs),
+      testGroup "type checking" (testTypeCheck <$> fibs),
+      testGroup "ANF" (testAstToAnf <$> fibs),
+      testGroup "LLVM" (testLlvm <$> fibs),
+      testGroup "LLVM run" (testLlvmRun <$> fibs)
+    ]
 
 -- Test types
 
 testParsing :: TestFileProvider -> TestTree
 testParsing (title, testFileProvider) =
   goldenVsString
-    (title <> " - parsing")
+    title
     (testFileProvider "ast")
     (pack . unpack . pShowNoColor . processTillParser <$> LBS.readFile (testFileProvider "ml"))
 
 testTypeCheck :: TestFileProvider -> TestTree
 testTypeCheck (title, testFileProvider) =
-  testCase (title <> " - type checking") $ do
+  testCase title $ do
     isOk <- processTillVerify <$> LBS.readFile (testFileProvider "ml")
     isOk @?= True
 
 testAstToAnf :: TestFileProvider -> TestTree
 testAstToAnf (title, testFileProvider) =
   goldenVsString
-    (title <> " - ANF")
+    title
     (testFileProvider "anf")
     (pack . processTillAnfGen <$> LBS.readFile (testFileProvider "ml"))
 
 testLlvm :: TestFileProvider -> TestTree
 testLlvm (title, testFileProvider) =
   goldenVsString
-    (title <> " - LLVM")
+    title
     (testFileProvider "ll")
     (pack . processTillLlvmIr "fibonacci" <$> LBS.readFile (testFileProvider "ml"))
 
 testLlvmRun :: TestFileProvider -> TestTree
 testLlvmRun (title, testFileProvider) =
   goldenVsString
-    (title <> " - LLVM run")
+    title
     (testFileProvider "out")
     (pack . processTillLlvmRunOutput "fibonacci" <$> LBS.readFile (testFileProvider "ml"))
 
