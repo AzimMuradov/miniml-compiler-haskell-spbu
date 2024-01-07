@@ -28,6 +28,34 @@ MiniML is a minimal dialect of ML (Meta Language).
 
 ## Command-Line Interface Application
 
+### Examples of Usage
+
+**fibonacci.ml**
+
+```ocaml
+let rec fib n =
+  if n < 2
+    then n
+    else fib (n - 1) + fib (n - 2);;
+
+print_int (fib 10)
+```
+
+```bash
+$ miniml run fibonacci.ml
+55
+$ cat fibonacci.ml | miniml run
+55
+$ miniml compile fibonacci.ml
+$ ./fibonacci.out
+55
+$ miniml compile fibonacci.ml -o "fib"
+$ ./fib
+55
+```
+
+### Full Documentation
+
 ```
 -- MiniML Runner & Compiler --
 
