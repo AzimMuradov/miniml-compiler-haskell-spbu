@@ -91,6 +91,9 @@ data Type
     TFun Type Type
   deriving (Show, Eq, Ord)
 
+-- | Arity of a function.
+type Arity = Int
+
 -- ** Values
 
 -- | Primitive value.
