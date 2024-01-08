@@ -8,7 +8,6 @@ module CodeGen.Llvm.LlvmIrGen (ppLlvmModule, genLlvmIrModule) where
 
 import CodeGen.Module (Module (Module))
 import Control.Monad.State (MonadState, State, evalState, gets, modify)
-import Data.Functor.Foldable (ListF (Cons, Nil), hylo)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.String.Conversions (cs)
@@ -47,15 +46,13 @@ type Llvm = LLVM.ModuleBuilderT (State Env)
 data Env = Env
   { locVars :: Map Identifier' LLVM.Operand,
     globVars :: Map Identifier' LLVM.Operand,
-    funs :: Map Identifier' (LLVM.Operand, ParamsCnt)
+    funs :: Map Identifier' (LLVM.Operand, Arity)
   }
-
-type ParamsCnt = Int
 
 genModule :: Module -> LLVM.Module
 genModule (Module name (Program decls)) = flip evalState (Env Map.empty Map.empty Map.empty) $
   LLVM.buildModuleT (toShortByteString name) $ do
-    mapM_ regStdLibDecl StdLib.allTypedDecls
+    mapM_ genStdLibDecl StdLib.allDeclsWithArity
     mapM_ genGlobDecl decls
 
     -- In the `main` we define our global variables.
@@ -70,6 +67,19 @@ genModule (Module name (Program decls)) = flip evalState (Env Map.empty Map.empt
         value' <- genExpr value
         store' operand value'
       _ -> return ()
+
+genStdLibDecl :: StdLib.DeclarationWithArity -> Llvm ()
+genStdLibDecl decl = declareAsExtern decl >>= register decl
+  where
+    declareAsExtern :: StdLib.DeclarationWithArity -> Llvm LLVM.Operand
+    declareAsExtern (ident, arity) =
+      LLVM.extern
+        (LLVM.mkName $ Txt.unpack ident)
+        (replicate arity LLVM.i64)
+        LLVM.i64
+
+    register :: StdLib.DeclarationWithArity -> LLVM.Operand -> Llvm ()
+    register (ident, arity) fun = regFun (Txt ident) fun arity
 
 genGlobDecl :: GlobalDeclaration -> Llvm ()
 genGlobDecl = \case
@@ -174,10 +184,10 @@ findAny ident = do
     Nothing -> do
       maybeFun <- gets ((Map.!? ident) . funs)
       case maybeFun of
-        Just (fun, pCnt) -> do
+        Just (fun, arity) -> do
           funToPafF <- findFun (Txt "miniml_fun_to_paf")
-          casted <- LLVM.ptrtoint fun LLVM.i64
-          LLVM.call funToPafF [(casted, []), (LLVM.int64 (toInteger pCnt), [])]
+          fun' <- LLVM.ptrtoint fun LLVM.i64
+          LLVM.call funToPafF [(fun', []), (LLVM.int64 (toInteger arity), [])]
         Nothing -> load' =<< findGlobVar ident
 
 findGlobVar :: MonadState Env m => Identifier' -> m LLVM.Operand
@@ -194,35 +204,9 @@ regGlobVar :: MonadState Env m => Identifier' -> LLVM.Operand -> m ()
 regGlobVar ident gVar = modify $
   \env -> env {globVars = Map.insert ident gVar (globVars env)}
 
-regFun :: MonadState Env m => Identifier' -> LLVM.Operand -> ParamsCnt -> m ()
+regFun :: MonadState Env m => Identifier' -> LLVM.Operand -> Arity -> m ()
 regFun ident fun paramsCnt = modify $
   \env -> env {funs = Map.insert ident (fun, paramsCnt) (funs env)}
-
--- StdLib utils
-
-regStdLibDecl :: StdLib.TypedDeclaration -> Llvm ()
-regStdLibDecl decl = register decl =<< declareAsExtern decl
-  where
-    declareAsExtern :: StdLib.TypedDeclaration -> Llvm LLVM.Operand
-    declareAsExtern (ident, t) =
-      LLVM.extern
-        (LLVM.mkName $ Txt.unpack ident)
-        (replicate (paramsTypesCount t) LLVM.i64)
-        LLVM.i64
-
-    register :: StdLib.TypedDeclaration -> LLVM.Operand -> Llvm ()
-    register (ident, t) fun = regFun (Txt ident) fun (paramsTypesCount t)
-
-    paramsTypesCount :: Type -> Int
-    paramsTypesCount = hylo paramsTypesCount'' paramsTypesCount'
-
-    paramsTypesCount' :: Type -> ListF Type Type
-    paramsTypesCount' (TFun pT retT) = Cons pT retT
-    paramsTypesCount' _ = Nil
-
-    paramsTypesCount'' :: ListF Type Int -> Int
-    paramsTypesCount'' (Cons _ n) = n + 1
-    paramsTypesCount'' Nil = 0
 
 -- Allocation utils
 
