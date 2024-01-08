@@ -1,9 +1,8 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Sample.AnfTest (tests) where
 
 import Data.ByteString.Lazy.Char8 (pack)
 import qualified Data.Text.IO as LBS
+import Sample.Utils (TestFileProvider)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.Golden (goldenVsString)
 import Utils (processTillAnfGen)
@@ -17,21 +16,21 @@ tests =
       testAstToAnf "duplicate test" testDuplicate
     ]
 
-testAstToAnf :: String -> (String -> FilePath) -> TestTree
+testAstToAnf :: String -> TestFileProvider -> TestTree
 testAstToAnf title testFileProvider =
   goldenVsString
     title
     (testFileProvider "anf")
     (pack . processTillAnfGen <$> LBS.readFile (testFileProvider "ml"))
 
-testFile :: String -> String
-testFile filename = "test/Sample/Anf/" <> filename
-
-simpleTest :: String -> String
+simpleTest :: TestFileProvider
 simpleTest ext = testFile $ "SimpleTest." <> ext
 
-hardTest :: String -> String
+hardTest :: TestFileProvider
 hardTest ext = testFile $ "HardTest." <> ext
 
-testDuplicate :: String -> String
+testDuplicate :: TestFileProvider
 testDuplicate ext = testFile $ "DuplicateDeclaration." <> ext
+
+testFile :: TestFileProvider
+testFile filename = "test/Sample/Anf/" <> filename
