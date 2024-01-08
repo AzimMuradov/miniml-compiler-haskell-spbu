@@ -1,5 +1,4 @@
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE TupleSections #-}
 
 module Transformations.Anf.AnfGen (genAnf) where
 
@@ -36,7 +35,7 @@ genDecl (Lfr.GlobFunDecl ident params body) = Anf.GlobFunDecl ident params <$> g
 
 genExpr :: Lfr.Expression -> AnfGenState Anf.Expression
 genExpr (Lfr.ExprId ident) = returnAtom $ Anf.AtomId ident
-genExpr (Lfr.ExprVal val) = returnAtom $ case val of
+genExpr (Lfr.ExprPrimVal val) = returnAtom $ case val of
   Common.PrimValUnit -> Anf.AtomUnit
   Common.PrimValBool bool -> Anf.AtomBool bool
   Common.PrimValInt int -> Anf.AtomInt int
@@ -56,10 +55,10 @@ genExpr (Lfr.ExprIte c t e) = evalContT $ do
   t' <- lift $ genExpr t
   e' <- lift $ genExpr e
   returnComplex $ Anf.CompIte c' t' e'
-genExpr (Lfr.ExprLetIn (Lfr.VarDecl ident value) expr) = do
-  varDecl' <- (ident,) <$> genExpr value
+genExpr (Lfr.ExprLetIn (Lfr.VarDecl ident val) expr) = do
+  val' <- genExpr val
   expr' <- genExpr expr
-  return $ Anf.ExprLetIn varDecl' expr'
+  return $ Anf.ExprLetIn (ident, val') expr'
 
 returnAtom :: MonadState Env m => Anf.AtomicExpression -> m Anf.Expression
 returnAtom = return . Anf.ExprAtom

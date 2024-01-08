@@ -1,3 +1,6 @@
+-- |
+-- Module      : Lfr
+-- Description : Lambda Free Representation.
 module Transformations.Ll.Lfr where
 
 import Trees.Common
@@ -15,7 +18,7 @@ data VarDeclaration = VarDecl Identifier' Expression
 
 data Expression
   = ExprId Identifier'
-  | ExprVal PrimitiveValue
+  | ExprPrimVal PrimitiveValue
   | ExprBinOp BinaryOperator Expression Expression
   | ExprUnOp UnaryOperator Expression
   | ExprApp Expression Expression
