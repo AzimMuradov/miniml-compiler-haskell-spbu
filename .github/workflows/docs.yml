@@ -44,6 +44,7 @@ jobs:
           --enable-documentation
           --haddock-html-location='https://hackage.haskell.org/package/$pkg-$version/docs'
           --haddock-hyperlink-source
+          --haddock-options=--quickjump
       - name: Deploy docs
         uses: peaceiris/actions-gh-pages@v3
         with:
