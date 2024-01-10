@@ -27,17 +27,14 @@ jobs:
         with:
           ghc-version: ${{ matrix.ghc }}
           cabal-version: ${{ matrix.cabal }}
-      - name: Cache Haddock
+      - name: Cache Cabal
         uses: actions/cache@v3
         env:
-          cache-name: cache-haddock
+          cache-name: cache-cabal
         with:
           path: ~/.cabal
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+          key: ${{ runner.os }}-docs-${{ env.cache-name }}-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project') }}
+          restore-keys: ${{ runner.os }}-docs-${{ env.cache-name }}-
       - name: Install LLVM
         run: sudo apt install -y llvm-9 llvm-9-dev
       - name: Build docs
@@ -45,9 +42,6 @@ jobs:
       - name: Deploy docs
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ env.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: docs
           publish_dir: ./dist-newstyle/build/x86_64-linux/ghc-${{ matrix.ghc }}/mini-ml-0.1.0.0/doc/html/mini-ml
-
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

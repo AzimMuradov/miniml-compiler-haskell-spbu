@@ -33,10 +33,7 @@ jobs:
         with:
           path: ~/.cabal
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+          restore-keys: ${{ runner.os }}-build-${{ env.cache-name }}-
       - name: Set up HLint
         uses: haskell-actions/hlint-setup@v2
       - name: Run HLint
@@ -54,6 +51,3 @@ jobs:
         run: cabal build
       - name: Run tests
         run: cabal test --test-show-details=direct --test-options "--color=always"
-
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
