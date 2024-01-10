@@ -1,4 +1,4 @@
-name: build
+name: docs
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  docs:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
