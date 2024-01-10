@@ -1,0 +1,51 @@
+name: build
+
+on:
+  push:
+    branches: ["master"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04]
+        ghc: ["8.10.7"]
+        cabal: ["3.6"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Haskell
+        uses: haskell-actions/setup@v2
+        with:
+          ghc-version: ${{ matrix.ghc }}
+          cabal-version: ${{ matrix.cabal }}
+      - name: Cache Haddock
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-haddock
+        with:
+          path: ~/.cabal
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Install LLVM
+        run: sudo apt install -y llvm-9 llvm-9-dev
+      - name: Build docs
+        run: cabal haddock --haddock-options="--ignore-all-exports" --haddock-html-location='https://hackage.haskell.org/package/$pkg-$version/docs' --haddock-hyperlink-source --enable-documentation
+      - name: Deploy docs
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: docs
+          publish_dir: ./dist-newstyle/build/x86_64-linux/ghc-${{ matrix.ghc }}/mini-ml-0.1.0.0/doc/html/mini-ml
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
