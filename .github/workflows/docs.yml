@@ -45,7 +45,7 @@ jobs:
       - name: Deploy docs
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ env.GITHUB_TOKEN }}
           publish_branch: docs
           publish_dir: ./dist-newstyle/build/x86_64-linux/ghc-${{ matrix.ghc }}/mini-ml-0.1.0.0/doc/html/mini-ml
 
