@@ -50,4 +50,7 @@ jobs:
       - name: Build project
         run: cabal build
       - name: Run tests
-        run: cabal test --test-show-details=direct --test-options "--color=always"
+        run: >
+           cabal test
+           --test-show-details=direct
+           --test-options "--color=always"
