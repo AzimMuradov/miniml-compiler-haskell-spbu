@@ -1,0 +1,1009 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DeriveAnyClass #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE DeriveTraversable #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE FlexibleInstances #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE GADTs #-}</span><span>
+</span><span id="line-7"></span><span class="hs-pragma">{-# LANGUAGE LambdaCase #-}</span><span>
+</span><span id="line-8"></span><span class="hs-pragma">{-# LANGUAGE MultiParamTypeClasses #-}</span><span>
+</span><span id="line-9"></span><span class="hs-pragma">{-# LANGUAGE PatternSynonyms #-}</span><span>
+</span><span id="line-10"></span><span class="hs-pragma">{-# LANGUAGE StandaloneDeriving #-}</span><span>
+</span><span id="line-11"></span><span class="hs-pragma">{-# OPTIONS_GHC -Wno-orphans #-}</span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">TypeChecker.HindleyMilner</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.Except</span></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.Reader</span></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Unification</span></span><span> </span><span class="hs-keyword">hiding</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">applyBindings</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-operator">(=:=)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Control.Unification</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">U</span></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Unification.IntVar</span></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Foldable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">fold</span></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Functor.Fixedpoint</span></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Functor.Identity</span></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Map</span></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">M</span></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Set</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-operator">(\\)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">S</span></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">pack</span></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic1</span></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Trees.Common.html"><span class="hs-identifier">Trees.Common</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier">Identifier</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier">Type</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Prelude</span></span><span> </span><span class="hs-keyword">hiding</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">lookup</span></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span>
+</span><span id="line-33"></span><span id="local-6989586621679211372"><span id="local-6989586621679211373"></span></span><span class="hs-keyword">data</span><span> </span><span id="HType"><span class="annot"><a href="TypeChecker.HindleyMilner.html#HType"><span class="hs-identifier hs-var">HType</span></a></span></span><span> </span><span id="local-6989586621679211371"><span class="annot"><a href="#local-6989586621679211371"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="TyVarF"><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyVarF"><span class="hs-identifier hs-var">TyVarF</span></a></span></span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TyUnitF"><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyUnitF"><span class="hs-identifier hs-var">TyUnitF</span></a></span></span><span>
+</span><span id="line-36"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TyBoolF"><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyBoolF"><span class="hs-identifier hs-var">TyBoolF</span></a></span></span><span>
+</span><span id="line-37"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TyIntF"><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyIntF"><span class="hs-identifier hs-var">TyIntF</span></a></span></span><span>
+</span><span id="line-38"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TyFunF"><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyFunF"><span class="hs-identifier hs-var">TyFunF</span></a></span></span><span> </span><span class="annot"><a href="#local-6989586621679211371"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679211371"><span class="hs-identifier hs-type">a</span></a></span><span>
+</span><span id="line-39"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679211360"><span id="local-6989586621679211362"><span id="local-6989586621679211364"><span class="annot"><span class="annottext">Int -&gt; HType a -&gt; ShowS
+[HType a] -&gt; ShowS
+HType a -&gt; String
+(Int -&gt; HType a -&gt; ShowS)
+-&gt; (HType a -&gt; String) -&gt; ([HType a] -&gt; ShowS) -&gt; Show (HType a)
+forall a. Show a =&gt; Int -&gt; HType a -&gt; ShowS
+forall a. Show a =&gt; [HType a] -&gt; ShowS
+forall a. Show a =&gt; HType a -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [HType a] -&gt; ShowS
+$cshowList :: forall a. Show a =&gt; [HType a] -&gt; ShowS
+show :: HType a -&gt; String
+$cshow :: forall a. Show a =&gt; HType a -&gt; String
+showsPrec :: Int -&gt; HType a -&gt; ShowS
+$cshowsPrec :: forall a. Show a =&gt; Int -&gt; HType a -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679211355"><span id="local-6989586621679211357"><span class="annot"><span class="annottext">HType a -&gt; HType a -&gt; Bool
+(HType a -&gt; HType a -&gt; Bool)
+-&gt; (HType a -&gt; HType a -&gt; Bool) -&gt; Eq (HType a)
+forall a. Eq a =&gt; HType a -&gt; HType a -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: HType a -&gt; HType a -&gt; Bool
+$c/= :: forall a. Eq a =&gt; HType a -&gt; HType a -&gt; Bool
+== :: HType a -&gt; HType a -&gt; Bool
+$c== :: forall a. Eq a =&gt; HType a -&gt; HType a -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679211350"><span id="local-6989586621679211352"><span class="annot"><span class="annottext">a -&gt; HType b -&gt; HType a
+(a -&gt; b) -&gt; HType a -&gt; HType b
+(forall a b. (a -&gt; b) -&gt; HType a -&gt; HType b)
+-&gt; (forall a b. a -&gt; HType b -&gt; HType a) -&gt; Functor HType
+forall a b. a -&gt; HType b -&gt; HType a
+forall a b. (a -&gt; b) -&gt; HType a -&gt; HType b
+forall (f :: * -&gt; *).
+(forall a b. (a -&gt; b) -&gt; f a -&gt; f b)
+-&gt; (forall a b. a -&gt; f b -&gt; f a) -&gt; Functor f
+&lt;$ :: a -&gt; HType b -&gt; HType a
+$c&lt;$ :: forall a b. a -&gt; HType b -&gt; HType a
+fmap :: (a -&gt; b) -&gt; HType a -&gt; HType b
+$cfmap :: forall a b. (a -&gt; b) -&gt; HType a -&gt; HType b
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Functor</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679211315"><span id="local-6989586621679211317"><span id="local-6989586621679211319"><span id="local-6989586621679211321"><span id="local-6989586621679211323"><span id="local-6989586621679211325"><span id="local-6989586621679211327"><span id="local-6989586621679211329"><span id="local-6989586621679211331"><span id="local-6989586621679211333"><span id="local-6989586621679211335"><span id="local-6989586621679211337"><span id="local-6989586621679211339"><span id="local-6989586621679211341"><span id="local-6989586621679211343"><span id="local-6989586621679211345"><span id="local-6989586621679211347"><span class="annot"><span class="annottext">HType a -&gt; Bool
+(a -&gt; m) -&gt; HType a -&gt; m
+(a -&gt; b -&gt; b) -&gt; b -&gt; HType a -&gt; b
+(forall m. Monoid m =&gt; HType m -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; HType a -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; HType a -&gt; m)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; HType a -&gt; b)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; HType a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; HType a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; HType a -&gt; b)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; HType a -&gt; a)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; HType a -&gt; a)
+-&gt; (forall a. HType a -&gt; [a])
+-&gt; (forall a. HType a -&gt; Bool)
+-&gt; (forall a. HType a -&gt; Int)
+-&gt; (forall a. Eq a =&gt; a -&gt; HType a -&gt; Bool)
+-&gt; (forall a. Ord a =&gt; HType a -&gt; a)
+-&gt; (forall a. Ord a =&gt; HType a -&gt; a)
+-&gt; (forall a. Num a =&gt; HType a -&gt; a)
+-&gt; (forall a. Num a =&gt; HType a -&gt; a)
+-&gt; Foldable HType
+forall a. Eq a =&gt; a -&gt; HType a -&gt; Bool
+forall a. Num a =&gt; HType a -&gt; a
+forall a. Ord a =&gt; HType a -&gt; a
+forall m. Monoid m =&gt; HType m -&gt; m
+forall a. HType a -&gt; Bool
+forall a. HType a -&gt; Int
+forall a. HType a -&gt; [a]
+forall a. (a -&gt; a -&gt; a) -&gt; HType a -&gt; a
+forall m a. Monoid m =&gt; (a -&gt; m) -&gt; HType a -&gt; m
+forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; HType a -&gt; b
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; HType a -&gt; b
+forall (t :: * -&gt; *).
+(forall m. Monoid m =&gt; t m -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; t a -&gt; m)
+-&gt; (forall m a. Monoid m =&gt; (a -&gt; m) -&gt; t a -&gt; m)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; t a -&gt; a)
+-&gt; (forall a. (a -&gt; a -&gt; a) -&gt; t a -&gt; a)
+-&gt; (forall a. t a -&gt; [a])
+-&gt; (forall a. t a -&gt; Bool)
+-&gt; (forall a. t a -&gt; Int)
+-&gt; (forall a. Eq a =&gt; a -&gt; t a -&gt; Bool)
+-&gt; (forall a. Ord a =&gt; t a -&gt; a)
+-&gt; (forall a. Ord a =&gt; t a -&gt; a)
+-&gt; (forall a. Num a =&gt; t a -&gt; a)
+-&gt; (forall a. Num a =&gt; t a -&gt; a)
+-&gt; Foldable t
+product :: HType a -&gt; a
+$cproduct :: forall a. Num a =&gt; HType a -&gt; a
+sum :: HType a -&gt; a
+$csum :: forall a. Num a =&gt; HType a -&gt; a
+minimum :: HType a -&gt; a
+$cminimum :: forall a. Ord a =&gt; HType a -&gt; a
+maximum :: HType a -&gt; a
+$cmaximum :: forall a. Ord a =&gt; HType a -&gt; a
+elem :: a -&gt; HType a -&gt; Bool
+$celem :: forall a. Eq a =&gt; a -&gt; HType a -&gt; Bool
+length :: HType a -&gt; Int
+$clength :: forall a. HType a -&gt; Int
+null :: HType a -&gt; Bool
+$cnull :: forall a. HType a -&gt; Bool
+toList :: HType a -&gt; [a]
+$ctoList :: forall a. HType a -&gt; [a]
+foldl1 :: (a -&gt; a -&gt; a) -&gt; HType a -&gt; a
+$cfoldl1 :: forall a. (a -&gt; a -&gt; a) -&gt; HType a -&gt; a
+foldr1 :: (a -&gt; a -&gt; a) -&gt; HType a -&gt; a
+$cfoldr1 :: forall a. (a -&gt; a -&gt; a) -&gt; HType a -&gt; a
+foldl' :: (b -&gt; a -&gt; b) -&gt; b -&gt; HType a -&gt; b
+$cfoldl' :: forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; HType a -&gt; b
+foldl :: (b -&gt; a -&gt; b) -&gt; b -&gt; HType a -&gt; b
+$cfoldl :: forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; HType a -&gt; b
+foldr' :: (a -&gt; b -&gt; b) -&gt; b -&gt; HType a -&gt; b
+$cfoldr' :: forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; HType a -&gt; b
+foldr :: (a -&gt; b -&gt; b) -&gt; b -&gt; HType a -&gt; b
+$cfoldr :: forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; HType a -&gt; b
+foldMap' :: (a -&gt; m) -&gt; HType a -&gt; m
+$cfoldMap' :: forall m a. Monoid m =&gt; (a -&gt; m) -&gt; HType a -&gt; m
+foldMap :: (a -&gt; m) -&gt; HType a -&gt; m
+$cfoldMap :: forall m a. Monoid m =&gt; (a -&gt; m) -&gt; HType a -&gt; m
+fold :: HType m -&gt; m
+$cfold :: forall m. Monoid m =&gt; HType m -&gt; m
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Foldable</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679211304"><span id="local-6989586621679211306"><span id="local-6989586621679211308"><span id="local-6989586621679211310"><span class="annot"><span class="annottext">Functor HType
+Foldable HType
+Functor HType
+-&gt; Foldable HType
+-&gt; (forall (f :: * -&gt; *) a b.
+    Applicative f =&gt;
+    (a -&gt; f b) -&gt; HType a -&gt; f (HType b))
+-&gt; (forall (f :: * -&gt; *) a.
+    Applicative f =&gt;
+    HType (f a) -&gt; f (HType a))
+-&gt; (forall (m :: * -&gt; *) a b.
+    Monad m =&gt;
+    (a -&gt; m b) -&gt; HType a -&gt; m (HType b))
+-&gt; (forall (m :: * -&gt; *) a. Monad m =&gt; HType (m a) -&gt; m (HType a))
+-&gt; Traversable HType
+(a -&gt; f b) -&gt; HType a -&gt; f (HType b)
+forall (t :: * -&gt; *).
+Functor t
+-&gt; Foldable t
+-&gt; (forall (f :: * -&gt; *) a b.
+    Applicative f =&gt;
+    (a -&gt; f b) -&gt; t a -&gt; f (t b))
+-&gt; (forall (f :: * -&gt; *) a. Applicative f =&gt; t (f a) -&gt; f (t a))
+-&gt; (forall (m :: * -&gt; *) a b.
+    Monad m =&gt;
+    (a -&gt; m b) -&gt; t a -&gt; m (t b))
+-&gt; (forall (m :: * -&gt; *) a. Monad m =&gt; t (m a) -&gt; m (t a))
+-&gt; Traversable t
+forall (m :: * -&gt; *) a. Monad m =&gt; HType (m a) -&gt; m (HType a)
+forall (f :: * -&gt; *) a. Applicative f =&gt; HType (f a) -&gt; f (HType a)
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+(a -&gt; m b) -&gt; HType a -&gt; m (HType b)
+forall (f :: * -&gt; *) a b.
+Applicative f =&gt;
+(a -&gt; f b) -&gt; HType a -&gt; f (HType b)
+sequence :: HType (m a) -&gt; m (HType a)
+$csequence :: forall (m :: * -&gt; *) a. Monad m =&gt; HType (m a) -&gt; m (HType a)
+mapM :: (a -&gt; m b) -&gt; HType a -&gt; m (HType b)
+$cmapM :: forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+(a -&gt; m b) -&gt; HType a -&gt; m (HType b)
+sequenceA :: HType (f a) -&gt; f (HType a)
+$csequenceA :: forall (f :: * -&gt; *) a. Applicative f =&gt; HType (f a) -&gt; f (HType a)
+traverse :: (a -&gt; f b) -&gt; HType a -&gt; f (HType b)
+$ctraverse :: forall (f :: * -&gt; *) a b.
+Applicative f =&gt;
+(a -&gt; f b) -&gt; HType a -&gt; f (HType b)
+$cp2Traversable :: Foldable HType
+$cp1Traversable :: Functor HType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Traversable</span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall a. HType a -&gt; Rep1 HType a)
+-&gt; (forall a. Rep1 HType a -&gt; HType a) -&gt; Generic1 HType
+forall a. Rep1 HType a -&gt; HType a
+forall a. HType a -&gt; Rep1 HType a
+forall k (f :: k -&gt; *).
+(forall (a :: k). f a -&gt; Rep1 f a)
+-&gt; (forall (a :: k). Rep1 f a -&gt; f a) -&gt; Generic1 f
+$cto1 :: forall a. Rep1 HType a -&gt; HType a
+$cfrom1 :: forall a. HType a -&gt; Rep1 HType a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic1</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679211297"><span class="annot"><span class="annottext">Traversable HType
+Traversable HType
+-&gt; (forall a.
+    HType a -&gt; HType a -&gt; Maybe (HType (Either a (a, a))))
+-&gt; Unifiable HType
+forall a. HType a -&gt; HType a -&gt; Maybe (HType (Either a (a, a)))
+forall (t :: * -&gt; *).
+Traversable t
+-&gt; (forall a. t a -&gt; t a -&gt; Maybe (t (Either a (a, a))))
+-&gt; Unifiable t
+zipMatch :: HType a -&gt; HType a -&gt; Maybe (HType (Either a (a, a)))
+$czipMatch :: forall a. HType a -&gt; HType a -&gt; Maybe (HType (Either a (a, a)))
+$cp1Unifiable :: Traversable HType
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var">Unifiable</span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span class="hs-keyword">type</span><span> </span><span id="TypeF"><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeF"><span class="hs-identifier hs-var">TypeF</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Fix</span></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#HType"><span class="hs-identifier hs-type">HType</span></a></span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span class="hs-keyword">type</span><span> </span><span id="UType"><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-var">UType</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">UTerm</span></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#HType"><span class="hs-identifier hs-type">HType</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IntVar</span></span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="hs-keyword">data</span><span> </span><span id="Poly"><span class="annot"><a href="TypeChecker.HindleyMilner.html#Poly"><span class="hs-identifier hs-var">Poly</span></a></span></span><span> </span><span id="local-6989586621679211387"><span class="annot"><a href="#local-6989586621679211387"><span class="hs-identifier hs-type">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Forall"><span class="annot"><a href="TypeChecker.HindleyMilner.html#Forall"><span class="hs-identifier hs-var">Forall</span></a></span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span class="hs-special">]</span><span> </span><span class="annot"><a href="#local-6989586621679211387"><span class="hs-identifier hs-type">t</span></a></span><span>
+</span><span id="line-46"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679211291"><span id="local-6989586621679211293"><span class="annot"><span class="annottext">Poly t -&gt; Poly t -&gt; Bool
+(Poly t -&gt; Poly t -&gt; Bool)
+-&gt; (Poly t -&gt; Poly t -&gt; Bool) -&gt; Eq (Poly t)
+forall t. Eq t =&gt; Poly t -&gt; Poly t -&gt; Bool
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Poly t -&gt; Poly t -&gt; Bool
+$c/= :: forall t. Eq t =&gt; Poly t -&gt; Poly t -&gt; Bool
+== :: Poly t -&gt; Poly t -&gt; Bool
+$c== :: forall t. Eq t =&gt; Poly t -&gt; Poly t -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679211285"><span id="local-6989586621679211287"><span id="local-6989586621679211289"><span class="annot"><span class="annottext">Int -&gt; Poly t -&gt; ShowS
+[Poly t] -&gt; ShowS
+Poly t -&gt; String
+(Int -&gt; Poly t -&gt; ShowS)
+-&gt; (Poly t -&gt; String) -&gt; ([Poly t] -&gt; ShowS) -&gt; Show (Poly t)
+forall t. Show t =&gt; Int -&gt; Poly t -&gt; ShowS
+forall t. Show t =&gt; [Poly t] -&gt; ShowS
+forall t. Show t =&gt; Poly t -&gt; String
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Poly t] -&gt; ShowS
+$cshowList :: forall t. Show t =&gt; [Poly t] -&gt; ShowS
+show :: Poly t -&gt; String
+$cshow :: forall t. Show t =&gt; Poly t -&gt; String
+showsPrec :: Int -&gt; Poly t -&gt; ShowS
+$cshowsPrec :: forall t. Show t =&gt; Int -&gt; Poly t -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679211281"><span id="local-6989586621679211283"><span class="annot"><span class="annottext">a -&gt; Poly b -&gt; Poly a
+(a -&gt; b) -&gt; Poly a -&gt; Poly b
+(forall a b. (a -&gt; b) -&gt; Poly a -&gt; Poly b)
+-&gt; (forall a b. a -&gt; Poly b -&gt; Poly a) -&gt; Functor Poly
+forall a b. a -&gt; Poly b -&gt; Poly a
+forall a b. (a -&gt; b) -&gt; Poly a -&gt; Poly b
+forall (f :: * -&gt; *).
+(forall a b. (a -&gt; b) -&gt; f a -&gt; f b)
+-&gt; (forall a b. a -&gt; f b -&gt; f a) -&gt; Functor f
+&lt;$ :: a -&gt; Poly b -&gt; Poly a
+$c&lt;$ :: forall a b. a -&gt; Poly b -&gt; Poly a
+fmap :: (a -&gt; b) -&gt; Poly a -&gt; Poly b
+$cfmap :: forall a b. (a -&gt; b) -&gt; Poly a -&gt; Poly b
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Functor</span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="hs-keyword">type</span><span> </span><span id="Polytype"><span class="annot"><a href="TypeChecker.HindleyMilner.html#Polytype"><span class="hs-identifier hs-var">Polytype</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Poly"><span class="hs-identifier hs-type">Poly</span></a></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeF"><span class="hs-identifier hs-type">TypeF</span></a></span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span class="hs-keyword">type</span><span> </span><span id="UPolytype"><span class="annot"><a href="TypeChecker.HindleyMilner.html#UPolytype"><span class="hs-identifier hs-var">UPolytype</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Poly"><span class="hs-identifier hs-type">Poly</span></a></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span class="hs-comment">-- TypeF</span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyVar"><span class="hs-identifier hs-type">TyVar</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeF"><span class="hs-identifier hs-type">TypeF</span></a></span><span>
+</span><span id="line-55"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bTyVar"><span id="%24mTyVar"><span id="TyVar"><span class="annot"><span class="annottext">$bTyVar :: Identifier -&gt; TypeF
+$mTyVar :: forall r. TypeF -&gt; (Identifier -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="TypeChecker.HindleyMilner.html#%24bTyVar"><span class="hs-identifier hs-var hs-var hs-var">TyVar</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679211277"><span class="hs-identifier hs-type">v</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Fix</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyVarF"><span class="hs-identifier hs-type">TyVarF</span></a></span><span> </span><span id="local-6989586621679211277"><span class="annot"><a href="#local-6989586621679211277"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-special">)</span><span>
+</span><span id="line-56"></span><span>
+</span><span id="line-57"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyUnit"><span class="hs-identifier hs-type">TyUnit</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeF"><span class="hs-identifier hs-type">TypeF</span></a></span><span>
+</span><span id="line-58"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bTyUnit"><span id="%24mTyUnit"><span id="TyUnit"><span class="annot"><span class="annottext">$bTyUnit :: TypeF
+$mTyUnit :: forall r. TypeF -&gt; (Void# -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="TypeChecker.HindleyMilner.html#%24bTyUnit"><span class="hs-identifier hs-var hs-var hs-var">TyUnit</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Fix</span></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyUnitF"><span class="hs-identifier hs-type">TyUnitF</span></a></span><span>
+</span><span id="line-59"></span><span>
+</span><span id="line-60"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyBool"><span class="hs-identifier hs-type">TyBool</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeF"><span class="hs-identifier hs-type">TypeF</span></a></span><span>
+</span><span id="line-61"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bTyBool"><span id="%24mTyBool"><span id="TyBool"><span class="annot"><span class="annottext">$bTyBool :: TypeF
+$mTyBool :: forall r. TypeF -&gt; (Void# -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="TypeChecker.HindleyMilner.html#%24bTyBool"><span class="hs-identifier hs-var hs-var hs-var">TyBool</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Fix</span></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyBoolF"><span class="hs-identifier hs-type">TyBoolF</span></a></span><span>
+</span><span id="line-62"></span><span>
+</span><span id="line-63"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyInt"><span class="hs-identifier hs-type">TyInt</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeF"><span class="hs-identifier hs-type">TypeF</span></a></span><span>
+</span><span id="line-64"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bTyInt"><span id="%24mTyInt"><span id="TyInt"><span class="annot"><span class="annottext">$bTyInt :: TypeF
+$mTyInt :: forall r. TypeF -&gt; (Void# -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="TypeChecker.HindleyMilner.html#%24bTyInt"><span class="hs-identifier hs-var hs-var hs-var">TyInt</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Fix</span></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyIntF"><span class="hs-identifier hs-type">TyIntF</span></a></span><span>
+</span><span id="line-65"></span><span>
+</span><span id="line-66"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyFun"><span class="hs-identifier hs-type">TyFun</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeF"><span class="hs-identifier hs-type">TypeF</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeF"><span class="hs-identifier hs-type">TypeF</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeF"><span class="hs-identifier hs-type">TypeF</span></a></span><span>
+</span><span id="line-67"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bTyFun"><span id="%24mTyFun"><span id="TyFun"><span class="annot"><span class="annottext">$bTyFun :: TypeF -&gt; TypeF -&gt; TypeF
+$mTyFun :: forall r. TypeF -&gt; (TypeF -&gt; TypeF -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="TypeChecker.HindleyMilner.html#%24bTyFun"><span class="hs-identifier hs-var hs-var hs-var">TyFun</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679211263"><span class="hs-identifier hs-type">t1</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679211262"><span class="hs-identifier hs-type">t2</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Fix</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyFunF"><span class="hs-identifier hs-type">TyFunF</span></a></span><span> </span><span id="local-6989586621679211263"><span class="annot"><a href="#local-6989586621679211263"><span class="hs-identifier hs-var">t1</span></a></span></span><span> </span><span id="local-6989586621679211262"><span class="annot"><a href="#local-6989586621679211262"><span class="hs-identifier hs-var">t2</span></a></span></span><span class="hs-special">)</span><span>
+</span><span id="line-68"></span><span>
+</span><span id="line-69"></span><span class="hs-comment">-- UType</span><span>
+</span><span id="line-70"></span><span>
+</span><span id="line-71"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UTyVar"><span class="hs-identifier hs-type">UTyVar</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span>
+</span><span id="line-72"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bUTyVar"><span id="%24mUTyVar"><span id="UTyVar"><span class="annot"><span class="annottext">$bUTyVar :: Identifier -&gt; UType
+$mUTyVar :: forall r. UType -&gt; (Identifier -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="TypeChecker.HindleyMilner.html#%24bUTyVar"><span class="hs-identifier hs-var hs-var hs-var">UTyVar</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679211258"><span class="hs-identifier hs-type">v</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">UTerm</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyVarF"><span class="hs-identifier hs-type">TyVarF</span></a></span><span> </span><span id="local-6989586621679211258"><span class="annot"><a href="#local-6989586621679211258"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span>
+</span><span id="line-74"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UTyUnit"><span class="hs-identifier hs-type">UTyUnit</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span>
+</span><span id="line-75"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bUTyUnit"><span id="%24mUTyUnit"><span id="UTyUnit"><span class="annot"><span class="annottext">$bUTyUnit :: UType
+$mUTyUnit :: forall r. UType -&gt; (Void# -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="TypeChecker.HindleyMilner.html#%24bUTyUnit"><span class="hs-identifier hs-var hs-var hs-var">UTyUnit</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">UTerm</span></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyUnitF"><span class="hs-identifier hs-type">TyUnitF</span></a></span><span>
+</span><span id="line-76"></span><span>
+</span><span id="line-77"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UTyBool"><span class="hs-identifier hs-type">UTyBool</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span>
+</span><span id="line-78"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bUTyBool"><span id="%24mUTyBool"><span id="UTyBool"><span class="annot"><span class="annottext">$bUTyBool :: UType
+$mUTyBool :: forall r. UType -&gt; (Void# -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="TypeChecker.HindleyMilner.html#%24bUTyBool"><span class="hs-identifier hs-var hs-var hs-var">UTyBool</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">UTerm</span></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyBoolF"><span class="hs-identifier hs-type">TyBoolF</span></a></span><span>
+</span><span id="line-79"></span><span>
+</span><span id="line-80"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UTyInt"><span class="hs-identifier hs-type">UTyInt</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span>
+</span><span id="line-81"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bUTyInt"><span id="%24mUTyInt"><span id="UTyInt"><span class="annot"><span class="annottext">$bUTyInt :: UType
+$mUTyInt :: forall r. UType -&gt; (Void# -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="TypeChecker.HindleyMilner.html#%24bUTyInt"><span class="hs-identifier hs-var hs-var hs-var">UTyInt</span></a></span></span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">UTerm</span></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyIntF"><span class="hs-identifier hs-type">TyIntF</span></a></span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UTyFun"><span class="hs-identifier hs-type">UTyFun</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span>
+</span><span id="line-84"></span><span class="hs-keyword">pattern</span><span> </span><span id="%24bUTyFun"><span id="%24mUTyFun"><span id="UTyFun"><span class="annot"><span class="annottext">$bUTyFun :: UType -&gt; UType -&gt; UType
+$mUTyFun :: forall r. UType -&gt; (UType -&gt; UType -&gt; r) -&gt; (Void# -&gt; r) -&gt; r
+</span><a href="TypeChecker.HindleyMilner.html#%24bUTyFun"><span class="hs-identifier hs-var hs-var hs-var">UTyFun</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679211244"><span class="hs-identifier hs-type">t1</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679211243"><span class="hs-identifier hs-type">t2</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">UTerm</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyFunF"><span class="hs-identifier hs-type">TyFunF</span></a></span><span> </span><span id="local-6989586621679211244"><span class="annot"><a href="#local-6989586621679211244"><span class="hs-identifier hs-var">t1</span></a></span></span><span> </span><span id="local-6989586621679211243"><span class="annot"><a href="#local-6989586621679211243"><span class="hs-identifier hs-var">t2</span></a></span></span><span class="hs-special">)</span><span>
+</span><span id="line-85"></span><span>
+</span><span id="line-86"></span><span class="annot"><a href="TypeChecker.HindleyMilner.html#toTypeF"><span class="hs-identifier hs-type">toTypeF</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeF"><span class="hs-identifier hs-type">TypeF</span></a></span><span>
+</span><span id="line-87"></span><span id="toTypeF"><span class="annot"><span class="annottext">toTypeF :: Type -&gt; TypeF
+</span><a href="TypeChecker.HindleyMilner.html#toTypeF"><span class="hs-identifier hs-var hs-var">toTypeF</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-88"></span><span>  </span><span class="annot"><span class="annottext">Type
+</span><a href="Trees.Common.html#TUnit"><span class="hs-identifier hs-var">TUnit</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TypeF
+</span><a href="TypeChecker.HindleyMilner.html#TyUnit"><span class="hs-identifier hs-var">TyUnit</span></a></span><span>
+</span><span id="line-89"></span><span>  </span><span class="annot"><span class="annottext">Type
+</span><a href="Trees.Common.html#TBool"><span class="hs-identifier hs-var">TBool</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TypeF
+</span><a href="TypeChecker.HindleyMilner.html#TyBool"><span class="hs-identifier hs-var">TyBool</span></a></span><span>
+</span><span id="line-90"></span><span>  </span><span class="annot"><span class="annottext">Type
+</span><a href="Trees.Common.html#TInt"><span class="hs-identifier hs-var">TInt</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TypeF
+</span><a href="TypeChecker.HindleyMilner.html#TyInt"><span class="hs-identifier hs-var">TyInt</span></a></span><span>
+</span><span id="line-91"></span><span>  </span><span class="annot"><a href="Trees.Common.html#TFun"><span class="hs-identifier hs-type">TFun</span></a></span><span> </span><span id="local-6989586621679211237"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679211237"><span class="hs-identifier hs-var">t1</span></a></span></span><span> </span><span id="local-6989586621679211236"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679211236"><span class="hs-identifier hs-var">t2</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TypeF -&gt; TypeF -&gt; TypeF
+</span><a href="TypeChecker.HindleyMilner.html#TyFun"><span class="hs-identifier hs-var">TyFun</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Type -&gt; TypeF
+</span><a href="TypeChecker.HindleyMilner.html#toTypeF"><span class="hs-identifier hs-var">toTypeF</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679211237"><span class="hs-identifier hs-var">t1</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Type -&gt; TypeF
+</span><a href="TypeChecker.HindleyMilner.html#toTypeF"><span class="hs-identifier hs-var">toTypeF</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679211236"><span class="hs-identifier hs-var">t2</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-92"></span><span>
+</span><span id="line-93"></span><span class="annot"><a href="TypeChecker.HindleyMilner.html#fromTypeToUType"><span class="hs-identifier hs-type">fromTypeToUType</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span>
+</span><span id="line-94"></span><span id="fromTypeToUType"><span class="annot"><span class="annottext">fromTypeToUType :: Type -&gt; UType
+</span><a href="TypeChecker.HindleyMilner.html#fromTypeToUType"><span class="hs-identifier hs-var hs-var">fromTypeToUType</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-95"></span><span>  </span><span class="annot"><span class="annottext">Type
+</span><a href="Trees.Common.html#TUnit"><span class="hs-identifier hs-var">TUnit</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">UType
+</span><a href="TypeChecker.HindleyMilner.html#UTyUnit"><span class="hs-identifier hs-var">UTyUnit</span></a></span><span>
+</span><span id="line-96"></span><span>  </span><span class="annot"><span class="annottext">Type
+</span><a href="Trees.Common.html#TBool"><span class="hs-identifier hs-var">TBool</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">UType
+</span><a href="TypeChecker.HindleyMilner.html#UTyBool"><span class="hs-identifier hs-var">UTyBool</span></a></span><span>
+</span><span id="line-97"></span><span>  </span><span class="annot"><span class="annottext">Type
+</span><a href="Trees.Common.html#TInt"><span class="hs-identifier hs-var">TInt</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">UType
+</span><a href="TypeChecker.HindleyMilner.html#UTyInt"><span class="hs-identifier hs-var">UTyInt</span></a></span><span>
+</span><span id="line-98"></span><span>  </span><span class="annot"><a href="Trees.Common.html#TFun"><span class="hs-identifier hs-type">TFun</span></a></span><span> </span><span id="local-6989586621679211234"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679211234"><span class="hs-identifier hs-var">t1</span></a></span></span><span> </span><span id="local-6989586621679211233"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679211233"><span class="hs-identifier hs-var">t2</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">UType -&gt; UType -&gt; UType
+</span><a href="TypeChecker.HindleyMilner.html#UTyFun"><span class="hs-identifier hs-var">UTyFun</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Type -&gt; UType
+</span><a href="TypeChecker.HindleyMilner.html#fromTypeToUType"><span class="hs-identifier hs-var">fromTypeToUType</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679211234"><span class="hs-identifier hs-var">t1</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Type -&gt; UType
+</span><a href="TypeChecker.HindleyMilner.html#fromTypeToUType"><span class="hs-identifier hs-var">fromTypeToUType</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679211233"><span class="hs-identifier hs-var">t2</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-99"></span><span>
+</span><span id="line-100"></span><span class="hs-keyword">type</span><span> </span><span id="Infer"><span class="annot"><a href="TypeChecker.HindleyMilner.html#Infer"><span class="hs-identifier hs-var">Infer</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ReaderT</span></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Ctx"><span class="hs-identifier hs-type">Ctx</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">ExceptT</span></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeError"><span class="hs-identifier hs-type">TypeError</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">IntBindingT</span></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#HType"><span class="hs-identifier hs-type">HType</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Identity</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-101"></span><span>
+</span><span id="line-102"></span><span class="hs-keyword">type</span><span> </span><span id="Ctx"><span class="annot"><a href="TypeChecker.HindleyMilner.html#Ctx"><span class="hs-identifier hs-var">Ctx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UPolytype"><span class="hs-identifier hs-type">UPolytype</span></a></span><span>
+</span><span id="line-103"></span><span>
+</span><span id="line-104"></span><span class="annot"><a href="TypeChecker.HindleyMilner.html#lookup"><span class="hs-identifier hs-type">lookup</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#LookUpType"><span class="hs-identifier hs-type">LookUpType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Infer"><span class="hs-identifier hs-type">Infer</span></a></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span>
+</span><span id="line-105"></span><span id="lookup"><span class="annot"><span class="annottext">lookup :: LookUpType -&gt; Infer UType
+</span><a href="TypeChecker.HindleyMilner.html#lookup"><span class="hs-identifier hs-var hs-var">lookup</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Var"><span class="hs-identifier hs-type">Var</span></a></span><span> </span><span id="local-6989586621679211229"><span class="annot"><span class="annottext">Identifier
+</span><a href="#local-6989586621679211229"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-106"></span><span>  </span><span id="local-6989586621679211228"><span class="annot"><span class="annottext">Map Identifier UPolytype
+</span><a href="#local-6989586621679211228"><span class="hs-identifier hs-var">ctx</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ReaderT
+  (Map Identifier UPolytype)
+  (ExceptT TypeError (IntBindingT HType Identity))
+  (Map Identifier UPolytype)
+forall r (m :: * -&gt; *). MonadReader r m =&gt; m r
+</span><span class="hs-identifier hs-var">ask</span></span><span>
+</span><span id="line-107"></span><span>  </span><span class="annot"><span class="annottext">Infer UType
+-&gt; (UPolytype -&gt; Infer UType) -&gt; Maybe UPolytype -&gt; Infer UType
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TypeError -&gt; Infer UType
+forall e (m :: * -&gt; *) a. MonadError e m =&gt; e -&gt; m a
+</span><span class="hs-identifier hs-var">throwError</span></span><span> </span><span class="annot"><span class="annottext">(TypeError -&gt; Infer UType) -&gt; TypeError -&gt; Infer UType
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Identifier -&gt; TypeError
+</span><a href="TypeChecker.HindleyMilner.html#UnboundVar"><span class="hs-identifier hs-var">UnboundVar</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier
+</span><a href="#local-6989586621679211229"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">UPolytype -&gt; Infer UType
+</span><a href="TypeChecker.HindleyMilner.html#instantiate"><span class="hs-identifier hs-var">instantiate</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier -&gt; Map Identifier UPolytype -&gt; Maybe UPolytype
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">M.lookup</span></span><span> </span><span class="annot"><span class="annottext">Identifier
+</span><a href="#local-6989586621679211229"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">Map Identifier UPolytype
+</span><a href="#local-6989586621679211228"><span class="hs-identifier hs-var">ctx</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-108"></span><span>
+</span><span id="line-109"></span><span id="local-6989586621679211220"><span id="local-6989586621679211221"><span class="annot"><a href="TypeChecker.HindleyMilner.html#withBinding"><span class="hs-identifier hs-type">withBinding</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadReader</span></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Ctx"><span class="hs-identifier hs-type">Ctx</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679211221"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UPolytype"><span class="hs-identifier hs-type">UPolytype</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679211221"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679211220"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679211221"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679211220"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-110"></span><span id="withBinding"><span class="annot"><span class="annottext">withBinding :: Identifier -&gt; UPolytype -&gt; m a -&gt; m a
+</span><a href="TypeChecker.HindleyMilner.html#withBinding"><span class="hs-identifier hs-var hs-var">withBinding</span></a></span></span><span> </span><span id="local-6989586621679211218"><span class="annot"><span class="annottext">Identifier
+</span><a href="#local-6989586621679211218"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679211217"><span class="annot"><span class="annottext">UPolytype
+</span><a href="#local-6989586621679211217"><span class="hs-identifier hs-var">ty</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Map Identifier UPolytype -&gt; Map Identifier UPolytype)
+-&gt; m a -&gt; m a
+forall r (m :: * -&gt; *) a. MonadReader r m =&gt; (r -&gt; r) -&gt; m a -&gt; m a
+</span><span class="hs-identifier hs-var">local</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier
+-&gt; UPolytype
+-&gt; Map Identifier UPolytype
+-&gt; Map Identifier UPolytype
+forall k a. Ord k =&gt; k -&gt; a -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">M.insert</span></span><span> </span><span class="annot"><span class="annottext">Identifier
+</span><a href="#local-6989586621679211218"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">UPolytype
+</span><a href="#local-6989586621679211217"><span class="hs-identifier hs-var">ty</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-111"></span><span>
+</span><span id="line-112"></span><span id="local-6989586621679211459"><span id="local-6989586621679211460"><span id="local-6989586621679211461"><span class="annot"><a href="TypeChecker.HindleyMilner.html#ucata"><span class="hs-identifier hs-type">ucata</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Functor</span></span><span> </span><span class="annot"><a href="#local-6989586621679211461"><span class="hs-identifier hs-type">t</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679211460"><span class="hs-identifier hs-type">v</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679211459"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679211461"><span class="hs-identifier hs-type">t</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679211459"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679211459"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">UTerm</span></span><span> </span><span class="annot"><a href="#local-6989586621679211461"><span class="hs-identifier hs-type">t</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679211460"><span class="hs-identifier hs-type">v</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679211459"><span class="hs-identifier hs-type">a</span></a></span></span></span></span><span>
+</span><span id="line-113"></span><span id="ucata"><span class="annot"><span class="annottext">ucata :: (v -&gt; a) -&gt; (t a -&gt; a) -&gt; UTerm t v -&gt; a
+</span><a href="TypeChecker.HindleyMilner.html#ucata"><span class="hs-identifier hs-var hs-var">ucata</span></a></span></span><span> </span><span id="local-6989586621679211213"><span class="annot"><span class="annottext">v -&gt; a
+</span><a href="#local-6989586621679211213"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="annot"><span class="annottext">t a -&gt; a
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">UVar</span></span><span> </span><span id="local-6989586621679211211"><span class="annot"><span class="annottext">v
+</span><a href="#local-6989586621679211211"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">v -&gt; a
+</span><a href="#local-6989586621679211213"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">v
+</span><a href="#local-6989586621679211211"><span class="hs-identifier hs-var">v</span></a></span><span>
+</span><span id="line-114"></span><span class="annot"><a href="TypeChecker.HindleyMilner.html#ucata"><span class="hs-identifier hs-var">ucata</span></a></span><span> </span><span id="local-6989586621679211210"><span class="annot"><span class="annottext">v -&gt; a
+</span><a href="#local-6989586621679211210"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679211209"><span class="annot"><span class="annottext">t a -&gt; a
+</span><a href="#local-6989586621679211209"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">UTerm</span></span><span> </span><span id="local-6989586621679211208"><span class="annot"><span class="annottext">t (UTerm t v)
+</span><a href="#local-6989586621679211208"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">t a -&gt; a
+</span><a href="#local-6989586621679211209"><span class="hs-identifier hs-var">g</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(UTerm t v -&gt; a) -&gt; t (UTerm t v) -&gt; t a
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(v -&gt; a) -&gt; (t a -&gt; a) -&gt; UTerm t v -&gt; a
+forall (t :: * -&gt; *) v a.
+Functor t =&gt;
+(v -&gt; a) -&gt; (t a -&gt; a) -&gt; UTerm t v -&gt; a
+</span><a href="TypeChecker.HindleyMilner.html#ucata"><span class="hs-identifier hs-var">ucata</span></a></span><span> </span><span class="annot"><span class="annottext">v -&gt; a
+</span><a href="#local-6989586621679211210"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">t a -&gt; a
+</span><a href="#local-6989586621679211209"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">t (UTerm t v)
+</span><a href="#local-6989586621679211208"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-115"></span><span>
+</span><span id="line-116"></span><span id="local-6989586621679211193"><span id="local-6989586621679211195"><span id="local-6989586621679211197"><span id="local-6989586621679211199"><span id="local-6989586621679211201"><span id="local-6989586621679211203"><span id="local-6989586621679211205"><span class="hs-keyword">deriving</span><span> </span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IntVar</span></span></span></span></span></span></span></span></span><span>
+</span><span id="line-117"></span><span>
+</span><span id="line-118"></span><span class="hs-keyword">class</span><span> </span><span id="FreeVars"><span class="annot"><a href="TypeChecker.HindleyMilner.html#FreeVars"><span class="hs-identifier hs-var">FreeVars</span></a></span></span><span> </span><span id="local-6989586621679211454"><span class="annot"><a href="#local-6989586621679211454"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-119"></span><span>  </span><span id="freeVars"><span class="annot"><a href="TypeChecker.HindleyMilner.html#freeVars"><span class="hs-identifier hs-type">freeVars</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679211454"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Infer"><span class="hs-identifier hs-type">Infer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IntVar</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-120"></span><span>
+</span><span id="line-121"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#FreeVars"><span class="hs-identifier hs-type">FreeVars</span></a></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-122"></span><span>  </span><span id="local-6989586621679211188"><span class="annot"><span class="annottext">freeVars :: UType -&gt; Infer (Set (Either Identifier IntVar))
+</span><a href="#local-6989586621679211188"><span class="hs-identifier hs-var hs-var hs-var hs-var">freeVars</span></a></span></span><span> </span><span id="local-6989586621679211187"><span class="annot"><span class="annottext">UType
+</span><a href="#local-6989586621679211187"><span class="hs-identifier hs-var">ut</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-123"></span><span>    </span><span id="local-6989586621679211186"><span class="annot"><span class="annottext">Set (Either Identifier IntVar)
+</span><a href="#local-6989586621679211186"><span class="hs-identifier hs-var">fuvs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">([IntVar] -&gt; Set (Either Identifier IntVar))
+-&gt; ReaderT
+     (Map Identifier UPolytype)
+     (ExceptT TypeError (IntBindingT HType Identity))
+     [IntVar]
+-&gt; Infer (Set (Either Identifier IntVar))
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Either Identifier IntVar] -&gt; Set (Either Identifier IntVar)
+forall a. Ord a =&gt; [a] -&gt; Set a
+</span><span class="hs-identifier hs-var">S.fromList</span></span><span> </span><span class="annot"><span class="annottext">([Either Identifier IntVar] -&gt; Set (Either Identifier IntVar))
+-&gt; ([IntVar] -&gt; [Either Identifier IntVar])
+-&gt; [IntVar]
+-&gt; Set (Either Identifier IntVar)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(IntVar -&gt; Either Identifier IntVar)
+-&gt; [IntVar] -&gt; [Either Identifier IntVar]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">IntVar -&gt; Either Identifier IntVar
+forall a b. b -&gt; Either a b
+</span><span class="hs-identifier hs-var">Right</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(ReaderT
+   (Map Identifier UPolytype)
+   (ExceptT TypeError (IntBindingT HType Identity))
+   [IntVar]
+ -&gt; Infer (Set (Either Identifier IntVar)))
+-&gt; (IntBindingT HType Identity [IntVar]
+    -&gt; ReaderT
+         (Map Identifier UPolytype)
+         (ExceptT TypeError (IntBindingT HType Identity))
+         [IntVar])
+-&gt; IntBindingT HType Identity [IntVar]
+-&gt; Infer (Set (Either Identifier IntVar))
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">ExceptT TypeError (IntBindingT HType Identity) [IntVar]
+-&gt; ReaderT
+     (Map Identifier UPolytype)
+     (ExceptT TypeError (IntBindingT HType Identity))
+     [IntVar]
+forall (t :: (* -&gt; *) -&gt; * -&gt; *) (m :: * -&gt; *) a.
+(MonadTrans t, Monad m) =&gt;
+m a -&gt; t m a
+</span><span class="hs-identifier hs-var">lift</span></span><span> </span><span class="annot"><span class="annottext">(ExceptT TypeError (IntBindingT HType Identity) [IntVar]
+ -&gt; ReaderT
+      (Map Identifier UPolytype)
+      (ExceptT TypeError (IntBindingT HType Identity))
+      [IntVar])
+-&gt; (IntBindingT HType Identity [IntVar]
+    -&gt; ExceptT TypeError (IntBindingT HType Identity) [IntVar])
+-&gt; IntBindingT HType Identity [IntVar]
+-&gt; ReaderT
+     (Map Identifier UPolytype)
+     (ExceptT TypeError (IntBindingT HType Identity))
+     [IntVar]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">IntBindingT HType Identity [IntVar]
+-&gt; ExceptT TypeError (IntBindingT HType Identity) [IntVar]
+forall (t :: (* -&gt; *) -&gt; * -&gt; *) (m :: * -&gt; *) a.
+(MonadTrans t, Monad m) =&gt;
+m a -&gt; t m a
+</span><span class="hs-identifier hs-var">lift</span></span><span> </span><span class="annot"><span class="annottext">(IntBindingT HType Identity [IntVar]
+ -&gt; Infer (Set (Either Identifier IntVar)))
+-&gt; IntBindingT HType Identity [IntVar]
+-&gt; Infer (Set (Either Identifier IntVar))
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">UType -&gt; IntBindingT HType Identity [IntVar]
+forall (t :: * -&gt; *) v (m :: * -&gt; *).
+BindingMonad t v m =&gt;
+UTerm t v -&gt; m [v]
+</span><span class="hs-identifier hs-var">getFreeVars</span></span><span> </span><span class="annot"><span class="annottext">UType
+</span><a href="#local-6989586621679211187"><span class="hs-identifier hs-var">ut</span></a></span><span>
+</span><span id="line-124"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679211181"><span class="annot"><span class="annottext">ftvs :: Set (Either Identifier IntVar)
+</span><a href="#local-6989586621679211181"><span class="hs-identifier hs-var hs-var">ftvs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-125"></span><span>          </span><span class="annot"><span class="annottext">(IntVar -&gt; Set (Either Identifier IntVar))
+-&gt; (HType (Set (Either Identifier IntVar))
+    -&gt; Set (Either Identifier IntVar))
+-&gt; UType
+-&gt; Set (Either Identifier IntVar)
+forall (t :: * -&gt; *) v a.
+Functor t =&gt;
+(v -&gt; a) -&gt; (t a -&gt; a) -&gt; UTerm t v -&gt; a
+</span><a href="TypeChecker.HindleyMilner.html#ucata"><span class="hs-identifier hs-var">ucata</span></a></span><span>
+</span><span id="line-126"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set (Either Identifier IntVar)
+-&gt; IntVar -&gt; Set (Either Identifier IntVar)
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">Set (Either Identifier IntVar)
+forall a. Set a
+</span><span class="hs-identifier hs-var">S.empty</span></span><span class="hs-special">)</span><span>
+</span><span id="line-127"></span><span>            </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyVarF"><span class="hs-identifier hs-type">TyVarF</span></a></span><span> </span><span id="local-6989586621679211178"><span class="annot"><span class="annottext">Identifier
+</span><a href="#local-6989586621679211178"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Either Identifier IntVar -&gt; Set (Either Identifier IntVar)
+forall a. a -&gt; Set a
+</span><span class="hs-identifier hs-var">S.singleton</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier -&gt; Either Identifier IntVar
+forall a b. a -&gt; Either a b
+</span><span class="hs-identifier hs-var">Left</span></span><span> </span><span class="annot"><span class="annottext">Identifier
+</span><a href="#local-6989586621679211178"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">)</span><span class="hs-special">;</span><span> </span><span id="local-6989586621679211176"><span class="annot"><span class="annottext">HType (Set (Either Identifier IntVar))
+</span><a href="#local-6989586621679211176"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">HType (Set (Either Identifier IntVar))
+-&gt; Set (Either Identifier IntVar)
+forall (t :: * -&gt; *) m. (Foldable t, Monoid m) =&gt; t m -&gt; m
+</span><span class="hs-identifier hs-var">fold</span></span><span> </span><span class="annot"><span class="annottext">HType (Set (Either Identifier IntVar))
+</span><a href="#local-6989586621679211176"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-128"></span><span>            </span><span class="annot"><span class="annottext">UType
+</span><a href="#local-6989586621679211187"><span class="hs-identifier hs-var">ut</span></a></span><span>
+</span><span id="line-129"></span><span>    </span><span class="annot"><span class="annottext">Set (Either Identifier IntVar)
+-&gt; Infer (Set (Either Identifier IntVar))
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Set (Either Identifier IntVar)
+ -&gt; Infer (Set (Either Identifier IntVar)))
+-&gt; Set (Either Identifier IntVar)
+-&gt; Infer (Set (Either Identifier IntVar))
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Set (Either Identifier IntVar)
+</span><a href="#local-6989586621679211186"><span class="hs-identifier hs-var">fuvs</span></a></span><span> </span><span class="annot"><span class="annottext">Set (Either Identifier IntVar)
+-&gt; Set (Either Identifier IntVar) -&gt; Set (Either Identifier IntVar)
+forall a. Ord a =&gt; Set a -&gt; Set a -&gt; Set a
+</span><span class="hs-operator hs-var">`S.union`</span></span><span> </span><span class="annot"><span class="annottext">Set (Either Identifier IntVar)
+</span><a href="#local-6989586621679211181"><span class="hs-identifier hs-var">ftvs</span></a></span><span>
+</span><span id="line-130"></span><span>
+</span><span id="line-131"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#FreeVars"><span class="hs-identifier hs-type">FreeVars</span></a></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UPolytype"><span class="hs-identifier hs-type">UPolytype</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-132"></span><span>  </span><span id="local-6989586621679211173"><span class="annot"><span class="annottext">freeVars :: UPolytype -&gt; Infer (Set (Either Identifier IntVar))
+</span><a href="#local-6989586621679211173"><span class="hs-identifier hs-var hs-var hs-var hs-var">freeVars</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Forall"><span class="hs-identifier hs-type">Forall</span></a></span><span> </span><span id="local-6989586621679211172"><span class="annot"><span class="annottext">[Identifier]
+</span><a href="#local-6989586621679211172"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span id="local-6989586621679211171"><span class="annot"><span class="annottext">UType
+</span><a href="#local-6989586621679211171"><span class="hs-identifier hs-var">ut</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set (Either Identifier IntVar)
+-&gt; Set (Either Identifier IntVar) -&gt; Set (Either Identifier IntVar)
+forall a. Ord a =&gt; Set a -&gt; Set a -&gt; Set a
+</span><span class="hs-operator hs-var">\\</span></span><span> </span><span class="annot"><span class="annottext">[Either Identifier IntVar] -&gt; Set (Either Identifier IntVar)
+forall a. Ord a =&gt; [a] -&gt; Set a
+</span><span class="hs-identifier hs-var">S.fromList</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Identifier -&gt; Either Identifier IntVar)
+-&gt; [Identifier] -&gt; [Either Identifier IntVar]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">Identifier -&gt; Either Identifier IntVar
+forall a b. a -&gt; Either a b
+</span><span class="hs-identifier hs-var">Left</span></span><span> </span><span class="annot"><span class="annottext">[Identifier]
+</span><a href="#local-6989586621679211172"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Set (Either Identifier IntVar) -&gt; Set (Either Identifier IntVar))
+-&gt; Infer (Set (Either Identifier IntVar))
+-&gt; Infer (Set (Either Identifier IntVar))
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">UType -&gt; Infer (Set (Either Identifier IntVar))
+forall a. FreeVars a =&gt; a -&gt; Infer (Set (Either Identifier IntVar))
+</span><a href="TypeChecker.HindleyMilner.html#freeVars"><span class="hs-identifier hs-var">freeVars</span></a></span><span> </span><span class="annot"><span class="annottext">UType
+</span><a href="#local-6989586621679211171"><span class="hs-identifier hs-var">ut</span></a></span><span>
+</span><span id="line-133"></span><span>
+</span><span id="line-134"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#FreeVars"><span class="hs-identifier hs-type">FreeVars</span></a></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Ctx"><span class="hs-identifier hs-type">Ctx</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-135"></span><span>  </span><span id="local-6989586621679211168"><span class="annot"><span class="annottext">freeVars :: Map Identifier UPolytype -&gt; Infer (Set (Either Identifier IntVar))
+</span><a href="#local-6989586621679211168"><span class="hs-identifier hs-var hs-var hs-var hs-var">freeVars</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([Set (Either Identifier IntVar)]
+ -&gt; Set (Either Identifier IntVar))
+-&gt; ReaderT
+     (Map Identifier UPolytype)
+     (ExceptT TypeError (IntBindingT HType Identity))
+     [Set (Either Identifier IntVar)]
+-&gt; Infer (Set (Either Identifier IntVar))
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">[Set (Either Identifier IntVar)] -&gt; Set (Either Identifier IntVar)
+forall (f :: * -&gt; *) a. (Foldable f, Ord a) =&gt; f (Set a) -&gt; Set a
+</span><span class="hs-identifier hs-var">S.unions</span></span><span> </span><span class="annot"><span class="annottext">(ReaderT
+   (Map Identifier UPolytype)
+   (ExceptT TypeError (IntBindingT HType Identity))
+   [Set (Either Identifier IntVar)]
+ -&gt; Infer (Set (Either Identifier IntVar)))
+-&gt; (Map Identifier UPolytype
+    -&gt; ReaderT
+         (Map Identifier UPolytype)
+         (ExceptT TypeError (IntBindingT HType Identity))
+         [Set (Either Identifier IntVar)])
+-&gt; Map Identifier UPolytype
+-&gt; Infer (Set (Either Identifier IntVar))
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(UPolytype -&gt; Infer (Set (Either Identifier IntVar)))
+-&gt; [UPolytype]
+-&gt; ReaderT
+     (Map Identifier UPolytype)
+     (ExceptT TypeError (IntBindingT HType Identity))
+     [Set (Either Identifier IntVar)]
+forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
+(Traversable t, Monad m) =&gt;
+(a -&gt; m b) -&gt; t a -&gt; m (t b)
+</span><span class="hs-identifier hs-var">mapM</span></span><span> </span><span class="annot"><span class="annottext">UPolytype -&gt; Infer (Set (Either Identifier IntVar))
+forall a. FreeVars a =&gt; a -&gt; Infer (Set (Either Identifier IntVar))
+</span><a href="TypeChecker.HindleyMilner.html#freeVars"><span class="hs-identifier hs-var">freeVars</span></a></span><span> </span><span class="annot"><span class="annottext">([UPolytype]
+ -&gt; ReaderT
+      (Map Identifier UPolytype)
+      (ExceptT TypeError (IntBindingT HType Identity))
+      [Set (Either Identifier IntVar)])
+-&gt; (Map Identifier UPolytype -&gt; [UPolytype])
+-&gt; Map Identifier UPolytype
+-&gt; ReaderT
+     (Map Identifier UPolytype)
+     (ExceptT TypeError (IntBindingT HType Identity))
+     [Set (Either Identifier IntVar)]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Map Identifier UPolytype -&gt; [UPolytype]
+forall k a. Map k a -&gt; [a]
+</span><span class="hs-identifier hs-var">M.elems</span></span><span>
+</span><span id="line-136"></span><span>
+</span><span id="line-137"></span><span class="hs-keyword">newtype</span><span> </span><span id="LookUpType"><span class="annot"><a href="TypeChecker.HindleyMilner.html#LookUpType"><span class="hs-identifier hs-var">LookUpType</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Var"><span class="annot"><a href="TypeChecker.HindleyMilner.html#Var"><span class="hs-identifier hs-var">Var</span></a></span></span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span>
+</span><span id="line-138"></span><span>
+</span><span id="line-139"></span><span class="hs-keyword">data</span><span> </span><span id="TypeError"><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeError"><span class="hs-identifier hs-var">TypeError</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-140"></span><span>  </span><span id="Unreachable"><span class="annot"><a href="TypeChecker.HindleyMilner.html#Unreachable"><span class="hs-identifier hs-var">Unreachable</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeError"><span class="hs-identifier hs-type">TypeError</span></a></span><span>
+</span><span id="line-141"></span><span>  </span><span id="UnboundVar"><span class="annot"><a href="TypeChecker.HindleyMilner.html#UnboundVar"><span class="hs-identifier hs-var">UnboundVar</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeError"><span class="hs-identifier hs-type">TypeError</span></a></span><span>
+</span><span id="line-142"></span><span>  </span><span id="Infinite"><span class="annot"><a href="TypeChecker.HindleyMilner.html#Infinite"><span class="hs-identifier hs-var">Infinite</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IntVar</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeError"><span class="hs-identifier hs-type">TypeError</span></a></span><span>
+</span><span id="line-143"></span><span>  </span><span id="ImpossibleBinOpApplication"><span class="annot"><a href="TypeChecker.HindleyMilner.html#ImpossibleBinOpApplication"><span class="hs-identifier hs-var">ImpossibleBinOpApplication</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeError"><span class="hs-identifier hs-type">TypeError</span></a></span><span>
+</span><span id="line-144"></span><span>  </span><span id="ImpossibleUnOpApplication"><span class="annot"><a href="TypeChecker.HindleyMilner.html#ImpossibleUnOpApplication"><span class="hs-identifier hs-var">ImpossibleUnOpApplication</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeError"><span class="hs-identifier hs-type">TypeError</span></a></span><span>
+</span><span id="line-145"></span><span>  </span><span id="Mismatch"><span class="annot"><a href="TypeChecker.HindleyMilner.html#Mismatch"><span class="hs-identifier hs-var">Mismatch</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#HType"><span class="hs-identifier hs-type">HType</span></a></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#HType"><span class="hs-identifier hs-type">HType</span></a></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeError"><span class="hs-identifier hs-type">TypeError</span></a></span><span>
+</span><span id="line-146"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679211154"><span id="local-6989586621679211156"><span id="local-6989586621679211158"><span class="annot"><span class="annottext">Int -&gt; TypeError -&gt; ShowS
+[TypeError] -&gt; ShowS
+TypeError -&gt; String
+(Int -&gt; TypeError -&gt; ShowS)
+-&gt; (TypeError -&gt; String)
+-&gt; ([TypeError] -&gt; ShowS)
+-&gt; Show TypeError
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [TypeError] -&gt; ShowS
+$cshowList :: [TypeError] -&gt; ShowS
+show :: TypeError -&gt; String
+$cshow :: TypeError -&gt; String
+showsPrec :: Int -&gt; TypeError -&gt; ShowS
+$cshowsPrec :: Int -&gt; TypeError -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-147"></span><span>
+</span><span id="line-148"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Fallible</span></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#HType"><span class="hs-identifier hs-type">HType</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IntVar</span></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeError"><span class="hs-identifier hs-type">TypeError</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-149"></span><span>  </span><span id="local-6989586621679211150"><span class="annot"><span class="annottext">occursFailure :: IntVar -&gt; UType -&gt; TypeError
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">occursFailure</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">IntVar -&gt; UType -&gt; TypeError
+</span><a href="TypeChecker.HindleyMilner.html#Infinite"><span class="hs-identifier hs-var">Infinite</span></a></span><span>
+</span><span id="line-150"></span><span>  </span><span id="local-6989586621679211148"><span class="annot"><span class="annottext">mismatchFailure :: HType UType -&gt; HType UType -&gt; TypeError
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">mismatchFailure</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">HType UType -&gt; HType UType -&gt; TypeError
+</span><a href="TypeChecker.HindleyMilner.html#Mismatch"><span class="hs-identifier hs-var">Mismatch</span></a></span><span>
+</span><span id="line-151"></span><span>
+</span><span id="line-152"></span><span class="annot"><a href="TypeChecker.HindleyMilner.html#fresh"><span class="hs-identifier hs-type">fresh</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Infer"><span class="hs-identifier hs-type">Infer</span></a></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span>
+</span><span id="line-153"></span><span id="fresh"><span class="annot"><span class="annottext">fresh :: Infer UType
+</span><a href="TypeChecker.HindleyMilner.html#fresh"><span class="hs-identifier hs-var hs-var">fresh</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">IntVar -&gt; UType
+forall (t :: * -&gt; *) v. v -&gt; UTerm t v
+</span><span class="hs-identifier hs-var">UVar</span></span><span> </span><span class="annot"><span class="annottext">(IntVar -&gt; UType)
+-&gt; ReaderT
+     (Map Identifier UPolytype)
+     (ExceptT TypeError (IntBindingT HType Identity))
+     IntVar
+-&gt; Infer UType
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">ExceptT TypeError (IntBindingT HType Identity) IntVar
+-&gt; ReaderT
+     (Map Identifier UPolytype)
+     (ExceptT TypeError (IntBindingT HType Identity))
+     IntVar
+forall (t :: (* -&gt; *) -&gt; * -&gt; *) (m :: * -&gt; *) a.
+(MonadTrans t, Monad m) =&gt;
+m a -&gt; t m a
+</span><span class="hs-identifier hs-var">lift</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">IntBindingT HType Identity IntVar
+-&gt; ExceptT TypeError (IntBindingT HType Identity) IntVar
+forall (t :: (* -&gt; *) -&gt; * -&gt; *) (m :: * -&gt; *) a.
+(MonadTrans t, Monad m) =&gt;
+m a -&gt; t m a
+</span><span class="hs-identifier hs-var">lift</span></span><span> </span><span class="annot"><span class="annottext">IntBindingT HType Identity IntVar
+forall (t :: * -&gt; *) v (m :: * -&gt; *). BindingMonad t v m =&gt; m v
+</span><span class="hs-identifier hs-var">freeVar</span></span><span class="hs-special">)</span><span>
+</span><span id="line-154"></span><span>
+</span><span id="line-155"></span><span class="annot"><a href="TypeChecker.HindleyMilner.html#%3D%3A%3D"><span class="hs-operator hs-type">(=:=)</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Infer"><span class="hs-identifier hs-type">Infer</span></a></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span>
+</span><span id="line-156"></span><span id="local-6989586621679211143"><span class="annot"><span class="annottext">UType
+</span><a href="#local-6989586621679211143"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span id="%3D%3A%3D"><span class="annot"><span class="annottext">=:= :: UType -&gt; UType -&gt; Infer UType
+</span><a href="TypeChecker.HindleyMilner.html#%3D%3A%3D"><span class="hs-operator hs-var hs-var">=:=</span></a></span></span><span> </span><span id="local-6989586621679211142"><span class="annot"><span class="annottext">UType
+</span><a href="#local-6989586621679211142"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ExceptT TypeError (IntBindingT HType Identity) UType -&gt; Infer UType
+forall (t :: (* -&gt; *) -&gt; * -&gt; *) (m :: * -&gt; *) a.
+(MonadTrans t, Monad m) =&gt;
+m a -&gt; t m a
+</span><span class="hs-identifier hs-var">lift</span></span><span> </span><span class="annot"><span class="annottext">(ExceptT TypeError (IntBindingT HType Identity) UType
+ -&gt; Infer UType)
+-&gt; ExceptT TypeError (IntBindingT HType Identity) UType
+-&gt; Infer UType
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">UType
+</span><a href="#local-6989586621679211143"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">UType
+-&gt; UType -&gt; ExceptT TypeError (IntBindingT HType Identity) UType
+forall (t :: * -&gt; *) v (m :: * -&gt; *) e (em :: (* -&gt; *) -&gt; * -&gt; *).
+(BindingMonad t v m, Fallible t v e, MonadTrans em, Functor (em m),
+ MonadError e (em m)) =&gt;
+UTerm t v -&gt; UTerm t v -&gt; em m (UTerm t v)
+</span><span class="hs-operator hs-var">U.=:=</span></span><span> </span><span class="annot"><span class="annottext">UType
+</span><a href="#local-6989586621679211142"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-157"></span><span>
+</span><span id="line-158"></span><span class="annot"><a href="TypeChecker.HindleyMilner.html#applyBindings"><span class="hs-identifier hs-type">applyBindings</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Infer"><span class="hs-identifier hs-type">Infer</span></a></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span>
+</span><span id="line-159"></span><span id="applyBindings"><span class="annot"><span class="annottext">applyBindings :: UType -&gt; Infer UType
+</span><a href="TypeChecker.HindleyMilner.html#applyBindings"><span class="hs-identifier hs-var hs-var">applyBindings</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ExceptT TypeError (IntBindingT HType Identity) UType -&gt; Infer UType
+forall (t :: (* -&gt; *) -&gt; * -&gt; *) (m :: * -&gt; *) a.
+(MonadTrans t, Monad m) =&gt;
+m a -&gt; t m a
+</span><span class="hs-identifier hs-var">lift</span></span><span> </span><span class="annot"><span class="annottext">(ExceptT TypeError (IntBindingT HType Identity) UType
+ -&gt; Infer UType)
+-&gt; (UType -&gt; ExceptT TypeError (IntBindingT HType Identity) UType)
+-&gt; UType
+-&gt; Infer UType
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">UType -&gt; ExceptT TypeError (IntBindingT HType Identity) UType
+forall (t :: * -&gt; *) v (m :: * -&gt; *) e (em :: (* -&gt; *) -&gt; * -&gt; *).
+(BindingMonad t v m, Fallible t v e, MonadTrans em, Functor (em m),
+ MonadError e (em m)) =&gt;
+UTerm t v -&gt; em m (UTerm t v)
+</span><span class="hs-identifier hs-var">U.applyBindings</span></span><span>
+</span><span id="line-160"></span><span>
+</span><span id="line-161"></span><span class="annot"><a href="TypeChecker.HindleyMilner.html#instantiate"><span class="hs-identifier hs-type">instantiate</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UPolytype"><span class="hs-identifier hs-type">UPolytype</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Infer"><span class="hs-identifier hs-type">Infer</span></a></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span>
+</span><span id="line-162"></span><span id="instantiate"><span class="annot"><span class="annottext">instantiate :: UPolytype -&gt; Infer UType
+</span><a href="TypeChecker.HindleyMilner.html#instantiate"><span class="hs-identifier hs-var hs-var">instantiate</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Forall"><span class="hs-identifier hs-type">Forall</span></a></span><span> </span><span id="local-6989586621679211140"><span class="annot"><span class="annottext">[Identifier]
+</span><a href="#local-6989586621679211140"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span id="local-6989586621679211139"><span class="annot"><span class="annottext">UType
+</span><a href="#local-6989586621679211139"><span class="hs-identifier hs-var">uty</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-163"></span><span>  </span><span id="local-6989586621679211138"><span class="annot"><span class="annottext">[UType]
+</span><a href="#local-6989586621679211138"><span class="hs-identifier hs-var">xs'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Identifier -&gt; Infer UType)
+-&gt; [Identifier]
+-&gt; ReaderT
+     (Map Identifier UPolytype)
+     (ExceptT TypeError (IntBindingT HType Identity))
+     [UType]
+forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
+(Traversable t, Monad m) =&gt;
+(a -&gt; m b) -&gt; t a -&gt; m (t b)
+</span><span class="hs-identifier hs-var">mapM</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Infer UType -&gt; Identifier -&gt; Infer UType
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">Infer UType
+</span><a href="TypeChecker.HindleyMilner.html#fresh"><span class="hs-identifier hs-var">fresh</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Identifier]
+</span><a href="#local-6989586621679211140"><span class="hs-identifier hs-var">xs</span></a></span><span>
+</span><span id="line-164"></span><span>  </span><span class="annot"><span class="annottext">UType -&gt; Infer UType
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(UType -&gt; Infer UType) -&gt; UType -&gt; Infer UType
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Map (Either Identifier IntVar) UType -&gt; UType -&gt; UType
+</span><a href="TypeChecker.HindleyMilner.html#substU"><span class="hs-identifier hs-var">substU</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[(Either Identifier IntVar, UType)]
+-&gt; Map (Either Identifier IntVar) UType
+forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
+</span><span class="hs-identifier hs-var">M.fromList</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Either Identifier IntVar]
+-&gt; [UType] -&gt; [(Either Identifier IntVar, UType)]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Identifier -&gt; Either Identifier IntVar)
+-&gt; [Identifier] -&gt; [Either Identifier IntVar]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">Identifier -&gt; Either Identifier IntVar
+forall a b. a -&gt; Either a b
+</span><span class="hs-identifier hs-var">Left</span></span><span> </span><span class="annot"><span class="annottext">[Identifier]
+</span><a href="#local-6989586621679211140"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[UType]
+</span><a href="#local-6989586621679211138"><span class="hs-identifier hs-var">xs'</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">UType
+</span><a href="#local-6989586621679211139"><span class="hs-identifier hs-var">uty</span></a></span><span>
+</span><span id="line-165"></span><span>
+</span><span id="line-166"></span><span class="annot"><a href="TypeChecker.HindleyMilner.html#substU"><span class="hs-identifier hs-type">substU</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IntVar</span></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span>
+</span><span id="line-167"></span><span id="substU"><span class="annot"><span class="annottext">substU :: Map (Either Identifier IntVar) UType -&gt; UType -&gt; UType
+</span><a href="TypeChecker.HindleyMilner.html#substU"><span class="hs-identifier hs-var hs-var">substU</span></a></span></span><span> </span><span id="local-6989586621679211135"><span class="annot"><span class="annottext">Map (Either Identifier IntVar) UType
+</span><a href="#local-6989586621679211135"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-168"></span><span>  </span><span class="annot"><span class="annottext">(IntVar -&gt; UType) -&gt; (HType UType -&gt; UType) -&gt; UType -&gt; UType
+forall (t :: * -&gt; *) v a.
+Functor t =&gt;
+(v -&gt; a) -&gt; (t a -&gt; a) -&gt; UTerm t v -&gt; a
+</span><a href="TypeChecker.HindleyMilner.html#ucata"><span class="hs-identifier hs-var">ucata</span></a></span><span>
+</span><span id="line-169"></span><span>    </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679211134"><span class="annot"><span class="annottext">IntVar
+</span><a href="#local-6989586621679211134"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">UType -&gt; Maybe UType -&gt; UType
+forall a. a -&gt; Maybe a -&gt; a
+</span><span class="hs-identifier hs-var">fromMaybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">IntVar -&gt; UType
+forall (t :: * -&gt; *) v. v -&gt; UTerm t v
+</span><span class="hs-identifier hs-var">UVar</span></span><span> </span><span class="annot"><span class="annottext">IntVar
+</span><a href="#local-6989586621679211134"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Either Identifier IntVar
+-&gt; Map (Either Identifier IntVar) UType -&gt; Maybe UType
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">M.lookup</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">IntVar -&gt; Either Identifier IntVar
+forall a b. b -&gt; Either a b
+</span><span class="hs-identifier hs-var">Right</span></span><span> </span><span class="annot"><span class="annottext">IntVar
+</span><a href="#local-6989586621679211134"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Map (Either Identifier IntVar) UType
+</span><a href="#local-6989586621679211135"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-170"></span><span>    </span><span class="hs-special">(</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-171"></span><span>        </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TyVarF"><span class="hs-identifier hs-type">TyVarF</span></a></span><span> </span><span id="local-6989586621679211132"><span class="annot"><span class="annottext">Identifier
+</span><a href="#local-6989586621679211132"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">UType -&gt; Maybe UType -&gt; UType
+forall a. a -&gt; Maybe a -&gt; a
+</span><span class="hs-identifier hs-var">fromMaybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier -&gt; UType
+</span><a href="TypeChecker.HindleyMilner.html#UTyVar"><span class="hs-identifier hs-var">UTyVar</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier
+</span><a href="#local-6989586621679211132"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Either Identifier IntVar
+-&gt; Map (Either Identifier IntVar) UType -&gt; Maybe UType
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">M.lookup</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier -&gt; Either Identifier IntVar
+forall a b. a -&gt; Either a b
+</span><span class="hs-identifier hs-var">Left</span></span><span> </span><span class="annot"><span class="annottext">Identifier
+</span><a href="#local-6989586621679211132"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Map (Either Identifier IntVar) UType
+</span><a href="#local-6989586621679211135"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-172"></span><span>        </span><span id="local-6989586621679211131"><span class="annot"><span class="annottext">HType UType
+</span><a href="#local-6989586621679211131"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">HType UType -&gt; UType
+forall (t :: * -&gt; *) v. t (UTerm t v) -&gt; UTerm t v
+</span><span class="hs-identifier hs-var">UTerm</span></span><span> </span><span class="annot"><span class="annottext">HType UType
+</span><a href="#local-6989586621679211131"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-173"></span><span>    </span><span class="hs-special">)</span><span>
+</span><span id="line-174"></span><span>
+</span><span id="line-175"></span><span class="annot"><a href="TypeChecker.HindleyMilner.html#skolemize"><span class="hs-identifier hs-type">skolemize</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UPolytype"><span class="hs-identifier hs-type">UPolytype</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Infer"><span class="hs-identifier hs-type">Infer</span></a></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span>
+</span><span id="line-176"></span><span id="skolemize"><span class="annot"><span class="annottext">skolemize :: UPolytype -&gt; Infer UType
+</span><a href="TypeChecker.HindleyMilner.html#skolemize"><span class="hs-identifier hs-var hs-var">skolemize</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Forall"><span class="hs-identifier hs-type">Forall</span></a></span><span> </span><span id="local-6989586621679211129"><span class="annot"><span class="annottext">[Identifier]
+</span><a href="#local-6989586621679211129"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span id="local-6989586621679211128"><span class="annot"><span class="annottext">UType
+</span><a href="#local-6989586621679211128"><span class="hs-identifier hs-var">uty</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-177"></span><span>  </span><span id="local-6989586621679211127"><span class="annot"><span class="annottext">[UType]
+</span><a href="#local-6989586621679211127"><span class="hs-identifier hs-var">xs'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Identifier -&gt; Infer UType)
+-&gt; [Identifier]
+-&gt; ReaderT
+     (Map Identifier UPolytype)
+     (ExceptT TypeError (IntBindingT HType Identity))
+     [UType]
+forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
+(Traversable t, Monad m) =&gt;
+(a -&gt; m b) -&gt; t a -&gt; m (t b)
+</span><span class="hs-identifier hs-var">mapM</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Infer UType -&gt; Identifier -&gt; Infer UType
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">Infer UType
+</span><a href="TypeChecker.HindleyMilner.html#fresh"><span class="hs-identifier hs-var">fresh</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Identifier]
+</span><a href="#local-6989586621679211129"><span class="hs-identifier hs-var">xs</span></a></span><span>
+</span><span id="line-178"></span><span>  </span><span class="annot"><span class="annottext">UType -&gt; Infer UType
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(UType -&gt; Infer UType) -&gt; UType -&gt; Infer UType
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Map (Either Identifier IntVar) UType -&gt; UType -&gt; UType
+</span><a href="TypeChecker.HindleyMilner.html#substU"><span class="hs-identifier hs-var">substU</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[(Either Identifier IntVar, UType)]
+-&gt; Map (Either Identifier IntVar) UType
+forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
+</span><span class="hs-identifier hs-var">M.fromList</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Either Identifier IntVar]
+-&gt; [UType] -&gt; [(Either Identifier IntVar, UType)]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Identifier -&gt; Either Identifier IntVar)
+-&gt; [Identifier] -&gt; [Either Identifier IntVar]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">Identifier -&gt; Either Identifier IntVar
+forall a b. a -&gt; Either a b
+</span><span class="hs-identifier hs-var">Left</span></span><span> </span><span class="annot"><span class="annottext">[Identifier]
+</span><a href="#local-6989586621679211129"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(UType -&gt; UType) -&gt; [UType] -&gt; [UType]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">UType -&gt; UType
+forall (t :: * -&gt; *). UTerm t IntVar -&gt; UType
+</span><a href="#local-6989586621679211126"><span class="hs-identifier hs-var">toSkolem</span></a></span><span> </span><span class="annot"><span class="annottext">[UType]
+</span><a href="#local-6989586621679211127"><span class="hs-identifier hs-var">xs'</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">UType
+</span><a href="#local-6989586621679211128"><span class="hs-identifier hs-var">uty</span></a></span><span>
+</span><span id="line-179"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-180"></span><span>    </span><span id="local-6989586621679211126"><span class="annot"><span class="annottext">toSkolem :: UTerm t IntVar -&gt; UType
+</span><a href="#local-6989586621679211126"><span class="hs-identifier hs-var hs-var">toSkolem</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">UVar</span></span><span> </span><span id="local-6989586621679211125"><span class="annot"><span class="annottext">IntVar
+</span><a href="#local-6989586621679211125"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Identifier -&gt; UType
+</span><a href="TypeChecker.HindleyMilner.html#UTyVar"><span class="hs-identifier hs-var">UTyVar</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; IntVar -&gt; Identifier
+</span><a href="TypeChecker.HindleyMilner.html#mkVarName"><span class="hs-identifier hs-var">mkVarName</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;s&quot;</span></span><span> </span><span class="annot"><span class="annottext">IntVar
+</span><a href="#local-6989586621679211125"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-181"></span><span>    </span><span class="annot"><a href="#local-6989586621679211126"><span class="hs-identifier hs-var">toSkolem</span></a></span><span> </span><span class="annot"><span class="annottext">UTerm t IntVar
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">UType
+forall a. HasCallStack =&gt; a
+</span><span class="hs-identifier hs-var">undefined</span></span><span> </span><span class="hs-comment">-- We can't reach another situation, because we previously give `fresh` variable</span><span>
+</span><span id="line-182"></span><span>
+</span><span id="line-183"></span><span class="annot"><a href="TypeChecker.HindleyMilner.html#mkVarName"><span class="hs-identifier hs-type">mkVarName</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IntVar</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span>
+</span><span id="line-184"></span><span id="mkVarName"><span class="annot"><span class="annottext">mkVarName :: String -&gt; IntVar -&gt; Identifier
+</span><a href="TypeChecker.HindleyMilner.html#mkVarName"><span class="hs-identifier hs-var hs-var">mkVarName</span></a></span></span><span> </span><span id="local-6989586621679211122"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679211122"><span class="hs-identifier hs-var">nm</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">IntVar</span></span><span> </span><span id="local-6989586621679211120"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679211120"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Identifier
+</span><span class="hs-identifier hs-var">pack</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679211122"><span class="hs-identifier hs-var">nm</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679211120"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+forall a. Bounded a =&gt; a
+</span><span class="hs-identifier hs-var">maxBound</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-185"></span><span>
+</span><span id="line-186"></span><span class="annot"><a href="TypeChecker.HindleyMilner.html#generalize"><span class="hs-identifier hs-type">generalize</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UType"><span class="hs-identifier hs-type">UType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Infer"><span class="hs-identifier hs-type">Infer</span></a></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UPolytype"><span class="hs-identifier hs-type">UPolytype</span></a></span><span>
+</span><span id="line-187"></span><span id="generalize"><span class="annot"><span class="annottext">generalize :: UType -&gt; Infer UPolytype
+</span><a href="TypeChecker.HindleyMilner.html#generalize"><span class="hs-identifier hs-var hs-var">generalize</span></a></span></span><span> </span><span id="local-6989586621679211115"><span class="annot"><span class="annottext">UType
+</span><a href="#local-6989586621679211115"><span class="hs-identifier hs-var">uty</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-188"></span><span>  </span><span id="local-6989586621679211114"><span class="annot"><span class="annottext">UType
+</span><a href="#local-6989586621679211114"><span class="hs-identifier hs-var">uty'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">UType -&gt; Infer UType
+</span><a href="TypeChecker.HindleyMilner.html#applyBindings"><span class="hs-identifier hs-var">applyBindings</span></a></span><span> </span><span class="annot"><span class="annottext">UType
+</span><a href="#local-6989586621679211115"><span class="hs-identifier hs-var">uty</span></a></span><span>
+</span><span id="line-189"></span><span>  </span><span id="local-6989586621679211113"><span class="annot"><span class="annottext">Map Identifier UPolytype
+</span><a href="#local-6989586621679211113"><span class="hs-identifier hs-var">ctx</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ReaderT
+  (Map Identifier UPolytype)
+  (ExceptT TypeError (IntBindingT HType Identity))
+  (Map Identifier UPolytype)
+forall r (m :: * -&gt; *). MonadReader r m =&gt; m r
+</span><span class="hs-identifier hs-var">ask</span></span><span>
+</span><span id="line-190"></span><span>  </span><span id="local-6989586621679211112"><span class="annot"><span class="annottext">Set (Either Identifier IntVar)
+</span><a href="#local-6989586621679211112"><span class="hs-identifier hs-var">tmfvs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">UType -&gt; Infer (Set (Either Identifier IntVar))
+forall a. FreeVars a =&gt; a -&gt; Infer (Set (Either Identifier IntVar))
+</span><a href="TypeChecker.HindleyMilner.html#freeVars"><span class="hs-identifier hs-var">freeVars</span></a></span><span> </span><span class="annot"><span class="annottext">UType
+</span><a href="#local-6989586621679211114"><span class="hs-identifier hs-var">uty'</span></a></span><span>
+</span><span id="line-191"></span><span>  </span><span id="local-6989586621679211111"><span class="annot"><span class="annottext">Set (Either Identifier IntVar)
+</span><a href="#local-6989586621679211111"><span class="hs-identifier hs-var">ctxfvs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Map Identifier UPolytype -&gt; Infer (Set (Either Identifier IntVar))
+forall a. FreeVars a =&gt; a -&gt; Infer (Set (Either Identifier IntVar))
+</span><a href="TypeChecker.HindleyMilner.html#freeVars"><span class="hs-identifier hs-var">freeVars</span></a></span><span> </span><span class="annot"><span class="annottext">Map Identifier UPolytype
+</span><a href="#local-6989586621679211113"><span class="hs-identifier hs-var">ctx</span></a></span><span>
+</span><span id="line-192"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679211110"><span class="annot"><span class="annottext">fvs :: [Either Identifier IntVar]
+</span><a href="#local-6989586621679211110"><span class="hs-identifier hs-var hs-var">fvs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set (Either Identifier IntVar) -&gt; [Either Identifier IntVar]
+forall a. Set a -&gt; [a]
+</span><span class="hs-identifier hs-var">S.toList</span></span><span> </span><span class="annot"><span class="annottext">(Set (Either Identifier IntVar) -&gt; [Either Identifier IntVar])
+-&gt; Set (Either Identifier IntVar) -&gt; [Either Identifier IntVar]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Set (Either Identifier IntVar)
+</span><a href="#local-6989586621679211112"><span class="hs-identifier hs-var">tmfvs</span></a></span><span> </span><span class="annot"><span class="annottext">Set (Either Identifier IntVar)
+-&gt; Set (Either Identifier IntVar) -&gt; Set (Either Identifier IntVar)
+forall a. Ord a =&gt; Set a -&gt; Set a -&gt; Set a
+</span><span class="hs-operator hs-var">\\</span></span><span> </span><span class="annot"><span class="annottext">Set (Either Identifier IntVar)
+</span><a href="#local-6989586621679211111"><span class="hs-identifier hs-var">ctxfvs</span></a></span><span>
+</span><span id="line-193"></span><span>      </span><span id="local-6989586621679211108"><span class="annot"><span class="annottext">xs :: [Identifier]
+</span><a href="#local-6989586621679211108"><span class="hs-identifier hs-var hs-var">xs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Either Identifier IntVar -&gt; Identifier)
+-&gt; [Either Identifier IntVar] -&gt; [Identifier]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Identifier -&gt; Identifier)
+-&gt; (IntVar -&gt; Identifier) -&gt; Either Identifier IntVar -&gt; Identifier
+forall a c b. (a -&gt; c) -&gt; (b -&gt; c) -&gt; Either a b -&gt; c
+</span><span class="hs-identifier hs-var">either</span></span><span> </span><span class="annot"><span class="annottext">Identifier -&gt; Identifier
+forall a. a -&gt; a
+</span><span class="hs-identifier hs-var">id</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; IntVar -&gt; Identifier
+</span><a href="TypeChecker.HindleyMilner.html#mkVarName"><span class="hs-identifier hs-var">mkVarName</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;a&quot;</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Either Identifier IntVar]
+</span><a href="#local-6989586621679211110"><span class="hs-identifier hs-var">fvs</span></a></span><span>
+</span><span id="line-194"></span><span>  </span><span class="annot"><span class="annottext">UPolytype -&gt; Infer UPolytype
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(UPolytype -&gt; Infer UPolytype) -&gt; UPolytype -&gt; Infer UPolytype
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Identifier] -&gt; UType -&gt; UPolytype
+forall t. [Identifier] -&gt; t -&gt; Poly t
+</span><a href="TypeChecker.HindleyMilner.html#Forall"><span class="hs-identifier hs-var">Forall</span></a></span><span> </span><span class="annot"><span class="annottext">[Identifier]
+</span><a href="#local-6989586621679211108"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map (Either Identifier IntVar) UType -&gt; UType -&gt; UType
+</span><a href="TypeChecker.HindleyMilner.html#substU"><span class="hs-identifier hs-var">substU</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[(Either Identifier IntVar, UType)]
+-&gt; Map (Either Identifier IntVar) UType
+forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
+</span><span class="hs-identifier hs-var">M.fromList</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Either Identifier IntVar]
+-&gt; [UType] -&gt; [(Either Identifier IntVar, UType)]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="annot"><span class="annottext">[Either Identifier IntVar]
+</span><a href="#local-6989586621679211110"><span class="hs-identifier hs-var">fvs</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Identifier -&gt; UType) -&gt; [Identifier] -&gt; [UType]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">Identifier -&gt; UType
+</span><a href="TypeChecker.HindleyMilner.html#UTyVar"><span class="hs-identifier hs-var">UTyVar</span></a></span><span> </span><span class="annot"><span class="annottext">[Identifier]
+</span><a href="#local-6989586621679211108"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">UType
+</span><a href="#local-6989586621679211114"><span class="hs-identifier hs-var">uty'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-195"></span><span>
+</span><span id="line-196"></span><span class="annot"><a href="TypeChecker.HindleyMilner.html#toUPolytype"><span class="hs-identifier hs-type">toUPolytype</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Polytype"><span class="hs-identifier hs-type">Polytype</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UPolytype"><span class="hs-identifier hs-type">UPolytype</span></a></span><span>
+</span><span id="line-197"></span><span id="toUPolytype"><span class="annot"><span class="annottext">toUPolytype :: Polytype -&gt; UPolytype
+</span><a href="TypeChecker.HindleyMilner.html#toUPolytype"><span class="hs-identifier hs-var hs-var">toUPolytype</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(TypeF -&gt; UType) -&gt; Polytype -&gt; UPolytype
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">TypeF -&gt; UType
+forall (t :: * -&gt; *) v. Functor t =&gt; Fix t -&gt; UTerm t v
+</span><span class="hs-identifier hs-var">unfreeze</span></span><span>
+</span><span id="line-198"></span><span>
+</span><span id="line-199"></span><span class="annot"><a href="TypeChecker.HindleyMilner.html#fromUPolytype"><span class="hs-identifier hs-type">fromUPolytype</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#UPolytype"><span class="hs-identifier hs-type">UPolytype</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#Polytype"><span class="hs-identifier hs-type">Polytype</span></a></span><span>
+</span><span id="line-200"></span><span id="fromUPolytype"><span class="annot"><span class="annottext">fromUPolytype :: UPolytype -&gt; Polytype
+</span><a href="TypeChecker.HindleyMilner.html#fromUPolytype"><span class="hs-identifier hs-var hs-var">fromUPolytype</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(UType -&gt; TypeF) -&gt; UPolytype -&gt; Polytype
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Maybe TypeF -&gt; TypeF
+forall a. HasCallStack =&gt; Maybe a -&gt; a
+</span><span class="hs-identifier hs-var">fromJust</span></span><span> </span><span class="annot"><span class="annottext">(Maybe TypeF -&gt; TypeF) -&gt; (UType -&gt; Maybe TypeF) -&gt; UType -&gt; TypeF
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">UType -&gt; Maybe TypeF
+forall (t :: * -&gt; *) v. Traversable t =&gt; UTerm t v -&gt; Maybe (Fix t)
+</span><span class="hs-identifier hs-var">freeze</span></span><span class="hs-special">)</span><span>
+</span><span id="line-201"></span></pre></body></html>

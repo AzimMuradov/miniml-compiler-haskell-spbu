@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">CodeGen.Module</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-4"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Parser.Parser.html"><span class="hs-identifier">Parser.Parser</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Parser.Parser.html#parseProgram"><span class="hs-identifier">parseProgram</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html"><span class="hs-identifier">Transformations.Anf.Anf</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Anf</span></span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Transformations.Anf.AnfGen.html"><span class="hs-identifier">Transformations.Anf.AnfGen</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Anf.AnfGen.html#genAnf"><span class="hs-identifier">genAnf</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Transformations.Cc.Cc.html"><span class="hs-identifier">Transformations.Cc.Cc</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Cc.Cc.html#ccAst"><span class="hs-identifier">ccAst</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Transformations.Ll.Ll.html"><span class="hs-identifier">Transformations.Ll.Ll</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Ll.Ll.html#llAst"><span class="hs-identifier">llAst</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Transformations.Relabeler.Relabeler.html"><span class="hs-identifier">Transformations.Relabeler.Relabeler</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Relabeler.Relabeler.html#relabelAst"><span class="hs-identifier">relabelAst</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html"><span class="hs-identifier">Transformations.Simplifier.Simplifier</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#simplifyAst"><span class="hs-identifier">simplifyAst</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html"><span class="hs-identifier">TypeChecker.HindleyMilner</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeError"><span class="hs-identifier">TypeError</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="TypeChecker.TypeChecker.html"><span class="hs-identifier">TypeChecker.TypeChecker</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="TypeChecker.TypeChecker.html#checkProgram"><span class="hs-identifier">checkProgram</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">data</span><span> </span><span id="Module"><span class="annot"><a href="CodeGen.Module.html#Module"><span class="hs-identifier hs-var">Module</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Module"><span class="annot"><a href="CodeGen.Module.html#Module"><span class="hs-identifier hs-var">Module</span></a></span></span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="name"><span class="annot"><span class="annottext">Module -&gt; Text
+</span><a href="CodeGen.Module.html#name"><span class="hs-identifier hs-var hs-var">name</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>    </span><span id="code"><span class="annot"><span class="annottext">Module -&gt; Program
+</span><a href="CodeGen.Module.html#code"><span class="hs-identifier hs-var hs-var">code</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#Program"><span class="hs-identifier hs-type">Anf.Program</span></a></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679212016"><span id="local-6989586621679212018"><span id="local-6989586621679212020"><span class="annot"><span class="annottext">Int -&gt; Module -&gt; ShowS
+[Module] -&gt; ShowS
+Module -&gt; String
+(Int -&gt; Module -&gt; ShowS)
+-&gt; (Module -&gt; String) -&gt; ([Module] -&gt; ShowS) -&gt; Show Module
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Module] -&gt; ShowS
+$cshowList :: [Module] -&gt; ShowS
+show :: Module -&gt; String
+$cshow :: Module -&gt; String
+showsPrec :: Int -&gt; Module -&gt; ShowS
+$cshowsPrec :: Int -&gt; Module -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679212011"><span id="local-6989586621679212013"><span class="annot"><span class="annottext">Module -&gt; Module -&gt; Bool
+(Module -&gt; Module -&gt; Bool)
+-&gt; (Module -&gt; Module -&gt; Bool) -&gt; Eq Module
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Module -&gt; Module -&gt; Bool
+$c/= :: Module -&gt; Module -&gt; Bool
+== :: Module -&gt; Module -&gt; Bool
+$c== :: Module -&gt; Module -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">data</span><span> </span><span id="CompilationResult"><span class="annot"><a href="CodeGen.Module.html#CompilationResult"><span class="hs-identifier hs-var">CompilationResult</span></a></span></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="Success"><span class="annot"><a href="CodeGen.Module.html#Success"><span class="hs-identifier hs-var">Success</span></a></span></span><span> </span><span class="annot"><a href="CodeGen.Module.html#Module"><span class="hs-identifier hs-type">Module</span></a></span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="SyntaxError"><span class="annot"><a href="CodeGen.Module.html#SyntaxError"><span class="hs-identifier hs-var">SyntaxError</span></a></span></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="SemanticError"><span class="annot"><a href="CodeGen.Module.html#SemanticError"><span class="hs-identifier hs-var">SemanticError</span></a></span></span><span> </span><span class="annot"><a href="TypeChecker.HindleyMilner.html#TypeError"><span class="hs-identifier hs-type">TypeError</span></a></span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="annot"><a href="CodeGen.Module.html#compileToModule"><span class="hs-identifier hs-type">compileToModule</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="CodeGen.Module.html#CompilationResult"><span class="hs-identifier hs-type">CompilationResult</span></a></span><span>
+</span><span id="line-26"></span><span id="compileToModule"><span class="annot"><span class="annottext">compileToModule :: Text -&gt; Text -&gt; CompilationResult
+</span><a href="CodeGen.Module.html#compileToModule"><span class="hs-identifier hs-var hs-var">compileToModule</span></a></span></span><span> </span><span id="local-6989586621679212005"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679212005"><span class="hs-identifier hs-var">moduleName</span></a></span></span><span> </span><span id="local-6989586621679212004"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679212004"><span class="hs-identifier hs-var">text</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Maybe Program
+</span><a href="Parser.Parser.html#parseProgram"><span class="hs-identifier hs-var">parseProgram</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679212004"><span class="hs-identifier hs-var">text</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-27"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679212003"><span class="annot"><span class="annottext">Program
+</span><a href="#local-6989586621679212003"><span class="hs-identifier hs-var">ast</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Program -&gt; Either TypeError ()
+</span><a href="TypeChecker.TypeChecker.html#checkProgram"><span class="hs-identifier hs-var">checkProgram</span></a></span><span> </span><span class="annot"><span class="annottext">Program
+</span><a href="#local-6989586621679212003"><span class="hs-identifier hs-var">ast</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-28"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-29"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679212002"><span class="annot"><span class="annottext">astToAnf :: Program -&gt; Program
+</span><a href="#local-6989586621679212002"><span class="hs-identifier hs-var hs-var">astToAnf</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Program -&gt; Program
+</span><a href="Transformations.Anf.AnfGen.html#genAnf"><span class="hs-identifier hs-var">genAnf</span></a></span><span> </span><span class="annot"><span class="annottext">(Program -&gt; Program) -&gt; (Program -&gt; Program) -&gt; Program -&gt; Program
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Program -&gt; Program
+</span><a href="Transformations.Ll.Ll.html#llAst"><span class="hs-identifier hs-var">llAst</span></a></span><span> </span><span class="annot"><span class="annottext">(Program -&gt; Program) -&gt; (Program -&gt; Program) -&gt; Program -&gt; Program
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Program -&gt; Program
+</span><a href="Transformations.Cc.Cc.html#ccAst"><span class="hs-identifier hs-var">ccAst</span></a></span><span> </span><span class="annot"><span class="annottext">(Program -&gt; Program) -&gt; (Program -&gt; Program) -&gt; Program -&gt; Program
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Program -&gt; Program
+</span><a href="Transformations.Relabeler.Relabeler.html#relabelAst"><span class="hs-identifier hs-var">relabelAst</span></a></span><span> </span><span class="annot"><span class="annottext">(Program -&gt; Program) -&gt; (Program -&gt; Program) -&gt; Program -&gt; Program
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Program -&gt; Program
+</span><a href="Transformations.Simplifier.Simplifier.html#simplifyAst"><span class="hs-identifier hs-var">simplifyAst</span></a></span><span>
+</span><span id="line-30"></span><span>          </span><span id="local-6989586621679212000"><span class="annot"><span class="annottext">anf :: Program
+</span><a href="#local-6989586621679212000"><span class="hs-identifier hs-var hs-var">anf</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Program -&gt; Program
+</span><a href="#local-6989586621679212002"><span class="hs-identifier hs-var">astToAnf</span></a></span><span> </span><span class="annot"><span class="annottext">Program
+</span><a href="#local-6989586621679212003"><span class="hs-identifier hs-var">ast</span></a></span><span>
+</span><span id="line-31"></span><span>          </span><span id="local-6989586621679211999"><span class="annot"><span class="annottext">irMod :: Module
+</span><a href="#local-6989586621679211999"><span class="hs-identifier hs-var hs-var">irMod</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Program -&gt; Module
+</span><a href="CodeGen.Module.html#Module"><span class="hs-identifier hs-var">Module</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679212005"><span class="hs-identifier hs-var">moduleName</span></a></span><span> </span><span class="annot"><span class="annottext">Program
+</span><a href="#local-6989586621679212000"><span class="hs-identifier hs-var">anf</span></a></span><span>
+</span><span id="line-32"></span><span>       </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">Module -&gt; CompilationResult
+</span><a href="CodeGen.Module.html#Success"><span class="hs-identifier hs-var">Success</span></a></span><span> </span><span class="annot"><span class="annottext">Module
+</span><a href="#local-6989586621679211999"><span class="hs-identifier hs-var">irMod</span></a></span><span>
+</span><span id="line-33"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span> </span><span id="local-6989586621679211998"><span class="annot"><span class="annottext">TypeError
+</span><a href="#local-6989586621679211998"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TypeError -&gt; CompilationResult
+</span><a href="CodeGen.Module.html#SemanticError"><span class="hs-identifier hs-var">SemanticError</span></a></span><span> </span><span class="annot"><span class="annottext">TypeError
+</span><a href="#local-6989586621679211998"><span class="hs-identifier hs-var">e</span></a></span><span>
+</span><span id="line-34"></span><span>  </span><span class="annot"><span class="annottext">Maybe Program
+</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">CompilationResult
+</span><a href="CodeGen.Module.html#SyntaxError"><span class="hs-identifier hs-var">SyntaxError</span></a></span><span>
+</span><span id="line-35"></span></pre></body></html>

@@ -1,0 +1,420 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE LambdaCase #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Transformations.Anf.PrettyPrinter</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#prettyPrint"><span class="hs-identifier">prettyPrint</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-4"></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.State</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">MonadState</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">get</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">State</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">evalState</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">modify</span></span><span class="hs-special">)</span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">unpack</span></span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html"><span class="hs-identifier">Transformations.Anf.Anf</span></a></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Trees.Common.html"><span class="hs-identifier">Trees.Common</span></a></span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#prettyPrint"><span class="hs-identifier hs-type">prettyPrint</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#Program"><span class="hs-identifier hs-type">Program</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-11"></span><span id="prettyPrint"><span class="annot"><span class="annottext">prettyPrint :: Program -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyPrint"><span class="hs-identifier hs-var hs-var">prettyPrint</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Anf.Anf.html#Program"><span class="hs-identifier hs-type">Program</span></a></span><span> </span><span id="local-6989586621679210061"><span class="annot"><span class="annottext">[GlobalDeclaration]
+</span><a href="#local-6989586621679210061"><span class="hs-identifier hs-var">decls</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
+</span><span class="hs-identifier hs-var">unlines</span></span><span> </span><span class="annot"><span class="annottext">([String] -&gt; String) -&gt; [String] -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">GlobalDeclaration -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyDecl"><span class="hs-identifier hs-var">prettyDecl</span></a></span><span> </span><span class="annot"><span class="annottext">(GlobalDeclaration -&gt; String) -&gt; [GlobalDeclaration] -&gt; [String]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[GlobalDeclaration]
+</span><a href="#local-6989586621679210061"><span class="hs-identifier hs-var">decls</span></a></span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">type</span><span> </span><span id="IndentState"><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#IndentState"><span class="hs-identifier hs-var">IndentState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#IndentLevel"><span class="hs-identifier hs-type">IndentLevel</span></a></span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">type</span><span> </span><span id="IndentLevel"><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#IndentLevel"><span class="hs-identifier hs-var">IndentLevel</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#prettyDecl"><span class="hs-identifier hs-type">prettyDecl</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#GlobalDeclaration"><span class="hs-identifier hs-type">GlobalDeclaration</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-18"></span><span id="prettyDecl"><span class="annot"><span class="annottext">prettyDecl :: GlobalDeclaration -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyDecl"><span class="hs-identifier hs-var hs-var">prettyDecl</span></a></span></span><span> </span><span id="local-6989586621679210056"><span class="annot"><span class="annottext">GlobalDeclaration
+</span><a href="#local-6989586621679210056"><span class="hs-identifier hs-var">decl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State IndentLevel String -&gt; IndentLevel -&gt; String
+forall s a. State s a -&gt; s -&gt; a
+</span><span class="hs-identifier hs-var">evalState</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">GlobalDeclaration -&gt; State IndentLevel String
+</span><a href="#local-6989586621679210055"><span class="hs-identifier hs-var">prettyDecl'</span></a></span><span> </span><span class="annot"><span class="annottext">GlobalDeclaration
+</span><a href="#local-6989586621679210056"><span class="hs-identifier hs-var">decl</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">IndentLevel
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;;;&quot;</span></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-20"></span><span>    </span><span class="annot"><a href="#local-6989586621679210055"><span class="hs-identifier hs-type">prettyDecl'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#GlobalDeclaration"><span class="hs-identifier hs-type">GlobalDeclaration</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#IndentState"><span class="hs-identifier hs-type">IndentState</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-21"></span><span>    </span><span id="local-6989586621679210055"><span class="annot"><span class="annottext">prettyDecl' :: GlobalDeclaration -&gt; State IndentLevel String
+</span><a href="#local-6989586621679210055"><span class="hs-identifier hs-var hs-var">prettyDecl'</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Anf.Anf.html#GlobVarDecl"><span class="hs-identifier hs-type">GlobVarDecl</span></a></span><span> </span><span id="local-6989586621679210053"><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679210053"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679210052"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210052"><span class="hs-identifier hs-var">value</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-22"></span><span>      </span><span id="local-6989586621679210051"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679210051"><span class="hs-identifier hs-var">val'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Expression -&gt; State IndentLevel String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyExpr"><span class="hs-identifier hs-var">prettyExpr</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210052"><span class="hs-identifier hs-var">value</span></a></span><span>
+</span><span id="line-23"></span><span>      </span><span class="annot"><span class="annottext">String -&gt; State IndentLevel String
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; State IndentLevel String)
+-&gt; String -&gt; State IndentLevel String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
+</span><span class="hs-identifier hs-var">unwords</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;let&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Identifier' -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyId"><span class="hs-identifier hs-var">prettyId</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679210053"><span class="hs-identifier hs-var">name</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;=&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679210051"><span class="hs-identifier hs-var">val'</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-24"></span><span>    </span><span class="annot"><a href="#local-6989586621679210055"><span class="hs-identifier hs-var">prettyDecl'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Anf.Anf.html#GlobFunDecl"><span class="hs-identifier hs-type">GlobFunDecl</span></a></span><span> </span><span id="local-6989586621679210046"><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679210046"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679210045"><span class="annot"><span class="annottext">[Identifier']
+</span><a href="#local-6989586621679210045"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679210044"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210044"><span class="hs-identifier hs-var">body</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-25"></span><span>      </span><span id="local-6989586621679210043"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679210043"><span class="hs-identifier hs-var">val'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Expression -&gt; State IndentLevel String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyExpr"><span class="hs-identifier hs-var">prettyExpr</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210044"><span class="hs-identifier hs-var">body</span></a></span><span>
+</span><span id="line-26"></span><span>      </span><span class="annot"><span class="annottext">String -&gt; State IndentLevel String
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; State IndentLevel String)
+-&gt; String -&gt; State IndentLevel String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
+</span><span class="hs-identifier hs-var">unwords</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;let&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Identifier' -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyId"><span class="hs-identifier hs-var">prettyId</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679210046"><span class="hs-identifier hs-var">name</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
+</span><span class="hs-identifier hs-var">unwords</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier' -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyId"><span class="hs-identifier hs-var">prettyId</span></a></span><span> </span><span class="annot"><span class="annottext">(Identifier' -&gt; String) -&gt; [Identifier'] -&gt; [String]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[Identifier']
+</span><a href="#local-6989586621679210045"><span class="hs-identifier hs-var">params</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;=&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679210043"><span class="hs-identifier hs-var">val'</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-27"></span><span>
+</span><span id="line-28"></span><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#prettyExpr"><span class="hs-identifier hs-type">prettyExpr</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#IndentState"><span class="hs-identifier hs-type">IndentState</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-29"></span><span id="prettyExpr"><span class="annot"><span class="annottext">prettyExpr :: Expression -&gt; State IndentLevel String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyExpr"><span class="hs-identifier hs-var hs-var">prettyExpr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Anf.Anf.html#ExprAtom"><span class="hs-identifier hs-type">ExprAtom</span></a></span><span> </span><span id="local-6989586621679210041"><span class="annot"><span class="annottext">AtomicExpression
+</span><a href="#local-6989586621679210041"><span class="hs-identifier hs-var">aexpr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; State IndentLevel String
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; State IndentLevel String)
+-&gt; String -&gt; State IndentLevel String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">AtomicExpression -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyAtomic"><span class="hs-identifier hs-var">prettyAtomic</span></a></span><span> </span><span class="annot"><span class="annottext">AtomicExpression
+</span><a href="#local-6989586621679210041"><span class="hs-identifier hs-var">aexpr</span></a></span><span>
+</span><span id="line-30"></span><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#prettyExpr"><span class="hs-identifier hs-var">prettyExpr</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Anf.Anf.html#ExprComp"><span class="hs-identifier hs-type">ExprComp</span></a></span><span> </span><span id="local-6989586621679210038"><span class="annot"><span class="annottext">ComplexExpression
+</span><a href="#local-6989586621679210038"><span class="hs-identifier hs-var">cexpr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ComplexExpression -&gt; State IndentLevel String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyComplex"><span class="hs-identifier hs-var">prettyComplex</span></a></span><span> </span><span class="annot"><span class="annottext">ComplexExpression
+</span><a href="#local-6989586621679210038"><span class="hs-identifier hs-var">cexpr</span></a></span><span>
+</span><span id="line-31"></span><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#prettyExpr"><span class="hs-identifier hs-var">prettyExpr</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Anf.Anf.html#ExprLetIn"><span class="hs-identifier hs-type">ExprLetIn</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679210035"><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679210035"><span class="hs-identifier hs-var">ident</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679210034"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210034"><span class="hs-identifier hs-var">val</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679210033"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210033"><span class="hs-identifier hs-var">expr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-32"></span><span>  </span><span class="annot"><span class="annottext">(IndentLevel -&gt; IndentLevel) -&gt; StateT IndentLevel Identity ()
+forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
+</span><span class="hs-identifier hs-var">modify</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">IndentLevel -&gt; IndentLevel -&gt; IndentLevel
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">IndentLevel
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span>  </span><span id="local-6989586621679210031"><span class="annot"><span class="annottext">IndentLevel
+</span><a href="#local-6989586621679210031"><span class="hs-identifier hs-var">indent</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">StateT IndentLevel Identity IndentLevel
+forall s (m :: * -&gt; *). MonadState s m =&gt; m s
+</span><span class="hs-identifier hs-var">get</span></span><span>
+</span><span id="line-34"></span><span>  </span><span id="local-6989586621679210030"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679210030"><span class="hs-identifier hs-var">val'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Expression -&gt; State IndentLevel String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyExpr"><span class="hs-identifier hs-var">prettyExpr</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210034"><span class="hs-identifier hs-var">val</span></a></span><span>
+</span><span id="line-35"></span><span>  </span><span id="local-6989586621679210029"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679210029"><span class="hs-identifier hs-var">expr'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Expression -&gt; State IndentLevel String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyExpr"><span class="hs-identifier hs-var">prettyExpr</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210033"><span class="hs-identifier hs-var">expr</span></a></span><span>
+</span><span id="line-36"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679210028"><span class="annot"><span class="annottext">declText :: String
+</span><a href="#local-6989586621679210028"><span class="hs-identifier hs-var hs-var">declText</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">IndentLevel -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#createIndent"><span class="hs-identifier hs-var">createIndent</span></a></span><span> </span><span class="annot"><span class="annottext">IndentLevel
+</span><a href="#local-6989586621679210031"><span class="hs-identifier hs-var">indent</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;let &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Identifier' -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyId"><span class="hs-identifier hs-var">prettyId</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679210035"><span class="hs-identifier hs-var">ident</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot; = &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679210030"><span class="hs-identifier hs-var">val'</span></a></span><span>
+</span><span id="line-37"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679210026"><span class="annot"><span class="annottext">exprText :: String
+</span><a href="#local-6989586621679210026"><span class="hs-identifier hs-var hs-var">exprText</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">IndentLevel -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#createIndent"><span class="hs-identifier hs-var">createIndent</span></a></span><span> </span><span class="annot"><span class="annottext">IndentLevel
+</span><a href="#local-6989586621679210031"><span class="hs-identifier hs-var">indent</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;in &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679210029"><span class="hs-identifier hs-var">expr'</span></a></span><span>
+</span><span id="line-38"></span><span>  </span><span class="annot"><span class="annottext">(IndentLevel -&gt; IndentLevel) -&gt; StateT IndentLevel Identity ()
+forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
+</span><span class="hs-identifier hs-var">modify</span></span><span> </span><span class="annot"><span class="annottext">((IndentLevel -&gt; IndentLevel) -&gt; StateT IndentLevel Identity ())
+-&gt; (IndentLevel -&gt; IndentLevel) -&gt; StateT IndentLevel Identity ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679210025"><span class="annot"><span class="annottext">IndentLevel
+</span><a href="#local-6989586621679210025"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">IndentLevel
+</span><a href="#local-6989586621679210025"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">IndentLevel -&gt; IndentLevel -&gt; IndentLevel
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">IndentLevel
+</span><span class="hs-number">2</span></span><span>
+</span><span id="line-39"></span><span>  </span><span class="annot"><span class="annottext">String -&gt; State IndentLevel String
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; State IndentLevel String)
+-&gt; String -&gt; State IndentLevel String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679210028"><span class="hs-identifier hs-var">declText</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679210026"><span class="hs-identifier hs-var">exprText</span></a></span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#prettyComplex"><span class="hs-identifier hs-type">prettyComplex</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#ComplexExpression"><span class="hs-identifier hs-type">ComplexExpression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#IndentState"><span class="hs-identifier hs-type">IndentState</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-42"></span><span id="prettyComplex"><span class="annot"><span class="annottext">prettyComplex :: ComplexExpression -&gt; State IndentLevel String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyComplex"><span class="hs-identifier hs-var hs-var">prettyComplex</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-43"></span><span>  </span><span class="annot"><a href="Transformations.Anf.Anf.html#CompApp"><span class="hs-identifier hs-type">CompApp</span></a></span><span> </span><span id="local-6989586621679210023"><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679210023"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679210022"><span class="annot"><span class="annottext">AtomicExpression
+</span><a href="#local-6989586621679210022"><span class="hs-identifier hs-var">arg</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; State IndentLevel String
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; State IndentLevel String)
+-&gt; String -&gt; State IndentLevel String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#parens"><span class="hs-identifier hs-var">parens</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; String) -&gt; String -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Identifier' -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyId"><span class="hs-identifier hs-var">prettyId</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679210023"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot; &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">AtomicExpression -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyAtomic"><span class="hs-identifier hs-var">prettyAtomic</span></a></span><span> </span><span class="annot"><span class="annottext">AtomicExpression
+</span><a href="#local-6989586621679210022"><span class="hs-identifier hs-var">arg</span></a></span><span>
+</span><span id="line-44"></span><span>  </span><span class="annot"><a href="Transformations.Anf.Anf.html#CompIte"><span class="hs-identifier hs-type">CompIte</span></a></span><span> </span><span id="local-6989586621679210019"><span class="annot"><span class="annottext">AtomicExpression
+</span><a href="#local-6989586621679210019"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span id="local-6989586621679210018"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210018"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679210017"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210017"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-45"></span><span>    </span><span class="annot"><span class="annottext">(IndentLevel -&gt; IndentLevel) -&gt; StateT IndentLevel Identity ()
+forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
+</span><span class="hs-identifier hs-var">modify</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">IndentLevel -&gt; IndentLevel -&gt; IndentLevel
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">IndentLevel
+</span><span class="hs-number">4</span></span><span class="hs-special">)</span><span>
+</span><span id="line-46"></span><span>    </span><span id="local-6989586621679210016"><span class="annot"><span class="annottext">IndentLevel
+</span><a href="#local-6989586621679210016"><span class="hs-identifier hs-var">indent</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">StateT IndentLevel Identity IndentLevel
+forall s (m :: * -&gt; *). MonadState s m =&gt; m s
+</span><span class="hs-identifier hs-var">get</span></span><span>
+</span><span id="line-47"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679210015"><span class="annot"><span class="annottext">cText :: String
+</span><a href="#local-6989586621679210015"><span class="hs-identifier hs-var hs-var">cText</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">IndentLevel -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#createIndent"><span class="hs-identifier hs-var">createIndent</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">IndentLevel
+</span><a href="#local-6989586621679210016"><span class="hs-identifier hs-var">indent</span></a></span><span> </span><span class="annot"><span class="annottext">IndentLevel -&gt; IndentLevel -&gt; IndentLevel
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">IndentLevel
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;if &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">AtomicExpression -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyAtomic"><span class="hs-identifier hs-var">prettyAtomic</span></a></span><span> </span><span class="annot"><span class="annottext">AtomicExpression
+</span><a href="#local-6989586621679210019"><span class="hs-identifier hs-var">c</span></a></span><span>
+</span><span id="line-48"></span><span>    </span><span id="local-6989586621679210014"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679210014"><span class="hs-identifier hs-var">t'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Expression -&gt; State IndentLevel String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyExpr"><span class="hs-identifier hs-var">prettyExpr</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210018"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-49"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679210013"><span class="annot"><span class="annottext">tText :: String
+</span><a href="#local-6989586621679210013"><span class="hs-identifier hs-var hs-var">tText</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">IndentLevel -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#createIndent"><span class="hs-identifier hs-var">createIndent</span></a></span><span> </span><span class="annot"><span class="annottext">IndentLevel
+</span><a href="#local-6989586621679210016"><span class="hs-identifier hs-var">indent</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;then &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679210014"><span class="hs-identifier hs-var">t'</span></a></span><span>
+</span><span id="line-50"></span><span>    </span><span id="local-6989586621679210012"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679210012"><span class="hs-identifier hs-var">e'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Expression -&gt; State IndentLevel String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyExpr"><span class="hs-identifier hs-var">prettyExpr</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210017"><span class="hs-identifier hs-var">e</span></a></span><span>
+</span><span id="line-51"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679210011"><span class="annot"><span class="annottext">eText :: String
+</span><a href="#local-6989586621679210011"><span class="hs-identifier hs-var hs-var">eText</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">IndentLevel -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#createIndent"><span class="hs-identifier hs-var">createIndent</span></a></span><span> </span><span class="annot"><span class="annottext">IndentLevel
+</span><a href="#local-6989586621679210016"><span class="hs-identifier hs-var">indent</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;else &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679210012"><span class="hs-identifier hs-var">e'</span></a></span><span>
+</span><span id="line-52"></span><span>    </span><span class="annot"><span class="annottext">(IndentLevel -&gt; IndentLevel) -&gt; StateT IndentLevel Identity ()
+forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
+</span><span class="hs-identifier hs-var">modify</span></span><span> </span><span class="annot"><span class="annottext">((IndentLevel -&gt; IndentLevel) -&gt; StateT IndentLevel Identity ())
+-&gt; (IndentLevel -&gt; IndentLevel) -&gt; StateT IndentLevel Identity ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679210010"><span class="annot"><span class="annottext">IndentLevel
+</span><a href="#local-6989586621679210010"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">IndentLevel
+</span><a href="#local-6989586621679210010"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">IndentLevel -&gt; IndentLevel -&gt; IndentLevel
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">IndentLevel
+</span><span class="hs-number">4</span></span><span>
+</span><span id="line-53"></span><span>    </span><span class="annot"><span class="annottext">String -&gt; State IndentLevel String
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; State IndentLevel String)
+-&gt; String -&gt; State IndentLevel String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679210015"><span class="hs-identifier hs-var">cText</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679210013"><span class="hs-identifier hs-var">tText</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679210011"><span class="hs-identifier hs-var">eText</span></a></span><span>
+</span><span id="line-54"></span><span>  </span><span class="annot"><a href="Transformations.Anf.Anf.html#CompBinOp"><span class="hs-identifier hs-type">CompBinOp</span></a></span><span> </span><span id="local-6989586621679210008"><span class="annot"><span class="annottext">BinaryOperator
+</span><a href="#local-6989586621679210008"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span id="local-6989586621679210007"><span class="annot"><span class="annottext">AtomicExpression
+</span><a href="#local-6989586621679210007"><span class="hs-identifier hs-var">lhs</span></a></span></span><span> </span><span id="local-6989586621679210006"><span class="annot"><span class="annottext">AtomicExpression
+</span><a href="#local-6989586621679210006"><span class="hs-identifier hs-var">rhs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; State IndentLevel String
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; State IndentLevel String)
+-&gt; String -&gt; State IndentLevel String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#parens"><span class="hs-identifier hs-var">parens</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[String] -&gt; String
+</span><span class="hs-identifier hs-var">unwords</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">AtomicExpression -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyAtomic"><span class="hs-identifier hs-var">prettyAtomic</span></a></span><span> </span><span class="annot"><span class="annottext">AtomicExpression
+</span><a href="#local-6989586621679210007"><span class="hs-identifier hs-var">lhs</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">BinaryOperator -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyBinOp"><span class="hs-identifier hs-var">prettyBinOp</span></a></span><span> </span><span class="annot"><span class="annottext">BinaryOperator
+</span><a href="#local-6989586621679210008"><span class="hs-identifier hs-var">op</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">AtomicExpression -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyAtomic"><span class="hs-identifier hs-var">prettyAtomic</span></a></span><span> </span><span class="annot"><span class="annottext">AtomicExpression
+</span><a href="#local-6989586621679210006"><span class="hs-identifier hs-var">rhs</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>  </span><span class="annot"><a href="Transformations.Anf.Anf.html#CompUnOp"><span class="hs-identifier hs-type">CompUnOp</span></a></span><span> </span><span id="local-6989586621679210003"><span class="annot"><span class="annottext">UnaryOperator
+</span><a href="#local-6989586621679210003"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span id="local-6989586621679210002"><span class="annot"><span class="annottext">AtomicExpression
+</span><a href="#local-6989586621679210002"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; State IndentLevel String
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; State IndentLevel String)
+-&gt; String -&gt; State IndentLevel String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#parens"><span class="hs-identifier hs-var">parens</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; String) -&gt; String -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">UnaryOperator -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyUnOp"><span class="hs-identifier hs-var">prettyUnOp</span></a></span><span> </span><span class="annot"><span class="annottext">UnaryOperator
+</span><a href="#local-6989586621679210003"><span class="hs-identifier hs-var">op</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">AtomicExpression -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyAtomic"><span class="hs-identifier hs-var">prettyAtomic</span></a></span><span> </span><span class="annot"><span class="annottext">AtomicExpression
+</span><a href="#local-6989586621679210002"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-56"></span><span>
+</span><span id="line-57"></span><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#prettyAtomic"><span class="hs-identifier hs-type">prettyAtomic</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#AtomicExpression"><span class="hs-identifier hs-type">AtomicExpression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-58"></span><span id="prettyAtomic"><span class="annot"><span class="annottext">prettyAtomic :: AtomicExpression -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyAtomic"><span class="hs-identifier hs-var hs-var">prettyAtomic</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-59"></span><span>  </span><span class="annot"><a href="Transformations.Anf.Anf.html#AtomId"><span class="hs-identifier hs-type">AtomId</span></a></span><span> </span><span id="local-6989586621679209999"><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679209999"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Identifier' -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyId"><span class="hs-identifier hs-var">prettyId</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679209999"><span class="hs-identifier hs-var">name</span></a></span><span>
+</span><span id="line-60"></span><span>  </span><span class="annot"><span class="annottext">AtomicExpression
+</span><a href="Transformations.Anf.Anf.html#AtomUnit"><span class="hs-identifier hs-var">AtomUnit</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;()&quot;</span></span><span>
+</span><span id="line-61"></span><span>  </span><span class="annot"><a href="Transformations.Anf.Anf.html#AtomBool"><span class="hs-identifier hs-type">AtomBool</span></a></span><span> </span><span id="local-6989586621679209996"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679209996"><span class="hs-identifier hs-var">value</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679209996"><span class="hs-identifier hs-var">value</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;true&quot;</span></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;false&quot;</span></span><span>
+</span><span id="line-62"></span><span>  </span><span class="annot"><a href="Transformations.Anf.Anf.html#AtomInt"><span class="hs-identifier hs-type">AtomInt</span></a></span><span> </span><span id="local-6989586621679209994"><span class="annot"><span class="annottext">Int64
+</span><a href="#local-6989586621679209994"><span class="hs-identifier hs-var">value</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Int64
+</span><a href="#local-6989586621679209994"><span class="hs-identifier hs-var">value</span></a></span><span>
+</span><span id="line-63"></span><span>
+</span><span id="line-64"></span><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#prettyId"><span class="hs-identifier hs-type">prettyId</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier%27"><span class="hs-identifier hs-type">Identifier'</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-65"></span><span id="prettyId"><span class="annot"><span class="annottext">prettyId :: Identifier' -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyId"><span class="hs-identifier hs-var hs-var">prettyId</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Trees.Common.html#Txt"><span class="hs-identifier hs-type">Txt</span></a></span><span> </span><span id="local-6989586621679209991"><span class="annot"><span class="annottext">Identifier
+</span><a href="#local-6989586621679209991"><span class="hs-identifier hs-var">n</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Identifier -&gt; String
+</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="annot"><span class="annottext">Identifier
+</span><a href="#local-6989586621679209991"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><span id="line-66"></span><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#prettyId"><span class="hs-identifier hs-var">prettyId</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Trees.Common.html#Gen"><span class="hs-identifier hs-type">Gen</span></a></span><span> </span><span id="local-6989586621679209989"><span class="annot"><span class="annottext">IndentLevel
+</span><a href="#local-6989586621679209989"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span id="local-6989586621679209988"><span class="annot"><span class="annottext">Identifier
+</span><a href="#local-6989586621679209988"><span class="hs-identifier hs-var">ident</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Identifier -&gt; String
+</span><span class="hs-identifier hs-var">unpack</span></span><span> </span><span class="annot"><span class="annottext">Identifier
+</span><a href="#local-6989586621679209988"><span class="hs-identifier hs-var">ident</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;'&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">IndentLevel -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">IndentLevel
+</span><a href="#local-6989586621679209989"><span class="hs-identifier hs-var">n</span></a></span><span>
+</span><span id="line-67"></span><span>
+</span><span id="line-68"></span><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#prettyBinOp"><span class="hs-identifier hs-type">prettyBinOp</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Trees.Common.html#BinaryOperator"><span class="hs-identifier hs-type">BinaryOperator</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-69"></span><span id="prettyBinOp"><span class="annot"><span class="annottext">prettyBinOp :: BinaryOperator -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyBinOp"><span class="hs-identifier hs-var hs-var">prettyBinOp</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-70"></span><span>  </span><span class="annot"><a href="Trees.Common.html#BoolOp"><span class="hs-identifier hs-type">BoolOp</span></a></span><span> </span><span class="annot"><span class="annottext">BooleanOperator
+</span><a href="Trees.Common.html#AndOp"><span class="hs-identifier hs-var">AndOp</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;&amp;&amp;&quot;</span></span><span>
+</span><span id="line-71"></span><span>  </span><span class="annot"><a href="Trees.Common.html#BoolOp"><span class="hs-identifier hs-type">BoolOp</span></a></span><span> </span><span class="annot"><span class="annottext">BooleanOperator
+</span><a href="Trees.Common.html#OrOp"><span class="hs-identifier hs-var">OrOp</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;||&quot;</span></span><span>
+</span><span id="line-72"></span><span>  </span><span class="annot"><a href="Trees.Common.html#ArithOp"><span class="hs-identifier hs-type">ArithOp</span></a></span><span> </span><span class="annot"><span class="annottext">ArithmeticOperator
+</span><a href="Trees.Common.html#PlusOp"><span class="hs-identifier hs-var">PlusOp</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;+&quot;</span></span><span>
+</span><span id="line-73"></span><span>  </span><span class="annot"><a href="Trees.Common.html#ArithOp"><span class="hs-identifier hs-type">ArithOp</span></a></span><span> </span><span class="annot"><span class="annottext">ArithmeticOperator
+</span><a href="Trees.Common.html#MinusOp"><span class="hs-identifier hs-var">MinusOp</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;-&quot;</span></span><span>
+</span><span id="line-74"></span><span>  </span><span class="annot"><a href="Trees.Common.html#ArithOp"><span class="hs-identifier hs-type">ArithOp</span></a></span><span> </span><span class="annot"><span class="annottext">ArithmeticOperator
+</span><a href="Trees.Common.html#MulOp"><span class="hs-identifier hs-var">MulOp</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;*&quot;</span></span><span>
+</span><span id="line-75"></span><span>  </span><span class="annot"><a href="Trees.Common.html#ArithOp"><span class="hs-identifier hs-type">ArithOp</span></a></span><span> </span><span class="annot"><span class="annottext">ArithmeticOperator
+</span><a href="Trees.Common.html#DivOp"><span class="hs-identifier hs-var">DivOp</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;/&quot;</span></span><span>
+</span><span id="line-76"></span><span>  </span><span class="annot"><a href="Trees.Common.html#CompOp"><span class="hs-identifier hs-type">CompOp</span></a></span><span> </span><span class="annot"><span class="annottext">ComparisonOperator
+</span><a href="Trees.Common.html#EqOp"><span class="hs-identifier hs-var">EqOp</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;=&quot;</span></span><span>
+</span><span id="line-77"></span><span>  </span><span class="annot"><a href="Trees.Common.html#CompOp"><span class="hs-identifier hs-type">CompOp</span></a></span><span> </span><span class="annot"><span class="annottext">ComparisonOperator
+</span><a href="Trees.Common.html#NeOp"><span class="hs-identifier hs-var">NeOp</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;&lt;&gt;&quot;</span></span><span>
+</span><span id="line-78"></span><span>  </span><span class="annot"><a href="Trees.Common.html#CompOp"><span class="hs-identifier hs-type">CompOp</span></a></span><span> </span><span class="annot"><span class="annottext">ComparisonOperator
+</span><a href="Trees.Common.html#LtOp"><span class="hs-identifier hs-var">LtOp</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;&lt;&quot;</span></span><span>
+</span><span id="line-79"></span><span>  </span><span class="annot"><a href="Trees.Common.html#CompOp"><span class="hs-identifier hs-type">CompOp</span></a></span><span> </span><span class="annot"><span class="annottext">ComparisonOperator
+</span><a href="Trees.Common.html#LeOp"><span class="hs-identifier hs-var">LeOp</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;&lt;=&quot;</span></span><span>
+</span><span id="line-80"></span><span>  </span><span class="annot"><a href="Trees.Common.html#CompOp"><span class="hs-identifier hs-type">CompOp</span></a></span><span> </span><span class="annot"><span class="annottext">ComparisonOperator
+</span><a href="Trees.Common.html#GtOp"><span class="hs-identifier hs-var">GtOp</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;&gt;&quot;</span></span><span>
+</span><span id="line-81"></span><span>  </span><span class="annot"><a href="Trees.Common.html#CompOp"><span class="hs-identifier hs-type">CompOp</span></a></span><span> </span><span class="annot"><span class="annottext">ComparisonOperator
+</span><a href="Trees.Common.html#GeOp"><span class="hs-identifier hs-var">GeOp</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;&gt;=&quot;</span></span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#prettyUnOp"><span class="hs-identifier hs-type">prettyUnOp</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Trees.Common.html#UnaryOperator"><span class="hs-identifier hs-type">UnaryOperator</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-84"></span><span id="prettyUnOp"><span class="annot"><span class="annottext">prettyUnOp :: UnaryOperator -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#prettyUnOp"><span class="hs-identifier hs-var hs-var">prettyUnOp</span></a></span></span><span> </span><span class="annot"><span class="annottext">UnaryOperator
+</span><a href="Trees.Common.html#UnMinusOp"><span class="hs-identifier hs-var">UnMinusOp</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;-&quot;</span></span><span>
+</span><span id="line-85"></span><span>
+</span><span id="line-86"></span><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#createIndent"><span class="hs-identifier hs-type">createIndent</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-87"></span><span id="createIndent"><span class="annot"><span class="annottext">createIndent :: IndentLevel -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#createIndent"><span class="hs-identifier hs-var hs-var">createIndent</span></a></span></span><span> </span><span id="local-6989586621679209971"><span class="annot"><span class="annottext">IndentLevel
+</span><a href="#local-6989586621679209971"><span class="hs-identifier hs-var">indent</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;\n&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">IndentLevel -&gt; Char -&gt; String
+forall a. IndentLevel -&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">replicate</span></span><span> </span><span class="annot"><span class="annottext">IndentLevel
+</span><a href="#local-6989586621679209971"><span class="hs-identifier hs-var">indent</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">' '</span></span><span>
+</span><span id="line-88"></span><span>
+</span><span id="line-89"></span><span class="annot"><a href="Transformations.Anf.PrettyPrinter.html#parens"><span class="hs-identifier hs-type">parens</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-90"></span><span id="parens"><span class="annot"><span class="annottext">parens :: String -&gt; String
+</span><a href="Transformations.Anf.PrettyPrinter.html#parens"><span class="hs-identifier hs-var hs-var">parens</span></a></span></span><span> </span><span id="local-6989586621679209969"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679209969"><span class="hs-identifier hs-var">val</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;(&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679209969"><span class="hs-identifier hs-var">val</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;)&quot;</span></span><span>
+</span><span id="line-91"></span></pre></body></html>

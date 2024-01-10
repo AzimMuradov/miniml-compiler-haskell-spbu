@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# OPTIONS_GHC -Wno-partial-fields #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">CodeGen.RunResult</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-4"></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="CodeGen.TimedValue.html"><span class="hs-identifier">CodeGen.TimedValue</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.TimedValue.html#Nanoseconds"><span class="hs-identifier">Nanoseconds</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">data</span><span> </span><span id="RunResult"><span class="annot"><a href="CodeGen.RunResult.html#RunResult"><span class="hs-identifier hs-var">RunResult</span></a></span></span><span>
+</span><span id="line-9"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="Success"><span class="annot"><a href="CodeGen.RunResult.html#Success"><span class="hs-identifier hs-var">Success</span></a></span></span><span>
+</span><span id="line-10"></span><span>      </span><span class="hs-special">{</span><span> </span><span id="stdout"><span class="annot"><span class="annottext">RunResult -&gt; Text
+</span><a href="CodeGen.RunResult.html#stdout"><span class="hs-identifier hs-var hs-var">stdout</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">,</span><span>
+</span><span id="line-11"></span><span>        </span><span id="compTime"><span class="annot"><span class="annottext">RunResult -&gt; Nanoseconds
+</span><a href="CodeGen.RunResult.html#compTime"><span class="hs-identifier hs-var hs-var">compTime</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="CodeGen.TimedValue.html#Nanoseconds"><span class="hs-identifier hs-type">Nanoseconds</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-12"></span><span>        </span><span id="runTime"><span class="annot"><span class="annottext">RunResult -&gt; Nanoseconds
+</span><a href="CodeGen.RunResult.html#runTime"><span class="hs-identifier hs-var hs-var">runTime</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="CodeGen.TimedValue.html#Nanoseconds"><span class="hs-identifier hs-type">Nanoseconds</span></a></span><span>
+</span><span id="line-13"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="CompilationError"><span class="annot"><a href="CodeGen.RunResult.html#CompilationError"><span class="hs-identifier hs-var">CompilationError</span></a></span></span><span>
+</span><span id="line-15"></span><span>      </span><span class="hs-special">{</span><span> </span><span id="compErrMsg"><span class="annot"><span class="annottext">RunResult -&gt; Text
+</span><a href="CodeGen.RunResult.html#compErrMsg"><span class="hs-identifier hs-var hs-var">compErrMsg</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>        </span><span id="compTime"><span class="annot"><a href="CodeGen.RunResult.html#compTime"><span class="hs-identifier hs-var">compTime</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="CodeGen.TimedValue.html#Nanoseconds"><span class="hs-identifier hs-type">Nanoseconds</span></a></span><span>
+</span><span id="line-17"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="RuntimeError"><span class="annot"><a href="CodeGen.RunResult.html#RuntimeError"><span class="hs-identifier hs-var">RuntimeError</span></a></span></span><span>
+</span><span id="line-19"></span><span>      </span><span class="hs-special">{</span><span> </span><span id="stdout"><span class="annot"><a href="CodeGen.RunResult.html#stdout"><span class="hs-identifier hs-var">stdout</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>        </span><span id="stderr"><span class="annot"><span class="annottext">RunResult -&gt; Text
+</span><a href="CodeGen.RunResult.html#stderr"><span class="hs-identifier hs-var hs-var">stderr</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>        </span><span id="exitCode"><span class="annot"><span class="annottext">RunResult -&gt; Int
+</span><a href="CodeGen.RunResult.html#exitCode"><span class="hs-identifier hs-var hs-var">exitCode</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">,</span><span>
+</span><span id="line-22"></span><span>        </span><span id="compTime"><span class="annot"><a href="CodeGen.RunResult.html#compTime"><span class="hs-identifier hs-var">compTime</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="CodeGen.TimedValue.html#Nanoseconds"><span class="hs-identifier hs-type">Nanoseconds</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-23"></span><span>        </span><span id="runTime"><span class="annot"><a href="CodeGen.RunResult.html#runTime"><span class="hs-identifier hs-var">runTime</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="CodeGen.TimedValue.html#Nanoseconds"><span class="hs-identifier hs-type">Nanoseconds</span></a></span><span>
+</span><span id="line-24"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679209082"><span id="local-6989586621679209084"><span id="local-6989586621679209086"><span class="annot"><span class="annottext">Int -&gt; RunResult -&gt; ShowS
+[RunResult] -&gt; ShowS
+RunResult -&gt; String
+(Int -&gt; RunResult -&gt; ShowS)
+-&gt; (RunResult -&gt; String)
+-&gt; ([RunResult] -&gt; ShowS)
+-&gt; Show RunResult
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [RunResult] -&gt; ShowS
+$cshowList :: [RunResult] -&gt; ShowS
+show :: RunResult -&gt; String
+$cshow :: RunResult -&gt; String
+showsPrec :: Int -&gt; RunResult -&gt; ShowS
+$cshowsPrec :: Int -&gt; RunResult -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span></pre></body></html>

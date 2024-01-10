@@ -1,0 +1,296 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE LambdaCase #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Transformations.Simplifier.Simplifier</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#simplifyAst"><span class="hs-identifier">simplifyAst</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-4"></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.State</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">State</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">get</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">modify</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">runState</span></span><span class="hs-special">)</span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">pack</span></span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="MonadUtils.html"><span class="hs-identifier">MonadUtils</span></a></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Parser.Ast.html"><span class="hs-identifier">Parser.Ast</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Ast</span></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html"><span class="hs-identifier">Transformations.Simplifier.SimplifiedAst</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SAst</span></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Trees.Common.html"><span class="hs-identifier">Trees.Common</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Common</span></span><span>
+</span><span id="line-11"></span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- * AST Simplifier</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#simplifyAst"><span class="hs-identifier hs-type">simplifyAst</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Parser.Ast.html#Program"><span class="hs-identifier hs-type">Ast.Program</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Program"><span class="hs-identifier hs-type">SAst.Program</span></a></span><span>
+</span><span id="line-15"></span><span id="simplifyAst"><span class="annot"><span class="annottext">simplifyAst :: Program -&gt; Program
+</span><a href="Transformations.Simplifier.Simplifier.html#simplifyAst"><span class="hs-identifier hs-var hs-var">simplifyAst</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Parser.Ast.html#Program"><span class="hs-identifier hs-type">Ast.Program</span></a></span><span> </span><span id="local-6989586621679210850"><span class="annot"><span class="annottext">[Statement]
+</span><a href="#local-6989586621679210850"><span class="hs-identifier hs-var">stmts</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679210849"><span class="annot"><span class="annottext">[Declaration]
+</span><a href="#local-6989586621679210849"><span class="hs-identifier hs-var">decls</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679210848"><span class="annot"><span class="annottext">IdCnt
+</span><a href="#local-6989586621679210848"><span class="hs-identifier hs-var">cnt</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State IdCnt [Declaration] -&gt; IdCnt -&gt; ([Declaration], IdCnt)
+forall s a. State s a -&gt; s -&gt; (a, s)
+</span><span class="hs-identifier hs-var">runState</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Statement -&gt; StateT IdCnt Identity Declaration)
+-&gt; [Statement] -&gt; State IdCnt [Declaration]
+forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
+(Traversable t, Monad m) =&gt;
+(a -&gt; m b) -&gt; t a -&gt; m (t b)
+</span><span class="hs-identifier hs-var">mapM</span></span><span> </span><span class="annot"><span class="annottext">Statement -&gt; StateT IdCnt Identity Declaration
+</span><a href="Transformations.Simplifier.Simplifier.html#simplifyStmt"><span class="hs-identifier hs-var">simplifyStmt</span></a></span><span> </span><span class="annot"><span class="annottext">[Statement]
+</span><a href="#local-6989586621679210850"><span class="hs-identifier hs-var">stmts</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">IdCnt
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-17"></span><span>   </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">[Declaration] -&gt; IdCnt -&gt; Program
+</span><a href="Transformations.Simplifier.SimplifiedAst.html#Program"><span class="hs-identifier hs-var">SAst.Program</span></a></span><span> </span><span class="annot"><span class="annottext">[Declaration]
+</span><a href="#local-6989586621679210849"><span class="hs-identifier hs-var">decls</span></a></span><span> </span><span class="annot"><span class="annottext">IdCnt
+</span><a href="#local-6989586621679210848"><span class="hs-identifier hs-var">cnt</span></a></span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-comment">-- * Internal</span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="hs-comment">-- ** Simplifier State</span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">type</span><span> </span><span id="SimplifierState"><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#SimplifierState"><span class="hs-identifier hs-var">SimplifierState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">State</span></span><span> </span><span class="annot"><a href="Trees.Common.html#IdCnt"><span class="hs-identifier hs-type">Common.IdCnt</span></a></span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-comment">-- ** Simplifiers</span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#simplifyStmt"><span class="hs-identifier hs-type">simplifyStmt</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Parser.Ast.html#Statement"><span class="hs-identifier hs-type">Ast.Statement</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#SimplifierState"><span class="hs-identifier hs-type">SimplifierState</span></a></span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Declaration"><span class="hs-identifier hs-type">SAst.Declaration</span></a></span><span>
+</span><span id="line-28"></span><span id="simplifyStmt"><span class="annot"><span class="annottext">simplifyStmt :: Statement -&gt; StateT IdCnt Identity Declaration
+</span><a href="Transformations.Simplifier.Simplifier.html#simplifyStmt"><span class="hs-identifier hs-var hs-var">simplifyStmt</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-29"></span><span>  </span><span class="annot"><a href="Parser.Ast.html#StmtDecl"><span class="hs-identifier hs-type">Ast.StmtDecl</span></a></span><span> </span><span id="local-6989586621679210843"><span class="annot"><span class="annottext">Declaration
+</span><a href="#local-6989586621679210843"><span class="hs-identifier hs-var">decl</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Declaration -&gt; StateT IdCnt Identity Declaration
+</span><a href="Transformations.Simplifier.Simplifier.html#simplifyDecl"><span class="hs-identifier hs-var">simplifyDecl</span></a></span><span> </span><span class="annot"><span class="annottext">Declaration
+</span><a href="#local-6989586621679210843"><span class="hs-identifier hs-var">decl</span></a></span><span>
+</span><span id="line-30"></span><span>  </span><span class="annot"><a href="Parser.Ast.html#StmtExpr"><span class="hs-identifier hs-type">Ast.StmtExpr</span></a></span><span> </span><span id="local-6989586621679210840"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210840"><span class="hs-identifier hs-var">expr</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Identifier' -&gt; Expression -&gt; Declaration
+</span><a href="Transformations.Simplifier.SimplifiedAst.html#DeclVar"><span class="hs-identifier hs-var">SAst.DeclVar</span></a></span><span> </span><span class="annot"><span class="annottext">(Identifier' -&gt; Expression -&gt; Declaration)
+-&gt; StateT IdCnt Identity Identifier'
+-&gt; StateT IdCnt Identity (Expression -&gt; Declaration)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">StateT IdCnt Identity Identifier'
+</span><a href="Transformations.Simplifier.Simplifier.html#genId"><span class="hs-identifier hs-var">genId</span></a></span><span> </span><span class="annot"><span class="annottext">StateT IdCnt Identity (Expression -&gt; Declaration)
+-&gt; StateT IdCnt Identity Expression
+-&gt; StateT IdCnt Identity Declaration
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Expression -&gt; StateT IdCnt Identity Expression
+</span><a href="Transformations.Simplifier.Simplifier.html#simplifyExpr"><span class="hs-identifier hs-var">simplifyExpr</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210840"><span class="hs-identifier hs-var">expr</span></a></span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#simplifyDecl"><span class="hs-identifier hs-type">simplifyDecl</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Parser.Ast.html#Declaration"><span class="hs-identifier hs-type">Ast.Declaration</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#SimplifierState"><span class="hs-identifier hs-type">SimplifierState</span></a></span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Declaration"><span class="hs-identifier hs-type">SAst.Declaration</span></a></span><span>
+</span><span id="line-33"></span><span id="simplifyDecl"><span class="annot"><span class="annottext">simplifyDecl :: Declaration -&gt; StateT IdCnt Identity Declaration
+</span><a href="Transformations.Simplifier.Simplifier.html#simplifyDecl"><span class="hs-identifier hs-var hs-var">simplifyDecl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-34"></span><span>  </span><span class="annot"><a href="Parser.Ast.html#DeclVar"><span class="hs-identifier hs-type">Ast.DeclVar</span></a></span><span> </span><span id="local-6989586621679210834"><span class="annot"><span class="annottext">(Identifier, Maybe Type)
+</span><a href="#local-6989586621679210834"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span id="local-6989586621679210833"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210833"><span class="hs-identifier hs-var">value</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Declaration)
+-&gt; Expression -&gt; StateT IdCnt Identity Declaration
+forall a. (Expression -&gt; a) -&gt; Expression -&gt; SimplifierState a
+</span><a href="Transformations.Simplifier.Simplifier.html#simplify1"><span class="hs-identifier hs-var">simplify1</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier' -&gt; Expression -&gt; Declaration
+</span><a href="Transformations.Simplifier.SimplifiedAst.html#DeclVar"><span class="hs-identifier hs-var">SAst.DeclVar</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Identifier, Maybe Type) -&gt; Identifier'
+</span><a href="Transformations.Simplifier.Simplifier.html#convertTypedId"><span class="hs-identifier hs-var">convertTypedId</span></a></span><span> </span><span class="annot"><span class="annottext">(Identifier, Maybe Type)
+</span><a href="#local-6989586621679210834"><span class="hs-identifier hs-var">ident</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210833"><span class="hs-identifier hs-var">value</span></a></span><span>
+</span><span id="line-35"></span><span>  </span><span class="annot"><a href="Parser.Ast.html#DeclFun"><span class="hs-identifier hs-type">Ast.DeclFun</span></a></span><span> </span><span id="local-6989586621679210829"><span class="annot"><span class="annottext">Identifier
+</span><a href="#local-6989586621679210829"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span id="local-6989586621679210828"><span class="annot"><span class="annottext">IsRec
+</span><a href="#local-6989586621679210828"><span class="hs-identifier hs-var">isRec</span></a></span></span><span> </span><span id="local-6989586621679210827"><span class="annot"><span class="annottext">Fun
+</span><a href="#local-6989586621679210827"><span class="hs-identifier hs-var">fun</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Identifier' -&gt; IsRec -&gt; Fun -&gt; Declaration
+</span><a href="Transformations.Simplifier.SimplifiedAst.html#DeclFun"><span class="hs-identifier hs-var">SAst.DeclFun</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier -&gt; Identifier'
+</span><a href="Transformations.Simplifier.Simplifier.html#convertId"><span class="hs-identifier hs-var">convertId</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier
+</span><a href="#local-6989586621679210829"><span class="hs-identifier hs-var">ident</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">IsRec
+</span><a href="#local-6989586621679210828"><span class="hs-identifier hs-var">isRec</span></a></span><span> </span><span class="annot"><span class="annottext">(Fun -&gt; Declaration)
+-&gt; StateT IdCnt Identity Fun -&gt; StateT IdCnt Identity Declaration
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Fun -&gt; StateT IdCnt Identity Fun
+</span><a href="Transformations.Simplifier.Simplifier.html#simplifyFun"><span class="hs-identifier hs-var">simplifyFun</span></a></span><span> </span><span class="annot"><span class="annottext">Fun
+</span><a href="#local-6989586621679210827"><span class="hs-identifier hs-var">fun</span></a></span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#simplifyExpr"><span class="hs-identifier hs-type">simplifyExpr</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#SimplifierState"><span class="hs-identifier hs-type">SimplifierState</span></a></span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">SAst.Expression</span></a></span><span>
+</span><span id="line-38"></span><span id="simplifyExpr"><span class="annot"><span class="annottext">simplifyExpr :: Expression -&gt; StateT IdCnt Identity Expression
+</span><a href="Transformations.Simplifier.Simplifier.html#simplifyExpr"><span class="hs-identifier hs-var hs-var">simplifyExpr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-39"></span><span>  </span><span class="annot"><a href="Parser.Ast.html#ExprId"><span class="hs-identifier hs-type">Ast.ExprId</span></a></span><span> </span><span id="local-6989586621679210822"><span class="annot"><span class="annottext">Identifier
+</span><a href="#local-6989586621679210822"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Expression -&gt; StateT IdCnt Identity Expression
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; StateT IdCnt Identity Expression)
+-&gt; Expression -&gt; StateT IdCnt Identity Expression
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Identifier' -&gt; Expression
+</span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprId"><span class="hs-identifier hs-var">SAst.ExprId</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier -&gt; Identifier'
+</span><a href="Transformations.Simplifier.Simplifier.html#convertId"><span class="hs-identifier hs-var">convertId</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier
+</span><a href="#local-6989586621679210822"><span class="hs-identifier hs-var">ident</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span><span>  </span><span class="annot"><a href="Parser.Ast.html#ExprPrimVal"><span class="hs-identifier hs-type">Ast.ExprPrimVal</span></a></span><span> </span><span id="local-6989586621679210819"><span class="annot"><span class="annottext">PrimitiveValue
+</span><a href="#local-6989586621679210819"><span class="hs-identifier hs-var">val</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Expression -&gt; StateT IdCnt Identity Expression
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; StateT IdCnt Identity Expression)
+-&gt; Expression -&gt; StateT IdCnt Identity Expression
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">PrimitiveValue -&gt; Expression
+</span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprPrimVal"><span class="hs-identifier hs-var">SAst.ExprPrimVal</span></a></span><span> </span><span class="annot"><span class="annottext">PrimitiveValue
+</span><a href="#local-6989586621679210819"><span class="hs-identifier hs-var">val</span></a></span><span>
+</span><span id="line-41"></span><span>  </span><span class="annot"><a href="Parser.Ast.html#ExprBinOp"><span class="hs-identifier hs-type">Ast.ExprBinOp</span></a></span><span> </span><span id="local-6989586621679210816"><span class="annot"><span class="annottext">BinaryOperator
+</span><a href="#local-6989586621679210816"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span id="local-6989586621679210815"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210815"><span class="hs-identifier hs-var">lhs</span></a></span></span><span> </span><span id="local-6989586621679210814"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210814"><span class="hs-identifier hs-var">rhs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression -&gt; Expression)
+-&gt; Expression -&gt; Expression -&gt; StateT IdCnt Identity Expression
+forall a.
+(Expression -&gt; Expression -&gt; a)
+-&gt; Expression -&gt; Expression -&gt; SimplifierState a
+</span><a href="Transformations.Simplifier.Simplifier.html#simplify2"><span class="hs-identifier hs-var">simplify2</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BinaryOperator -&gt; Expression -&gt; Expression -&gt; Expression
+</span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprBinOp"><span class="hs-identifier hs-var">SAst.ExprBinOp</span></a></span><span> </span><span class="annot"><span class="annottext">BinaryOperator
+</span><a href="#local-6989586621679210816"><span class="hs-identifier hs-var">op</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210815"><span class="hs-identifier hs-var">lhs</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210814"><span class="hs-identifier hs-var">rhs</span></a></span><span>
+</span><span id="line-42"></span><span>  </span><span class="annot"><a href="Parser.Ast.html#ExprUnOp"><span class="hs-identifier hs-type">Ast.ExprUnOp</span></a></span><span> </span><span id="local-6989586621679210810"><span class="annot"><span class="annottext">UnaryOperator
+</span><a href="#local-6989586621679210810"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span id="local-6989586621679210809"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210809"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression)
+-&gt; Expression -&gt; StateT IdCnt Identity Expression
+forall a. (Expression -&gt; a) -&gt; Expression -&gt; SimplifierState a
+</span><a href="Transformations.Simplifier.Simplifier.html#simplify1"><span class="hs-identifier hs-var">simplify1</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">UnaryOperator -&gt; Expression -&gt; Expression
+</span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprUnOp"><span class="hs-identifier hs-var">SAst.ExprUnOp</span></a></span><span> </span><span class="annot"><span class="annottext">UnaryOperator
+</span><a href="#local-6989586621679210810"><span class="hs-identifier hs-var">op</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210809"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-43"></span><span>  </span><span class="annot"><a href="Parser.Ast.html#ExprApp"><span class="hs-identifier hs-type">Ast.ExprApp</span></a></span><span> </span><span id="local-6989586621679210806"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210806"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679210805"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210805"><span class="hs-identifier hs-var">arg</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression -&gt; Expression)
+-&gt; Expression -&gt; Expression -&gt; StateT IdCnt Identity Expression
+forall a.
+(Expression -&gt; Expression -&gt; a)
+-&gt; Expression -&gt; Expression -&gt; SimplifierState a
+</span><a href="Transformations.Simplifier.Simplifier.html#simplify2"><span class="hs-identifier hs-var">simplify2</span></a></span><span> </span><span class="annot"><span class="annottext">Expression -&gt; Expression -&gt; Expression
+</span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprApp"><span class="hs-identifier hs-var">SAst.ExprApp</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210806"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210805"><span class="hs-identifier hs-var">arg</span></a></span><span>
+</span><span id="line-44"></span><span>  </span><span class="annot"><a href="Parser.Ast.html#ExprIte"><span class="hs-identifier hs-type">Ast.ExprIte</span></a></span><span> </span><span id="local-6989586621679210802"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210802"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span id="local-6989586621679210801"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210801"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679210800"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210800"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression -&gt; Expression -&gt; Expression)
+-&gt; Expression
+-&gt; Expression
+-&gt; Expression
+-&gt; StateT IdCnt Identity Expression
+forall a.
+(Expression -&gt; Expression -&gt; Expression -&gt; a)
+-&gt; Expression -&gt; Expression -&gt; Expression -&gt; SimplifierState a
+</span><a href="Transformations.Simplifier.Simplifier.html#simplify3"><span class="hs-identifier hs-var">simplify3</span></a></span><span> </span><span class="annot"><span class="annottext">Expression -&gt; Expression -&gt; Expression -&gt; Expression
+</span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprIte"><span class="hs-identifier hs-var">SAst.ExprIte</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210802"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210801"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210800"><span class="hs-identifier hs-var">e</span></a></span><span>
+</span><span id="line-45"></span><span>  </span><span class="annot"><a href="Parser.Ast.html#ExprLetIn"><span class="hs-identifier hs-type">Ast.ExprLetIn</span></a></span><span> </span><span id="local-6989586621679210796"><span class="annot"><span class="annottext">Declaration
+</span><a href="#local-6989586621679210796"><span class="hs-identifier hs-var">decl</span></a></span></span><span> </span><span id="local-6989586621679210795"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210795"><span class="hs-identifier hs-var">expr</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Declaration -&gt; Expression -&gt; Expression
+</span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprLetIn"><span class="hs-identifier hs-var">SAst.ExprLetIn</span></a></span><span> </span><span class="annot"><span class="annottext">(Declaration -&gt; Expression -&gt; Expression)
+-&gt; StateT IdCnt Identity Declaration
+-&gt; StateT IdCnt Identity (Expression -&gt; Expression)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Declaration -&gt; StateT IdCnt Identity Declaration
+</span><a href="Transformations.Simplifier.Simplifier.html#simplifyDecl"><span class="hs-identifier hs-var">simplifyDecl</span></a></span><span> </span><span class="annot"><span class="annottext">Declaration
+</span><a href="#local-6989586621679210796"><span class="hs-identifier hs-var">decl</span></a></span><span> </span><span class="annot"><span class="annottext">StateT IdCnt Identity (Expression -&gt; Expression)
+-&gt; StateT IdCnt Identity Expression
+-&gt; StateT IdCnt Identity Expression
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Expression -&gt; StateT IdCnt Identity Expression
+</span><a href="Transformations.Simplifier.Simplifier.html#simplifyExpr"><span class="hs-identifier hs-var">simplifyExpr</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210795"><span class="hs-identifier hs-var">expr</span></a></span><span>
+</span><span id="line-46"></span><span>  </span><span class="annot"><a href="Parser.Ast.html#ExprFun"><span class="hs-identifier hs-type">Ast.ExprFun</span></a></span><span> </span><span id="local-6989586621679210792"><span class="annot"><span class="annottext">Fun
+</span><a href="#local-6989586621679210792"><span class="hs-identifier hs-var">fun</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Fun -&gt; Expression
+</span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprFun"><span class="hs-identifier hs-var">SAst.ExprFun</span></a></span><span> </span><span class="annot"><span class="annottext">(Fun -&gt; Expression)
+-&gt; StateT IdCnt Identity Fun -&gt; StateT IdCnt Identity Expression
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Fun -&gt; StateT IdCnt Identity Fun
+</span><a href="Transformations.Simplifier.Simplifier.html#simplifyFun"><span class="hs-identifier hs-var">simplifyFun</span></a></span><span> </span><span class="annot"><span class="annottext">Fun
+</span><a href="#local-6989586621679210792"><span class="hs-identifier hs-var">fun</span></a></span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#simplifyFun"><span class="hs-identifier hs-type">simplifyFun</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Parser.Ast.html#Fun"><span class="hs-identifier hs-type">Ast.Fun</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#SimplifierState"><span class="hs-identifier hs-type">SimplifierState</span></a></span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Fun"><span class="hs-identifier hs-type">SAst.Fun</span></a></span><span>
+</span><span id="line-49"></span><span id="simplifyFun"><span class="annot"><span class="annottext">simplifyFun :: Fun -&gt; StateT IdCnt Identity Fun
+</span><a href="Transformations.Simplifier.Simplifier.html#simplifyFun"><span class="hs-identifier hs-var hs-var">simplifyFun</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Parser.Ast.html#Fun"><span class="hs-identifier hs-type">Ast.Fun</span></a></span><span> </span><span id="local-6989586621679210789"><span class="annot"><span class="annottext">NonEmpty (Identifier, Maybe Type)
+</span><a href="#local-6989586621679210789"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span class="annot"><span class="annottext">Maybe Type
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679210788"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210788"><span class="hs-identifier hs-var">body</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Fun) -&gt; Expression -&gt; StateT IdCnt Identity Fun
+forall a. (Expression -&gt; a) -&gt; Expression -&gt; SimplifierState a
+</span><a href="Transformations.Simplifier.Simplifier.html#simplify1"><span class="hs-identifier hs-var">simplify1</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NonEmpty Identifier' -&gt; Expression -&gt; Fun
+</span><a href="Transformations.Simplifier.SimplifiedAst.html#Fun"><span class="hs-identifier hs-var">SAst.Fun</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Identifier, Maybe Type) -&gt; Identifier'
+</span><a href="Transformations.Simplifier.Simplifier.html#convertTypedId"><span class="hs-identifier hs-var">convertTypedId</span></a></span><span> </span><span class="annot"><span class="annottext">((Identifier, Maybe Type) -&gt; Identifier')
+-&gt; NonEmpty (Identifier, Maybe Type) -&gt; NonEmpty Identifier'
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">NonEmpty (Identifier, Maybe Type)
+</span><a href="#local-6989586621679210789"><span class="hs-identifier hs-var">params</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679210788"><span class="hs-identifier hs-var">body</span></a></span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span class="hs-comment">-- ** Identifier Conversion and Generation</span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#convertId"><span class="hs-identifier hs-type">convertId</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Common.Identifier</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier%27"><span class="hs-identifier hs-type">Common.Identifier'</span></a></span><span>
+</span><span id="line-54"></span><span id="convertId"><span class="annot"><span class="annottext">convertId :: Identifier -&gt; Identifier'
+</span><a href="Transformations.Simplifier.Simplifier.html#convertId"><span class="hs-identifier hs-var hs-var">convertId</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Identifier -&gt; Identifier'
+</span><a href="Trees.Common.html#Txt"><span class="hs-identifier hs-var">Common.Txt</span></a></span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#convertTypedId"><span class="hs-identifier hs-type">convertTypedId</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Common.Identifier</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Common.Type</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier%27"><span class="hs-identifier hs-type">Common.Identifier'</span></a></span><span>
+</span><span id="line-57"></span><span id="convertTypedId"><span class="annot"><span class="annottext">convertTypedId :: (Identifier, Maybe Type) -&gt; Identifier'
+</span><a href="Transformations.Simplifier.Simplifier.html#convertTypedId"><span class="hs-identifier hs-var hs-var">convertTypedId</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Identifier -&gt; Identifier'
+</span><a href="Trees.Common.html#Txt"><span class="hs-identifier hs-var">Common.Txt</span></a></span><span> </span><span class="annot"><span class="annottext">(Identifier -&gt; Identifier')
+-&gt; ((Identifier, Maybe Type) -&gt; Identifier)
+-&gt; (Identifier, Maybe Type)
+-&gt; Identifier'
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Identifier, Maybe Type) -&gt; Identifier
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#genId"><span class="hs-identifier hs-type">genId</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#SimplifierState"><span class="hs-identifier hs-type">SimplifierState</span></a></span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier%27"><span class="hs-identifier hs-type">Common.Identifier'</span></a></span><span>
+</span><span id="line-60"></span><span id="genId"><span class="annot"><span class="annottext">genId :: StateT IdCnt Identity Identifier'
+</span><a href="Transformations.Simplifier.Simplifier.html#genId"><span class="hs-identifier hs-var hs-var">genId</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-61"></span><span>  </span><span id="local-6989586621679210784"><span class="annot"><span class="annottext">IdCnt
+</span><a href="#local-6989586621679210784"><span class="hs-identifier hs-var">cnt</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">StateT IdCnt Identity IdCnt
+forall s (m :: * -&gt; *). MonadState s m =&gt; m s
+</span><span class="hs-identifier hs-var">get</span></span><span>
+</span><span id="line-62"></span><span>  </span><span class="annot"><span class="annottext">(IdCnt -&gt; IdCnt) -&gt; StateT IdCnt Identity ()
+forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
+</span><span class="hs-identifier hs-var">modify</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">IdCnt -&gt; IdCnt -&gt; IdCnt
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">IdCnt
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span>
+</span><span id="line-63"></span><span>  </span><span class="annot"><span class="annottext">Identifier' -&gt; StateT IdCnt Identity Identifier'
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Identifier' -&gt; StateT IdCnt Identity Identifier')
+-&gt; Identifier' -&gt; StateT IdCnt Identity Identifier'
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">IdCnt -&gt; Identifier -&gt; Identifier'
+</span><a href="Trees.Common.html#Gen"><span class="hs-identifier hs-var">Common.Gen</span></a></span><span> </span><span class="annot"><span class="annottext">IdCnt
+</span><a href="#local-6989586621679210784"><span class="hs-identifier hs-var">cnt</span></a></span><span> </span><span class="annot"><span class="annottext">(Identifier -&gt; Identifier') -&gt; Identifier -&gt; Identifier'
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Identifier
+</span><span class="hs-identifier hs-var">pack</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;simp&quot;</span></span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span class="hs-comment">-- ** Utils</span><span>
+</span><span id="line-66"></span><span>
+</span><span id="line-67"></span><span id="local-6989586621679210899"><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#simplify1"><span class="hs-identifier hs-type">simplify1</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-68"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">SAst.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679210899"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-69"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#SimplifierState"><span class="hs-identifier hs-type">SimplifierState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679210899"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-70"></span><span id="simplify1"><span class="annot"><span class="annottext">simplify1 :: (Expression -&gt; a) -&gt; Expression -&gt; SimplifierState a
+</span><a href="Transformations.Simplifier.Simplifier.html#simplify1"><span class="hs-identifier hs-var hs-var">simplify1</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; StateT IdCnt Identity Expression)
+-&gt; (Expression -&gt; a) -&gt; Expression -&gt; SimplifierState a
+forall (m :: * -&gt; *) a' a b.
+Monad m =&gt;
+(a' -&gt; m a) -&gt; (a -&gt; b) -&gt; a' -&gt; m b
+</span><a href="MonadUtils.html#liftM1%27"><span class="hs-identifier hs-var">liftM1'</span></a></span><span> </span><span class="annot"><span class="annottext">Expression -&gt; StateT IdCnt Identity Expression
+</span><a href="Transformations.Simplifier.Simplifier.html#simplifyExpr"><span class="hs-identifier hs-var">simplifyExpr</span></a></span><span>
+</span><span id="line-71"></span><span>
+</span><span id="line-72"></span><span id="local-6989586621679210887"><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#simplify2"><span class="hs-identifier hs-type">simplify2</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-73"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">SAst.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">SAst.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679210887"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-74"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#SimplifierState"><span class="hs-identifier hs-type">SimplifierState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679210887"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-75"></span><span id="simplify2"><span class="annot"><span class="annottext">simplify2 :: (Expression -&gt; Expression -&gt; a)
+-&gt; Expression -&gt; Expression -&gt; SimplifierState a
+</span><a href="Transformations.Simplifier.Simplifier.html#simplify2"><span class="hs-identifier hs-var hs-var">simplify2</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; StateT IdCnt Identity Expression)
+-&gt; (Expression -&gt; Expression -&gt; a)
+-&gt; Expression
+-&gt; Expression
+-&gt; SimplifierState a
+forall (m :: * -&gt; *) a' a b.
+Monad m =&gt;
+(a' -&gt; m a) -&gt; (a -&gt; a -&gt; b) -&gt; a' -&gt; a' -&gt; m b
+</span><a href="MonadUtils.html#liftM2%27"><span class="hs-identifier hs-var">liftM2'</span></a></span><span> </span><span class="annot"><span class="annottext">Expression -&gt; StateT IdCnt Identity Expression
+</span><a href="Transformations.Simplifier.Simplifier.html#simplifyExpr"><span class="hs-identifier hs-var">simplifyExpr</span></a></span><span>
+</span><span id="line-76"></span><span>
+</span><span id="line-77"></span><span id="local-6989586621679210885"><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#simplify3"><span class="hs-identifier hs-type">simplify3</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-78"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">SAst.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">SAst.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">SAst.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679210885"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-79"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.Simplifier.html#SimplifierState"><span class="hs-identifier hs-type">SimplifierState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679210885"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-80"></span><span id="simplify3"><span class="annot"><span class="annottext">simplify3 :: (Expression -&gt; Expression -&gt; Expression -&gt; a)
+-&gt; Expression -&gt; Expression -&gt; Expression -&gt; SimplifierState a
+</span><a href="Transformations.Simplifier.Simplifier.html#simplify3"><span class="hs-identifier hs-var hs-var">simplify3</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; StateT IdCnt Identity Expression)
+-&gt; (Expression -&gt; Expression -&gt; Expression -&gt; a)
+-&gt; Expression
+-&gt; Expression
+-&gt; Expression
+-&gt; SimplifierState a
+forall (m :: * -&gt; *) a' a b.
+Monad m =&gt;
+(a' -&gt; m a) -&gt; (a -&gt; a -&gt; a -&gt; b) -&gt; a' -&gt; a' -&gt; a' -&gt; m b
+</span><a href="MonadUtils.html#liftM3%27"><span class="hs-identifier hs-var">liftM3'</span></a></span><span> </span><span class="annot"><span class="annottext">Expression -&gt; StateT IdCnt Identity Expression
+</span><a href="Transformations.Simplifier.Simplifier.html#simplifyExpr"><span class="hs-identifier hs-var">simplifyExpr</span></a></span><span>
+</span><span id="line-81"></span></pre></body></html>

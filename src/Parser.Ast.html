@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Module      : Ast</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Description : Contains all AST elements.</span><span>
+</span><span id="line-4"></span><span class="hs-comment">--</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- Contains all AST elements, all of these produced by the [Parser](&quot;Parser.Parser&quot;) module.</span><span>
+</span><span id="line-6"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Parser.Ast</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List.NonEmpty</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">NonEmpty</span></span><span class="hs-special">)</span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Trees.Common.html"><span class="hs-identifier">Trees.Common</span></a></span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="hs-comment">--------------------------------------------------------Program---------------------------------------------------------</span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- * Program</span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-comment">-- | The head of the AST.</span><span>
+</span><span id="line-16"></span><span class="hs-keyword">newtype</span><span> </span><span id="Program"><span class="annot"><a href="Parser.Ast.html#Program"><span class="hs-identifier hs-var">Program</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Program"><span class="annot"><a href="Parser.Ast.html#Program"><span class="hs-identifier hs-var">Program</span></a></span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Parser.Ast.html#Statement"><span class="hs-identifier hs-type">Statement</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679210762"><span id="local-6989586621679210764"><span id="local-6989586621679210766"><span class="annot"><span class="annottext">Int -&gt; Program -&gt; ShowS
+[Program] -&gt; ShowS
+Program -&gt; String
+(Int -&gt; Program -&gt; ShowS)
+-&gt; (Program -&gt; String) -&gt; ([Program] -&gt; ShowS) -&gt; Show Program
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Program] -&gt; ShowS
+$cshowList :: [Program] -&gt; ShowS
+show :: Program -&gt; String
+$cshow :: Program -&gt; String
+showsPrec :: Int -&gt; Program -&gt; ShowS
+$cshowsPrec :: Int -&gt; Program -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679210757"><span id="local-6989586621679210759"><span class="annot"><span class="annottext">Program -&gt; Program -&gt; Bool
+(Program -&gt; Program -&gt; Bool)
+-&gt; (Program -&gt; Program -&gt; Bool) -&gt; Eq Program
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Program -&gt; Program -&gt; Bool
+$c/= :: Program -&gt; Program -&gt; Bool
+== :: Program -&gt; Program -&gt; Bool
+$c== :: Program -&gt; Program -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-comment">-- ** Statements</span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="hs-comment">-- | Statement.</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">data</span><span> </span><span id="Statement"><span class="annot"><a href="Parser.Ast.html#Statement"><span class="hs-identifier hs-var">Statement</span></a></span></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-comment">-- | Declaration statement, see 'Declaration'.</span><span>
+</span><span id="line-24"></span><span>    </span><span id="StmtDecl"><span class="annot"><a href="Parser.Ast.html#StmtDecl"><span class="hs-identifier hs-var">StmtDecl</span></a></span></span><span> </span><span class="annot"><a href="Parser.Ast.html#Declaration"><span class="hs-identifier hs-type">Declaration</span></a></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="hs-comment">-- | Expression statement, see 'Expression'.</span><span>
+</span><span id="line-26"></span><span>    </span><span id="StmtExpr"><span class="annot"><a href="Parser.Ast.html#StmtExpr"><span class="hs-identifier hs-var">StmtExpr</span></a></span></span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679210748"><span id="local-6989586621679210750"><span id="local-6989586621679210752"><span class="annot"><span class="annottext">Int -&gt; Statement -&gt; ShowS
+[Statement] -&gt; ShowS
+Statement -&gt; String
+(Int -&gt; Statement -&gt; ShowS)
+-&gt; (Statement -&gt; String)
+-&gt; ([Statement] -&gt; ShowS)
+-&gt; Show Statement
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Statement] -&gt; ShowS
+$cshowList :: [Statement] -&gt; ShowS
+show :: Statement -&gt; String
+$cshow :: Statement -&gt; String
+showsPrec :: Int -&gt; Statement -&gt; ShowS
+$cshowsPrec :: Int -&gt; Statement -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679210744"><span id="local-6989586621679210746"><span class="annot"><span class="annottext">Statement -&gt; Statement -&gt; Bool
+(Statement -&gt; Statement -&gt; Bool)
+-&gt; (Statement -&gt; Statement -&gt; Bool) -&gt; Eq Statement
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Statement -&gt; Statement -&gt; Bool
+$c/= :: Statement -&gt; Statement -&gt; Bool
+== :: Statement -&gt; Statement -&gt; Bool
+$c== :: Statement -&gt; Statement -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span>
+</span><span id="line-29"></span><span class="hs-comment">------------------------------------------------------Declarations------------------------------------------------------</span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span class="hs-comment">-- * Declarations</span><span>
+</span><span id="line-32"></span><span>
+</span><span id="line-33"></span><span class="hs-comment">-- | Declaration.</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">data</span><span> </span><span id="Declaration"><span class="annot"><a href="Parser.Ast.html#Declaration"><span class="hs-identifier hs-var">Declaration</span></a></span></span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-comment">-- | Variable declaration.</span><span>
+</span><span id="line-36"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-37"></span><span>    </span><span class="hs-comment">-- &gt; let x = 5</span><span>
+</span><span id="line-38"></span><span>    </span><span id="DeclVar"><span class="annot"><a href="Parser.Ast.html#DeclVar"><span class="hs-identifier hs-var">DeclVar</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
+</span><span id="line-39"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="hs-comment">-- | Function declaration.</span><span>
+</span><span id="line-40"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-41"></span><span>    </span><span class="hs-comment">-- &gt; let f x y = x + y</span><span>
+</span><span id="line-42"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-43"></span><span>    </span><span class="hs-comment">-- &gt; let rec f x y = f x 1 + f 1 y</span><span>
+</span><span id="line-44"></span><span>    </span><span id="DeclFun"><span class="annot"><a href="Parser.Ast.html#DeclFun"><span class="hs-identifier hs-var">DeclFun</span></a></span></span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span> </span><span class="annot"><a href="Trees.Common.html#IsRec"><span class="hs-identifier hs-type">IsRec</span></a></span><span> </span><span class="annot"><a href="Parser.Ast.html#Fun"><span class="hs-identifier hs-type">Fun</span></a></span><span>
+</span><span id="line-45"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679210733"><span id="local-6989586621679210735"><span id="local-6989586621679210737"><span class="annot"><span class="annottext">Int -&gt; Declaration -&gt; ShowS
+[Declaration] -&gt; ShowS
+Declaration -&gt; String
+(Int -&gt; Declaration -&gt; ShowS)
+-&gt; (Declaration -&gt; String)
+-&gt; ([Declaration] -&gt; ShowS)
+-&gt; Show Declaration
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Declaration] -&gt; ShowS
+$cshowList :: [Declaration] -&gt; ShowS
+show :: Declaration -&gt; String
+$cshow :: Declaration -&gt; String
+showsPrec :: Int -&gt; Declaration -&gt; ShowS
+$cshowsPrec :: Int -&gt; Declaration -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679210729"><span id="local-6989586621679210731"><span class="annot"><span class="annottext">Declaration -&gt; Declaration -&gt; Bool
+(Declaration -&gt; Declaration -&gt; Bool)
+-&gt; (Declaration -&gt; Declaration -&gt; Bool) -&gt; Eq Declaration
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Declaration -&gt; Declaration -&gt; Bool
+$c/= :: Declaration -&gt; Declaration -&gt; Bool
+== :: Declaration -&gt; Declaration -&gt; Bool
+$c== :: Declaration -&gt; Declaration -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="hs-comment">------------------------------------------------------Expressions-------------------------------------------------------</span><span>
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span class="hs-comment">-- * Expressions</span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span class="hs-comment">-- | Expression.</span><span>
+</span><span id="line-52"></span><span class="hs-keyword">data</span><span> </span><span id="Expression"><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-var">Expression</span></a></span></span><span>
+</span><span id="line-53"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-comment">-- | Identifier expression, see 'Identifier'.</span><span>
+</span><span id="line-54"></span><span>    </span><span id="ExprId"><span class="annot"><a href="Parser.Ast.html#ExprId"><span class="hs-identifier hs-var">ExprId</span></a></span></span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="hs-comment">-- | Primitive value expression, see 'PrimitiveValue'.</span><span>
+</span><span id="line-56"></span><span>    </span><span id="ExprPrimVal"><span class="annot"><a href="Parser.Ast.html#ExprPrimVal"><span class="hs-identifier hs-var">ExprPrimVal</span></a></span></span><span> </span><span class="annot"><a href="Trees.Common.html#PrimitiveValue"><span class="hs-identifier hs-type">PrimitiveValue</span></a></span><span>
+</span><span id="line-57"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="hs-comment">-- | Binary operation, see 'BinaryOperator'.</span><span>
+</span><span id="line-58"></span><span>    </span><span id="ExprBinOp"><span class="annot"><a href="Parser.Ast.html#ExprBinOp"><span class="hs-identifier hs-var">ExprBinOp</span></a></span></span><span> </span><span class="annot"><a href="Trees.Common.html#BinaryOperator"><span class="hs-identifier hs-type">BinaryOperator</span></a></span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
+</span><span id="line-59"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="hs-comment">-- | Unary operation, see 'UnaryOperator'.</span><span>
+</span><span id="line-60"></span><span>    </span><span id="ExprUnOp"><span class="annot"><a href="Parser.Ast.html#ExprUnOp"><span class="hs-identifier hs-var">ExprUnOp</span></a></span></span><span> </span><span class="annot"><a href="Trees.Common.html#UnaryOperator"><span class="hs-identifier hs-type">UnaryOperator</span></a></span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
+</span><span id="line-61"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="hs-comment">-- | Function application expression.</span><span>
+</span><span id="line-62"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-63"></span><span>    </span><span class="hs-comment">-- &gt; f 6</span><span>
+</span><span id="line-64"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-65"></span><span>    </span><span class="hs-comment">-- &gt; (fun x y = x + y) 5</span><span>
+</span><span id="line-66"></span><span>    </span><span id="ExprApp"><span class="annot"><a href="Parser.Ast.html#ExprApp"><span class="hs-identifier hs-var">ExprApp</span></a></span></span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
+</span><span id="line-67"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="hs-comment">-- | If-then-else expression.</span><span>
+</span><span id="line-68"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-69"></span><span>    </span><span class="hs-comment">-- &gt; if x &gt; 4 then x * 8 else x / 15</span><span>
+</span><span id="line-70"></span><span>    </span><span id="ExprIte"><span class="annot"><a href="Parser.Ast.html#ExprIte"><span class="hs-identifier hs-var">ExprIte</span></a></span></span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
+</span><span id="line-71"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="hs-comment">-- | Let expression.</span><span>
+</span><span id="line-72"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-73"></span><span>    </span><span class="hs-comment">-- &gt; let x = 4 in x * x</span><span>
+</span><span id="line-74"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-75"></span><span>    </span><span class="hs-comment">-- &gt; let f x y = x + y in f 4 8</span><span>
+</span><span id="line-76"></span><span>    </span><span class="hs-comment">--</span><span>
+</span><span id="line-77"></span><span>    </span><span class="hs-comment">-- &gt; let rec f x y = f x 1 + f 1 y in f 4 8</span><span>
+</span><span id="line-78"></span><span>    </span><span id="ExprLetIn"><span class="annot"><a href="Parser.Ast.html#ExprLetIn"><span class="hs-identifier hs-var">ExprLetIn</span></a></span></span><span> </span><span class="annot"><a href="Parser.Ast.html#Declaration"><span class="hs-identifier hs-type">Declaration</span></a></span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
+</span><span id="line-79"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="hs-comment">-- | Anonymous function, see 'Fun'.</span><span>
+</span><span id="line-80"></span><span>    </span><span id="ExprFun"><span class="annot"><a href="Parser.Ast.html#ExprFun"><span class="hs-identifier hs-var">ExprFun</span></a></span></span><span> </span><span class="annot"><a href="Parser.Ast.html#Fun"><span class="hs-identifier hs-type">Fun</span></a></span><span>
+</span><span id="line-81"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679210712"><span id="local-6989586621679210714"><span id="local-6989586621679210716"><span class="annot"><span class="annottext">Int -&gt; Expression -&gt; ShowS
+[Expression] -&gt; ShowS
+Expression -&gt; String
+(Int -&gt; Expression -&gt; ShowS)
+-&gt; (Expression -&gt; String)
+-&gt; ([Expression] -&gt; ShowS)
+-&gt; Show Expression
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Expression] -&gt; ShowS
+$cshowList :: [Expression] -&gt; ShowS
+show :: Expression -&gt; String
+$cshow :: Expression -&gt; String
+showsPrec :: Int -&gt; Expression -&gt; ShowS
+$cshowsPrec :: Int -&gt; Expression -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679210708"><span id="local-6989586621679210710"><span class="annot"><span class="annottext">Expression -&gt; Expression -&gt; Bool
+(Expression -&gt; Expression -&gt; Bool)
+-&gt; (Expression -&gt; Expression -&gt; Bool) -&gt; Eq Expression
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Expression -&gt; Expression -&gt; Bool
+$c/= :: Expression -&gt; Expression -&gt; Bool
+== :: Expression -&gt; Expression -&gt; Bool
+$c== :: Expression -&gt; Expression -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span class="hs-comment">-- | Function representation without the name.</span><span>
+</span><span id="line-84"></span><span class="hs-comment">--</span><span>
+</span><span id="line-85"></span><span class="hs-comment">-- It contains its parameters, returned type and body.</span><span>
+</span><span id="line-86"></span><span class="hs-comment">--</span><span>
+</span><span id="line-87"></span><span class="hs-comment">-- &gt; fun x -&gt; true</span><span>
+</span><span id="line-88"></span><span class="hs-comment">--</span><span>
+</span><span id="line-89"></span><span class="hs-comment">-- &gt; fun x y -&gt; x + y</span><span>
+</span><span id="line-90"></span><span class="hs-keyword">data</span><span> </span><span id="Fun"><span class="annot"><a href="Parser.Ast.html#Fun"><span class="hs-identifier hs-var">Fun</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Fun"><span class="annot"><a href="Parser.Ast.html#Fun"><span class="hs-identifier hs-var">Fun</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">NonEmpty</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
+</span><span id="line-91"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679210701"><span id="local-6989586621679210703"><span id="local-6989586621679210705"><span class="annot"><span class="annottext">Int -&gt; Fun -&gt; ShowS
+[Fun] -&gt; ShowS
+Fun -&gt; String
+(Int -&gt; Fun -&gt; ShowS)
+-&gt; (Fun -&gt; String) -&gt; ([Fun] -&gt; ShowS) -&gt; Show Fun
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Fun] -&gt; ShowS
+$cshowList :: [Fun] -&gt; ShowS
+show :: Fun -&gt; String
+$cshow :: Fun -&gt; String
+showsPrec :: Int -&gt; Fun -&gt; ShowS
+$cshowsPrec :: Int -&gt; Fun -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679210697"><span id="local-6989586621679210699"><span class="annot"><span class="annottext">Fun -&gt; Fun -&gt; Bool
+(Fun -&gt; Fun -&gt; Bool) -&gt; (Fun -&gt; Fun -&gt; Bool) -&gt; Eq Fun
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Fun -&gt; Fun -&gt; Bool
+$c/= :: Fun -&gt; Fun -&gt; Bool
+== :: Fun -&gt; Fun -&gt; Bool
+$c== :: Fun -&gt; Fun -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-92"></span></pre></body></html>
