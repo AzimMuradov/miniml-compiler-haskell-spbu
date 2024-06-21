@@ -44,7 +44,6 @@ jobs:
         uses: haskell-actions/run-ormolu@v14
         with:
           pattern: "**/*.hs"
-          version: 0.3.1.0
       - name: Install LLVM
         run: sudo apt install -y llvm-17 llvm-17-dev
       - name: Build project
