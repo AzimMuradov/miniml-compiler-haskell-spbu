@@ -112,6 +112,6 @@ Global options:
 
 ### Build Requirements
 
-**GHC**: 9.4.8
-**Cabal**: 3.8
-**LLVM**: 17
+- **GHC**: 9.4.8
+- **Cabal**: 3.8
+- **LLVM**: 17
