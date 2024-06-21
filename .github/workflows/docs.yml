@@ -11,9 +11,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04]
-        ghc: ["8.10.7"]
-        cabal: ["3.6"]
+        os: [ubuntu-22.04]
+        ghc: ["9.4.8"]
+        cabal: ["3.8"]
 
     steps:
       - name: Checkout code
@@ -34,7 +34,7 @@ jobs:
           key: ${{ runner.os }}-docs-${{ env.cache-name }}-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project') }}
           restore-keys: ${{ runner.os }}-docs-${{ env.cache-name }}-
       - name: Install LLVM
-        run: sudo apt install -y llvm-9 llvm-9-dev
+        run: sudo apt install -y llvm-17 llvm-17-dev
       - name: Build docs
         run: >
           cabal haddock

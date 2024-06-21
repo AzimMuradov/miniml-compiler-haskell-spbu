@@ -1,16 +1,18 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Commands.Compile (compile) where
 
 import CodeGen.Llvm.Runner (compileToBinary, compileToLlvmIr)
 import CodeGen.TimedValue (TimedValue (TimedValue))
-import Configuration.AppConfiguration (CompilationTarget (..), Compile (..), Debug (Yes), Output (..))
+import Configuration.AppConfiguration (CompilationTarget (..), Compile (..), Debug (Yes), Input (..), Output (..))
 import Control.Monad (when)
 import Data.Text (Text)
 import qualified Data.Text as Txt
 import System.Exit (die)
+import System.FilePath (takeBaseName)
 import qualified Text.Printf as Printf
-import Utils (inputToModuleName, ns2s, readText)
+import Utils (ns2s, readText)
 
 compile :: Compile -> Debug -> IO ()
 compile (Compile input target output) debug = do
@@ -20,16 +22,21 @@ compile (Compile input target output) debug = do
   TimedValue res compTime <- case target of
     TargetBinary -> do
       let outputFilePath = outputToFilePath output moduleName "out"
-      compileToBinary moduleName text outputFilePath
+      compileToBinary text outputFilePath
     TargetLlvmIr -> do
       let outputFilePath = outputToFilePath output moduleName "ll"
-      compileToLlvmIr moduleName text outputFilePath
+      compileToLlvmIr text outputFilePath
 
   when (debug == Yes) $ do
     putStrLn $ Printf.printf "Finished compiling in %0.5f sec" (ns2s compTime)
     putStrLn ""
 
   either (die . Txt.unpack) return res
+
+inputToModuleName :: Input -> Text
+inputToModuleName = \case
+  StdInput -> "unnamed"
+  FileInput filePath -> Txt.pack $ takeBaseName filePath
 
 outputToFilePath :: Output -> Text -> Text -> FilePath
 outputToFilePath output moduleName ext = case output of

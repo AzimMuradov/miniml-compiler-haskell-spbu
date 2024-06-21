@@ -1,122 +1,120 @@
-cabal-version:      3.6
-name:               mini-ml
-version:            0.1.0.0
-synopsis:           MiniML compiler
-description:        MiniML is a minimal dialect of ML (Meta Language).
-homepage:           https://github.com/AzimMuradov/miniml-compiler-haskell-spbu
+cabal-version: 3.8
+name:          mini-ml
+version:       0.1.0.0
+synopsis:      MiniML compiler
+description:   MiniML is a minimal dialect of ML (Meta Language).
+homepage:      https://github.com/AzimMuradov/miniml-compiler-haskell-spbu
 bug-reports:
-    https://github.com/AzimMuradov/miniml-compiler-haskell-spbu/issues
+  https://github.com/AzimMuradov/miniml-compiler-haskell-spbu/issues
 
-license:            MIT
-license-file:       LICENSE
-author:             Azim Muradov, Alexander Zadorozhnyy
-maintainer:         azim.muradov.dev@gmail.com, alexander.zadorozhnyy@yandex.ru
-copyright:          Copyright (c) 2023 Azim Muradov, Alexander Zadorozhnyy
-category:           Language
+license:       MIT
+license-file:  LICENSE
+author:        Azim Muradov, Alexander Zadorozhnyy
+maintainer:    azim.muradov.dev@gmail.com, alexander.zadorozhnyy@yandex.ru
+copyright:     Copyright (c) 2023 Azim Muradov, Alexander Zadorozhnyy
+category:      Language
 
 common shared-properties
-    default-language: Haskell2010
-    build-depends:
-        , base        >=4.14
-        , bytestring  >=0.11.2.0
-        , extra       >=1.7.12
-        , text        >=2.0.1
+  default-language: Haskell2010
+  build-depends:
+    , base        >=4.7    && <5
+    , bytestring  >=0.11   && <0.12
+    , extra       >=1.7.12
+    , text        >=2.0.1
 
-    ghc-options:
-        -Wall -Wcompat -Widentities -Wincomplete-uni-patterns
-        -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  ghc-options:
+    -Wall -Wcompat -Widentities -Wincomplete-uni-patterns
+    -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
 
 library
-    import:           shared-properties
-    exposed-modules:
-        CodeGen.Llvm.LlvmIrGen
-        CodeGen.Llvm.Runner
-        CodeGen.Module
-        CodeGen.RunResult
-        CodeGen.TimedValue
-        MonadUtils
-        Parser.Ast
-        Parser.Lexer
-        Parser.Parser
-        Parser.Utils
-        StdLib
-        Transformations.Anf.Anf
-        Transformations.Anf.AnfGen
-        Transformations.Anf.PrettyPrinter
-        Transformations.Cc.Cc
-        Transformations.Ll.Lfr
-        Transformations.Ll.Ll
-        Transformations.Relabeler.Relabeler
-        Transformations.Simplifier.SimplifiedAst
-        Transformations.Simplifier.Simplifier
-        Trees.Common
-        TypeChecker.HindleyMilner
-        TypeChecker.PrettyPrinter
-        TypeChecker.TypeChecker
+  import:           shared-properties
+  exposed-modules:
+    CodeGen.Llvm.LlvmIrGen
+    CodeGen.Llvm.Runner
+    CodeGen.Module
+    CodeGen.RunResult
+    CodeGen.TimedValue
+    MonadUtils
+    Parser.Ast
+    Parser.Lexer
+    Parser.Parser
+    Parser.Utils
+    StdLib
+    Transformations.Anf.Anf
+    Transformations.Anf.AnfGen
+    Transformations.Anf.PrettyPrinter
+    Transformations.Cc.Cc
+    Transformations.Ll.Lfr
+    Transformations.Ll.Ll
+    Transformations.Relabeler.Relabeler
+    Transformations.Simplifier.SimplifiedAst
+    Transformations.Simplifier.Simplifier
+    Trees.Common
+    TypeChecker.HindleyMilner
+    TypeChecker.PrettyPrinter
+    TypeChecker.TypeChecker
 
-    other-modules:
-    other-extensions:
-    build-depends:
-        , containers          >=0.6.6
-        , directory
-        , file-embed
-        , llvm-hs             >=9.0.1
-        , llvm-hs-pretty      >=0.9.0.0
-        , llvm-hs-pure        >=9.0.0
-        , megaparsec          >=9.2
-        , mtl                 >=2.2.2
-        , parser-combinators  >=1.3.0
-        , process
-        , recursion-schemes
-        , string-conversions
-        , string-transform
-        , transformers        >=0.5.6
-        , unification-fd      >=0.5.0
-        , unix
+  other-modules:
+  other-extensions:
+  build-depends:
+    , containers          >=0.6.6
+    , directory
+    , file-embed
+    , llvm-codegen
+    , megaparsec          >=9.2
+    , mtl                 >=2.2.2
+    , parser-combinators  >=1.3.0
+    , process
+    , recursion-schemes
+    , string-conversions
+    , string-transform
+    , transformers        >=0.5.6
+    , unification-fd      >=0.5.0
+    , unix
 
-    hs-source-dirs:   lib
+  hs-source-dirs:   lib
 
 executable miniml
-    import:           shared-properties
-    main-is:          Main.hs
-    other-modules:
-        Commands.Compile
-        Commands.Run
-        Configuration.AppConfiguration
-        Configuration.Commands.Compile
-        Configuration.Commands.MiniMl
-        Configuration.Commands.Run
-        Configuration.CommonParsers
-        Utils
+  import:           shared-properties
+  main-is:          Main.hs
+  other-modules:
+    Commands.Compile
+    Commands.Run
+    Configuration.AppConfiguration
+    Configuration.Commands.Compile
+    Configuration.Commands.MiniMl
+    Configuration.Commands.Run
+    Configuration.CommonParsers
+    Utils
 
-    other-extensions:
-    build-depends:
-        , filepath
-        , mini-ml
-        , optparse-applicative  >=0.18
+  other-extensions:
+  build-depends:
+    , filepath
+    , mini-ml
+    , optparse-applicative  >=0.18
 
-    hs-source-dirs:   app
+  hs-source-dirs:   app
 
 test-suite tests
-    import:         shared-properties
-    type:           exitcode-stdio-1.0
-    main-is:        Main.hs
-    other-modules:
-        Sample.AnfTest
-        Sample.FactorialTest
-        Sample.FibonacciTest
-        Sample.SimpleTest
-        Sample.Utils
-        Unit.Parser.ParserTest
-        Unit.StdLibTest
-        Unit.TypeInference.TypeInferenceTest
-        Utils
+  import:         shared-properties
+  type:           exitcode-stdio-1.0
+  main-is:        Main.hs
+  other-modules:
+    Sample.AnfTest
+    Sample.FactorialTest
+    Sample.FibonacciTest
+    Sample.SimpleTest
+    Sample.Utils
+    Unit.Parser.ParserTest
+    Unit.StdLibTest
+    Unit.TypeInference.TypeInferenceTest
+    Utils
 
-    build-depends:
-        , mini-ml
-        , pretty-simple  >=4.1.2.0
-        , tasty          >=1.5
-        , tasty-golden   >=2.3.5
-        , tasty-hunit    >=0.10.1
+  build-depends:
+    , mini-ml
+    , pretty-simple  >=4.1.2.0
+    , tasty          >=1.5
+    , tasty-golden   >=2.3.5
+    , tasty-hunit    >=0.10.1
 
-    hs-source-dirs: test
+  hs-source-dirs: test
