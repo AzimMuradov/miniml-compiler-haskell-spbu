@@ -41,9 +41,12 @@ jobs:
         with:
           fail-on: warning
       - name: Check for Ormolu formatting
-        uses: haskell-actions/run-ormolu@v14
+        uses: haskell-actions/run-ormolu@v16
         with:
-          pattern: "**/*.hs"
+          pattern: |
+            app/**/*.hs
+            lib/**/*.hs
+            test/**/*.hs
       - name: Install LLVM
         run: sudo apt install -y llvm-17 llvm-17-dev
       - name: Build project
