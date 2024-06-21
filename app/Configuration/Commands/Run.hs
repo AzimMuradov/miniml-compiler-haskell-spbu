@@ -11,7 +11,7 @@ runParserInfo :: ParserInfo Command
 runParserInfo = info runParser runInfoMod
 
 runParser :: Parser Command
-runParser = CmdRun <$> (Run <$> inputParser)
+runParser = CmdRun . Run <$> inputParser
 
 runInfoMod :: InfoMod a
 runInfoMod =
