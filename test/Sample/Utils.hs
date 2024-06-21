@@ -55,11 +55,11 @@ testLlvm testFileProvider =
   goldenVsString
     "LLVM"
     (testFileProvider "ll")
-    (LBSC8.pack . processTillLlvmIr "unnamed" <$> TxtIO.readFile (testFileProvider "ml"))
+    (LBSC8.pack . processTillLlvmIr <$> TxtIO.readFile (testFileProvider "ml"))
 
 testLlvmRun :: TestFileProvider -> TestTree
 testLlvmRun testFileProvider =
   goldenVsString
     "LLVM run"
     (testFileProvider "out")
-    (LBSC8.pack . processTillLlvmRunOutput "unnamed" <$> TxtIO.readFile (testFileProvider "ml"))
+    (LBSC8.pack . processTillLlvmRunOutput <$> TxtIO.readFile (testFileProvider "ml"))

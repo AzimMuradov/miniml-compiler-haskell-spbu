@@ -11,7 +11,6 @@ import Control.Monad.Except (Except, runExcept)
 import Data.FileEmbed (embedFile, makeRelativeToProject)
 import Data.String.Conversions (cs)
 import Data.Text (Text)
-import qualified Data.Text as Txt
 import qualified Data.Text.Encoding as Txt
 import qualified Data.Text.IO as Txt
 import System.Directory (removePathForcibly, withCurrentDirectory)
@@ -20,9 +19,9 @@ import System.IO (IOMode (WriteMode), hClose, withFile)
 import System.Posix.Temp (mkdtemp, mkstemps)
 import System.Process (callProcess, readProcessWithExitCode)
 
-run :: Text -> Text -> IO RR.RunResult
-run moduleName text = do
-  TimedValue compResult compTime <- compileToBinary moduleName text outputFilePath
+run :: Text -> IO RR.RunResult
+run text = do
+  TimedValue compResult compTime <- compileToBinary text outputFilePath
 
   case compResult of
     Right () -> do
@@ -50,7 +49,7 @@ run moduleName text = do
           }
   where
     outputFilePath :: FilePath
-    outputFilePath = "./" <> Txt.unpack moduleName
+    outputFilePath = "./program"
 
     runCompiledModule :: IO (TimedValue (Either (String, String, Int) String))
     runCompiledModule = do
@@ -64,15 +63,15 @@ run moduleName text = do
 
       return measuredResult
 
-compileToBinary :: Text -> Text -> FilePath -> IO (TimedValue (Either Text ()))
-compileToBinary moduleName text outputFilePath = measureTimedValue $
+compileToBinary :: Text -> FilePath -> IO (TimedValue (Either Text ()))
+compileToBinary text outputFilePath = measureTimedValue $
   sequenceA $
     runExcept $ do
-      llvmIrText <- compileToLlvmIr' moduleName text
+      llvmIrText <- compileToLlvmIr' text
       return $
         bracket (mkdtemp "build") removePathForcibly $ \buildDir ->
           withCurrentDirectory buildDir $ do
-            (llvm, llvmHandle) <- mkstemps (Txt.unpack moduleName) ".ll"
+            (llvm, llvmHandle) <- mkstemps "module" ".ll"
             Txt.hPutStrLn llvmHandle llvmIrText
             hClose llvmHandle
 
@@ -83,18 +82,18 @@ compileToBinary moduleName text outputFilePath = measureTimedValue $
 
             callProcess "clang" ["-Wno-override-module", "-O3", "-lm", llvm, runtime, "-o", "../" <> outputFilePath]
 
-compileToLlvmIr :: Text -> Text -> FilePath -> IO (TimedValue (Either Text ()))
-compileToLlvmIr moduleName text outputFilePath = measureTimedValue $
+compileToLlvmIr :: Text -> FilePath -> IO (TimedValue (Either Text ()))
+compileToLlvmIr text outputFilePath = measureTimedValue $
   sequenceA $
     runExcept $ do
-      llvmIrText <- compileToLlvmIr' moduleName text
+      llvmIrText <- compileToLlvmIr' text
       return $
         withFile outputFilePath WriteMode $ \handle -> do
           Txt.hPutStrLn handle llvmIrText
 
 -- * Internal
 
-compileToLlvmIr' :: Text -> Text -> Except Text Text
-compileToLlvmIr' moduleName text = do
-  irModule <- compileToModule moduleName text
+compileToLlvmIr' :: Text -> Except Text Text
+compileToLlvmIr' text = do
+  irModule <- compileToModule text
   return $ ppLlvmModule $ genLlvmIrModule irModule

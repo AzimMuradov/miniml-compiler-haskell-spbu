@@ -12,9 +12,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04]
-        ghc: ["8.10.7"]
-        cabal: ["3.6"]
+        os: [ubuntu-24.04]
+        ghc: ["9.4.8"]
+        cabal: ["3.8"]
 
     steps:
       - name: Checkout code
@@ -27,7 +27,7 @@ jobs:
           ghc-version: ${{ matrix.ghc }}
           cabal-version: ${{ matrix.cabal }}
       - name: Cache Cabal
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
           cache-name: cache-cabal
         with:
@@ -41,12 +41,14 @@ jobs:
         with:
           fail-on: warning
       - name: Check for Ormolu formatting
-        uses: haskell-actions/run-ormolu@v14
+        uses: haskell-actions/run-ormolu@v16
         with:
-          pattern: "**/*.hs"
-          version: 0.3.1.0
+          pattern: |
+            app/**/*.hs
+            lib/**/*.hs
+            test/**/*.hs
       - name: Install LLVM
-        run: sudo apt install -y llvm-9 llvm-9-dev
+        run: sudo apt install -y llvm-17 llvm-17-dev
       - name: Build project
         run: cabal build
       - name: Run tests

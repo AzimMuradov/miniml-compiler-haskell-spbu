@@ -11,14 +11,13 @@ import System.Exit (ExitCode (..), die, exitWith)
 import System.IO (hPutStr)
 import qualified System.IO as Sys
 import qualified Text.Printf as Printf
-import Utils (inputToModuleName, ns2s, readText)
+import Utils (ns2s, readText)
 
 run :: Run -> Debug -> IO ()
 run (Run input) debug = do
-  let moduleName = inputToModuleName input
   text <- readText input
 
-  runResult <- Llvm.run moduleName text
+  runResult <- Llvm.run text
 
   case runResult of
     Success stdout compTime runTime -> do

@@ -11,19 +11,10 @@ import Control.Monad.State (MonadState, State, evalState, gets, modify)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.String.Conversions (cs)
-import Data.String.Transform (toShortByteString)
 import Data.Text (Text)
 import qualified Data.Text as Txt
 import Foreign (fromBool)
-import qualified LLVM.AST as LLVM hiding (function)
-import qualified LLVM.AST.Constant as C
-import qualified LLVM.AST.IntegerPredicate as LLVM
-import qualified LLVM.AST.Type as LLVM
-import qualified LLVM.IRBuilder.Constant as LLVM
-import qualified LLVM.IRBuilder.Instruction as LLVM
-import qualified LLVM.IRBuilder.Module as LLVM
-import qualified LLVM.IRBuilder.Monad as LLVM
-import LLVM.Pretty (ppllvm)
+import qualified LLVM.Codegen as LLVM
 import MonadUtils (locally)
 import qualified StdLib
 import Transformations.Anf.Anf
@@ -35,7 +26,7 @@ genLlvmIrModule :: Module -> LLVM.Module
 genLlvmIrModule = genModule
 
 ppLlvmModule :: LLVM.Module -> Text
-ppLlvmModule = cs . ppllvm
+ppLlvmModule = cs . LLVM.ppllvm
 
 -- * Implementation
 
@@ -50,8 +41,8 @@ data Env = Env
   }
 
 genModule :: Module -> LLVM.Module
-genModule (Module name (Program decls)) = flip evalState (Env Map.empty Map.empty Map.empty) $
-  LLVM.buildModuleT (toShortByteString name) $ do
+genModule (Module (Program decls)) = flip evalState (Env Map.empty Map.empty Map.empty) $
+  LLVM.runModuleBuilderT $ do
     mapM_ genStdLibDecl StdLib.allDeclsWithArity
     mapM_ genGlobDecl decls
 
@@ -74,7 +65,7 @@ genStdLibDecl decl = declareAsExtern decl >>= register decl
     declareAsExtern :: StdLib.DeclarationWithArity -> Llvm LLVM.Operand
     declareAsExtern (ident, arity) =
       LLVM.extern
-        (LLVM.mkName $ Txt.unpack ident)
+        (LLVM.Name ident)
         (replicate arity LLVM.i64)
         LLVM.i64
 
@@ -84,14 +75,14 @@ genStdLibDecl decl = declareAsExtern decl >>= register decl
 genGlobDecl :: GlobalDeclaration -> Llvm ()
 genGlobDecl = \case
   GlobVarDecl ident _ -> do
-    var <- LLVM.global (LLVM.mkName $ genId ident) LLVM.i64 (C.Int 64 0)
+    var <- LLVM.global (LLVM.Name $ Txt.pack $ genId ident) LLVM.i64 (LLVM.Int 64 0)
     regGlobVar ident var
   GlobFunDecl ident params body -> mdo
     regFun ident fun (length params)
     fun <- locally $ do
       LLVM.function
-        (LLVM.mkName $ genId ident)
-        ((LLVM.i64,) . LLVM.ParameterName . toShortByteString . genId <$> params)
+        (LLVM.Name $ Txt.pack $ genId ident)
+        ((LLVM.i64,) . LLVM.ParameterName . Txt.pack . genId <$> params)
         LLVM.i64
         $ \args -> do
           mapM_ (uncurry regLocVar) (params `zip` args)
@@ -109,7 +100,7 @@ genExpr = \case
   ExprAtom atom -> genAtom atom
   ExprComp ce -> genComp ce
   ExprLetIn (ident, val) expr -> do
-    val' <- genExpr val `LLVM.named` toShortByteString (genId ident)
+    val' <- genExpr val
     regLocVar ident val'
     genExpr expr
 
@@ -126,22 +117,22 @@ genComp = \case
     f' <- findAny f
     arg' <- genAtom arg
     applyF <- findFun (Txt "miniml_apply")
-    LLVM.call applyF [(f', []), (arg', [])]
+    LLVM.call applyF [f', arg']
   CompIte c t e -> mdo
     rv <- allocate'
 
     c' <- genAtom c >>= intToBool
     LLVM.condBr c' tBlock eBlock
 
-    tBlock <- LLVM.block `LLVM.named` "if.then"
+    tBlock <- LLVM.blockNamed "if.then"
     store' rv =<< genExpr t
     LLVM.br end
 
-    eBlock <- LLVM.block `LLVM.named` "if.else"
+    eBlock <- LLVM.blockNamed "if.else"
     store' rv =<< genExpr e
     LLVM.br end
 
-    end <- LLVM.block `LLVM.named` "if.end"
+    end <- LLVM.blockNamed "if.end"
 
     load' rv
   CompBinOp op lhs rhs -> do
@@ -156,7 +147,7 @@ genComp = \case
           ArithOp DivOp ->
             ( \lhs'' rhs'' -> do
                 divF <- findFun (Txt "miniml_div")
-                LLVM.call divF [(lhs'', []), (rhs'', [])]
+                LLVM.call divF [lhs'', rhs'']
             )
           CompOp cOp ->
             let cOpF = case cOp of
@@ -187,24 +178,24 @@ findAny ident = do
         Just (fun, arity) -> do
           funToPafF <- findFun (Txt "miniml_fun_to_paf")
           fun' <- LLVM.ptrtoint fun LLVM.i64
-          LLVM.call funToPafF [(fun', []), (LLVM.int64 (toInteger arity), [])]
+          LLVM.call funToPafF [fun', LLVM.int64 (toInteger arity)]
         Nothing -> load' =<< findGlobVar ident
 
-findGlobVar :: MonadState Env m => Identifier' -> m LLVM.Operand
+findGlobVar :: (MonadState Env m) => Identifier' -> m LLVM.Operand
 findGlobVar ident = gets ((Map.! ident) . globVars)
 
 findFun :: Identifier' -> CodeGenM LLVM.Operand
 findFun ident = gets (fst . (Map.! ident) . funs)
 
-regLocVar :: MonadState Env m => Identifier' -> LLVM.Operand -> m ()
+regLocVar :: (MonadState Env m) => Identifier' -> LLVM.Operand -> m ()
 regLocVar ident var = modify $
   \env -> env {locVars = Map.insert ident var (locVars env)}
 
-regGlobVar :: MonadState Env m => Identifier' -> LLVM.Operand -> m ()
+regGlobVar :: (MonadState Env m) => Identifier' -> LLVM.Operand -> m ()
 regGlobVar ident gVar = modify $
   \env -> env {globVars = Map.insert ident gVar (globVars env)}
 
-regFun :: MonadState Env m => Identifier' -> LLVM.Operand -> Arity -> m ()
+regFun :: (MonadState Env m) => Identifier' -> LLVM.Operand -> Arity -> m ()
 regFun ident fun paramsCnt = modify $
   \env -> env {funs = Map.insert ident (fun, paramsCnt) (funs env)}
 
