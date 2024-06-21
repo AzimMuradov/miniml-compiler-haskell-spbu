@@ -62,12 +62,12 @@ processTillLl = show . processTillLl'
 processTillAnfGen :: Text -> String
 processTillAnfGen = Anf.prettyPrint . processTillAnfGen'
 
-processTillLlvmIr :: Text -> Text -> String
-processTillLlvmIr name program = Txt.unpack $ ppLlvmModule $ genLlvmIrModule (Module name (processTillAnfGen' program))
+processTillLlvmIr :: Text -> String
+processTillLlvmIr program = Txt.unpack $ ppLlvmModule $ genLlvmIrModule (Module (processTillAnfGen' program))
 
-processTillLlvmRunOutput :: Text -> Text -> String
-processTillLlvmRunOutput name program =
-  let Success out _ _ = unsafePerformIO $ run name program
+processTillLlvmRunOutput :: Text -> String
+processTillLlvmRunOutput program =
+  let Success out _ _ = unsafePerformIO $ run program
    in Txt.unpack out
 
 -- Combinators

@@ -84,7 +84,7 @@ ccExpr = \case
     closedFun <- cc1 (Ast.Fun (prependList fv params)) body
     return $ apply (Ast.ExprFun closedFun) (Ast.ExprId <$> fv)
   where
-    apply :: Foldable t => Ast.Expression -> t Ast.Expression -> Ast.Expression
+    apply :: (Foldable t) => Ast.Expression -> t Ast.Expression -> Ast.Expression
     apply = foldl' Ast.ExprApp
 
 findFv :: Ast.Expression -> Set Ast.Identifier'
@@ -112,7 +112,7 @@ findFv = \case
 
 -- ** Collection Utils
 
-toSet :: Ord a => NonEmpty a -> Set a
+toSet :: (Ord a) => NonEmpty a -> Set a
 toSet = Set.fromList . NE.toList
 
 prependList :: [a] -> NonEmpty a -> NonEmpty a

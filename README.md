@@ -109,3 +109,9 @@ Global options:
 
 - [Implementation details](docs/dev/impl.md)
 - [Development workflow](docs/dev/flow.md)
+
+### Build Requirements
+
+**GHC**: 9.4.8
+**Cabal**: 3.8
+**LLVM**: 17

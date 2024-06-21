@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module CodeGen.Module
-  ( Module (Module, name, code),
+  ( Module (Module, code),
     compileToModule,
   )
 where
@@ -21,18 +21,15 @@ import Transformations.Simplifier.Simplifier (simplifyAst)
 import qualified TypeChecker.PrettyPrinter as TC
 import TypeChecker.TypeChecker (checkProgram)
 
-data Module = Module
-  { name :: Text,
-    code :: Anf.Program
-  }
+newtype Module = Module {code :: Anf.Program}
   deriving (Show, Eq)
 
-compileToModule :: Text -> Text -> Except Text Module
-compileToModule moduleName text = do
+compileToModule :: Text -> Except Text Module
+compileToModule text = do
   program <- parseAndVerify text
   let astToAnf = genAnf . llAst . ccAst . relabelAst . simplifyAst
       anf = astToAnf program
-      irMod = Module moduleName anf
+      irMod = Module anf
    in return irMod
 
 parseAndVerify :: Text -> Except Text Program

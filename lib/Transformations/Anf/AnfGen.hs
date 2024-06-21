@@ -60,10 +60,10 @@ genExpr (Lfr.ExprLetIn (Lfr.VarDecl ident val) expr) = do
   expr' <- genExpr expr
   return $ Anf.ExprLetIn (ident, val') expr'
 
-returnAtom :: MonadState Env m => Anf.AtomicExpression -> m Anf.Expression
+returnAtom :: (MonadState Env m) => Anf.AtomicExpression -> m Anf.Expression
 returnAtom = return . Anf.ExprAtom
 
-returnComplex :: MonadState Env m => Anf.ComplexExpression -> m Anf.Expression
+returnComplex :: (MonadState Env m) => Anf.ComplexExpression -> m Anf.Expression
 returnComplex = return . Anf.ExprComp
 
 -- ** Normalizers
