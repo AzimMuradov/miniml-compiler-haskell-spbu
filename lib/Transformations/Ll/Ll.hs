@@ -36,14 +36,17 @@ data FunDeclaration = FunDecl Common.Identifier' [Common.Identifier'] Lfr.Expres
 llGDecl :: Ast.Declaration -> LlState [Lfr.GlobalDeclaration]
 llGDecl = \case
   Ast.DeclVar ident value -> do
-    varDecl <- ll1 (Lfr.VarDecl ident) value
-    return [Lfr.GlobVarDecl varDecl]
+    var <- ll1 (Lfr.VarDecl ident) value
+    genFuns <- gets genFunDecls
+    modify $ \env -> env {genFunDecls = []}
+    return $ reverse (Lfr.GlobVarDecl var : (convertFunDecl <$> genFuns))
   Ast.DeclFun ident _ (Ast.Fun params body) -> do
     fun <- ll1 (FunDecl ident (NE.toList params)) body
     genFuns <- gets genFunDecls
     modify $ \env -> env {genFunDecls = []}
-    let convertFunDecl (FunDecl i ps b) = Lfr.GlobFunDecl i ps b
     return $ convertFunDecl <$> reverse (fun : genFuns)
+  where
+    convertFunDecl (FunDecl i ps b) = Lfr.GlobFunDecl i ps b
 
 llExpr :: Ast.Expression -> LlState Lfr.Expression
 llExpr = \case
