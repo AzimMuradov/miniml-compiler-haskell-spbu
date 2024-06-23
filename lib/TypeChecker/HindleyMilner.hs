@@ -10,7 +10,25 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module TypeChecker.HindleyMilner where
+module TypeChecker.HindleyMilner
+  ( Infer,
+    TypeError (..),
+    UType,
+    Polytype,
+    applyBindings,
+    generalize,
+    toPolytype,
+    toUType,
+    withBinding,
+    fresh,
+    Poly (..),
+    UTerm (UTVar, UTUnit, UTBool, UTInt, UTFun),
+    (=:=),
+    lookup,
+    TypeF (..),
+    mkVarName,
+  )
+where
 
 import Control.Monad.Except
 import Control.Monad.Reader
@@ -27,86 +45,78 @@ import Data.Set (Set, (\\))
 import qualified Data.Set as S
 import Data.Text (pack)
 import GHC.Generics (Generic1)
-import Trees.Common (Identifier, Type (..))
+import qualified Trees.Common as L -- Lang
 import Prelude hiding (lookup)
 
-data HType a
-  = TyVarF Identifier
-  | TyUnitF
-  | TyBoolF
-  | TyIntF
-  | TyFunF a a
+-- * Type
+
+type Type = Fix TypeF
+
+data TypeF a
+  = TVarF L.Identifier
+  | TUnitF
+  | TBoolF
+  | TIntF
+  | TFunF a a
   deriving (Show, Eq, Functor, Foldable, Traversable, Generic1, Unifiable)
 
-type TypeF = Fix HType
+-- * UType
 
-type UType = UTerm HType IntVar
+type UType = UTerm TypeF IntVar
 
-data Poly t = Forall [Identifier] t
+pattern UTVar :: L.Identifier -> UType
+pattern UTVar var = UTerm (TVarF var)
+
+pattern UTUnit :: UType
+pattern UTUnit = UTerm TUnitF
+
+pattern UTBool :: UType
+pattern UTBool = UTerm TBoolF
+
+pattern UTInt :: UType
+pattern UTInt = UTerm TIntF
+
+pattern UTFun :: UType -> UType -> UType
+pattern UTFun funT argT = UTerm (TFunF funT argT)
+
+-- * Polytype
+
+data Poly t = Forall [L.Identifier] t
   deriving (Eq, Show, Functor)
 
-type Polytype = Poly TypeF
+type Polytype = Poly Type
 
 type UPolytype = Poly UType
 
--- TypeF
+-- * Converters
 
-pattern TyVar :: Identifier -> TypeF
-pattern TyVar v = Fix (TyVarF v)
+toUType :: L.Type -> UType
+toUType = \case
+  L.TUnit -> UTUnit
+  L.TBool -> UTBool
+  L.TInt -> UTInt
+  L.TFun funT argT -> UTFun (toUType funT) (toUType argT)
 
-pattern TyUnit :: TypeF
-pattern TyUnit = Fix TyUnitF
+toPolytype :: UPolytype -> Polytype
+toPolytype = fmap (fromJust . freeze)
 
-pattern TyBool :: TypeF
-pattern TyBool = Fix TyBoolF
+-- * Infer
 
-pattern TyInt :: TypeF
-pattern TyInt = Fix TyIntF
+type Infer = ReaderT Ctx (ExceptT TypeError (IntBindingT TypeF Identity))
 
-pattern TyFun :: TypeF -> TypeF -> TypeF
-pattern TyFun t1 t2 = Fix (TyFunF t1 t2)
+type Ctx = Map L.Identifier UPolytype
 
--- UType
+lookup :: L.Identifier -> Infer UType
+lookup var = do
+  varUPT <- asks $ M.lookup var
+  maybe (throwError $ UnboundVar var) instantiate varUPT
+  where
+    instantiate :: UPolytype -> Infer UType
+    instantiate (Forall xs uty) = do
+      xs' <- mapM (const fresh) xs
+      return $ substU (M.fromList (zip (map Left xs) xs')) uty
 
-pattern UTyVar :: Identifier -> UType
-pattern UTyVar v = UTerm (TyVarF v)
-
-pattern UTyUnit :: UType
-pattern UTyUnit = UTerm TyUnitF
-
-pattern UTyBool :: UType
-pattern UTyBool = UTerm TyBoolF
-
-pattern UTyInt :: UType
-pattern UTyInt = UTerm TyIntF
-
-pattern UTyFun :: UType -> UType -> UType
-pattern UTyFun t1 t2 = UTerm (TyFunF t1 t2)
-
-toTypeF :: Type -> TypeF
-toTypeF = \case
-  TUnit -> TyUnit
-  TBool -> TyBool
-  TInt -> TyInt
-  TFun t1 t2 -> TyFun (toTypeF t1) (toTypeF t2)
-
-fromTypeToUType :: Type -> UType
-fromTypeToUType = \case
-  TUnit -> UTyUnit
-  TBool -> UTyBool
-  TInt -> UTyInt
-  TFun t1 t2 -> UTyFun (fromTypeToUType t1) (fromTypeToUType t2)
-
-type Infer = ReaderT Ctx (ExceptT TypeError (IntBindingT HType Identity))
-
-type Ctx = Map Identifier UPolytype
-
-lookup :: LookUpType -> Infer UType
-lookup (Var v) = do
-  ctx <- ask
-  maybe (throwError $ UnboundVar v) instantiate (M.lookup v ctx)
-
-withBinding :: (MonadReader Ctx m) => Identifier -> UPolytype -> m a -> m a
+withBinding :: (MonadReader Ctx m) => L.Identifier -> UPolytype -> m a -> m a
 withBinding x ty = local (M.insert x ty)
 
 ucata :: (Functor t) => (v -> a) -> (t a -> a) -> UTerm t v -> a
@@ -115,8 +125,10 @@ ucata f g (UTerm t) = g (fmap (ucata f g) t)
 
 deriving instance Ord IntVar
 
+-- * FreeVars
+
 class FreeVars a where
-  freeVars :: a -> Infer (Set (Either Identifier IntVar))
+  freeVars :: a -> Infer (Set (Either L.Identifier IntVar))
 
 instance FreeVars UType where
   freeVars ut = do
@@ -124,7 +136,7 @@ instance FreeVars UType where
     let ftvs =
           ucata
             (const S.empty)
-            (\case TyVarF x -> S.singleton (Left x); f -> fold f)
+            (\case TVarF x -> S.singleton (Left x); f -> fold f)
             ut
     return $ fuvs `S.union` ftvs
 
@@ -134,23 +146,23 @@ instance FreeVars UPolytype where
 instance FreeVars Ctx where
   freeVars = fmap S.unions . mapM freeVars . M.elems
 
-newtype LookUpType = Var Identifier
+fresh :: Infer UType
+fresh = UVar <$> lift (lift freeVar)
+
+-- * Errors
 
 data TypeError where
   Unreachable :: TypeError
-  UnboundVar :: Identifier -> TypeError
+  UnboundVar :: L.Identifier -> TypeError
   Infinite :: IntVar -> UType -> TypeError
   ImpossibleBinOpApplication :: UType -> UType -> TypeError
   ImpossibleUnOpApplication :: UType -> TypeError
-  Mismatch :: HType UType -> HType UType -> TypeError
+  Mismatch :: TypeF UType -> TypeF UType -> TypeError
   deriving (Show)
 
-instance Fallible HType IntVar TypeError where
+instance Fallible TypeF IntVar TypeError where
   occursFailure = Infinite
   mismatchFailure = Mismatch
-
-fresh :: Infer UType
-fresh = UVar <$> lift (lift freeVar)
 
 (=:=) :: UType -> UType -> Infer UType
 s =:= t = lift $ s U.=:= t
@@ -158,43 +170,24 @@ s =:= t = lift $ s U.=:= t
 applyBindings :: UType -> Infer UType
 applyBindings = lift . U.applyBindings
 
-instantiate :: UPolytype -> Infer UType
-instantiate (Forall xs uty) = do
-  xs' <- mapM (const fresh) xs
-  return $ substU (M.fromList (zip (map Left xs) xs')) uty
-
-substU :: Map (Either Identifier IntVar) UType -> UType -> UType
+substU :: Map (Either L.Identifier IntVar) UType -> UType -> UType
 substU m =
   ucata
     (\v -> fromMaybe (UVar v) (M.lookup (Right v) m))
     ( \case
-        TyVarF v -> fromMaybe (UTyVar v) (M.lookup (Left v) m)
+        TVarF v -> fromMaybe (UTVar v) (M.lookup (Left v) m)
         f -> UTerm f
     )
 
-skolemize :: UPolytype -> Infer UType
-skolemize (Forall xs uty) = do
-  xs' <- mapM (const fresh) xs
-  return $ substU (M.fromList (zip (map Left xs) (map toSkolem xs'))) uty
-  where
-    toSkolem (UVar v) = UTyVar (mkVarName "s" v)
-    toSkolem _ = undefined -- We can't reach another situation, because we previously give `fresh` variable
-
-mkVarName :: String -> IntVar -> Identifier
-mkVarName nm (IntVar v) = pack (nm ++ show (v + (maxBound :: Int) + 1))
+mkVarName :: String -> IntVar -> L.Identifier
+mkVarName nm (IntVar v) = pack (nm <> show (v + (maxBound :: Int) + 1))
 
 generalize :: UType -> Infer UPolytype
 generalize uty = do
   uty' <- applyBindings uty
   ctx <- ask
-  tmfvs <- freeVars uty'
-  ctxfvs <- freeVars ctx
-  let fvs = S.toList $ tmfvs \\ ctxfvs
+  tmFreeVars <- freeVars uty'
+  ctxFreeVars <- freeVars ctx
+  let fvs = S.toList $ tmFreeVars \\ ctxFreeVars
       xs = map (either id (mkVarName "a")) fvs
-  return $ Forall xs (substU (M.fromList (zip fvs (map UTyVar xs))) uty')
-
-toUPolytype :: Polytype -> UPolytype
-toUPolytype = fmap unfreeze
-
-fromUPolytype :: UPolytype -> Polytype
-fromUPolytype = fmap (fromJust . freeze)
+  return $ Forall xs (substU (M.fromList (zip fvs (map UTVar xs))) uty')
