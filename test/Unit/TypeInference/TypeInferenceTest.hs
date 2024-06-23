@@ -24,6 +24,7 @@ tests =
       test11,
       test12,
       test13,
+      test14,
       testredecalaration,
       testfib,
       testrec,
@@ -172,6 +173,16 @@ test13 =
     $ do
       let expected = "It is not possible to apply this operation between 'int' and 'bool'"
       let actual = processTillTypeChecker "1 && (false || true)"
+
+      expected @=? actual
+
+test14 :: TestTree
+test14 =
+  testCase
+    "[let f x = x;; print_int(f 4);; print_bool(f true);; f]"
+    $ do
+      let expected = "forall a7. a7 -> a7"
+      let actual = processTillTypeChecker "let f x = x;; print_int(f 4);; print_bool(f true);; f"
 
       expected @=? actual
 

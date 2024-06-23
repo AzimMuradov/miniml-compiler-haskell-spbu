@@ -23,12 +23,12 @@ type Prec = Int
 instance (Pretty (t (Fix t))) => Pretty (Fix t) where
   prettyPrec p = prettyPrec p . unFix
 
-instance (Pretty t) => Pretty (HType t) where
-  prettyPrec _ (TyVarF x) = unpack x
-  prettyPrec _ TyUnitF = "unit"
-  prettyPrec _ TyBoolF = "bool"
-  prettyPrec _ TyIntF = "int"
-  prettyPrec p (TyFunF ty1 ty2) =
+instance (Pretty t) => Pretty (TypeF t) where
+  prettyPrec _ (TVarF x) = unpack x
+  prettyPrec _ TUnitF = "unit"
+  prettyPrec _ TBoolF = "bool"
+  prettyPrec _ TIntF = "int"
+  prettyPrec p (TFunF ty1 ty2) =
     mparens (p > 0) $ prettyPrec 1 ty1 ++ " -> " ++ prettyPrec 0 ty2
 
 instance (Pretty (t (UTerm t v)), Pretty v) => Pretty (UTerm t v) where
