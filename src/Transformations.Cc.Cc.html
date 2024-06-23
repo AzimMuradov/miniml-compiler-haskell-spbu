@@ -18,31 +18,32 @@
 </span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html"><span class="hs-identifier">Transformations.Simplifier.SimplifiedAst</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Ast</span></span><span>
 </span><span id="line-19"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Trees.Common.html"><span class="hs-identifier">Trees.Common</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Ast</span></span><span>
 </span><span id="line-20"></span><span>
-</span><span id="line-21"></span><span class="hs-comment">-- * AST Closure Converter</span><span>
+</span><span id="line-21"></span><span class="annot"><span class="hs-comment">-- * AST Closure Converter</span></span><span>
 </span><span id="line-22"></span><span>
-</span><span id="line-23"></span><span class="hs-comment">-- | Convert AST to its closure-free representation.</span><span>
+</span><span id="line-23"></span><span class="annot"><span class="hs-comment">-- | Convert AST to its closure-free representation.</span></span><span>
 </span><span id="line-24"></span><span class="annot"><a href="Transformations.Cc.Cc.html#ccAst"><span class="hs-identifier hs-type">ccAst</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Program"><span class="hs-identifier hs-type">Ast.Program</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Program"><span class="hs-identifier hs-type">Ast.Program</span></a></span><span>
 </span><span id="line-25"></span><span id="ccAst"><span class="annot"><span class="annottext">ccAst :: Program -&gt; Program
-</span><a href="Transformations.Cc.Cc.html#ccAst"><span class="hs-identifier hs-var hs-var">ccAst</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Program"><span class="hs-identifier hs-type">Ast.Program</span></a></span><span> </span><span id="local-6989586621679211212"><span class="annot"><span class="annottext">[Declaration]
-</span><a href="#local-6989586621679211212"><span class="hs-identifier hs-var">decls</span></a></span></span><span> </span><span id="local-6989586621679211211"><span class="annot"><span class="annottext">IdCnt
-</span><a href="#local-6989586621679211211"><span class="hs-identifier hs-var">cnt</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-26"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679211210"><span class="annot"><span class="annottext">decls' :: [Declaration]
-</span><a href="#local-6989586621679211210"><span class="hs-identifier hs-var hs-var">decls'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Reader Env [Declaration] -&gt; Env -&gt; [Declaration]
+</span><a href="Transformations.Cc.Cc.html#ccAst"><span class="hs-identifier hs-var hs-var">ccAst</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Program"><span class="hs-identifier hs-type">Ast.Program</span></a></span><span> </span><span id="local-6989586621679208620"><span class="annot"><span class="annottext">[Declaration]
+</span><a href="#local-6989586621679208620"><span class="hs-identifier hs-var">decls</span></a></span></span><span> </span><span id="local-6989586621679208621"><span class="annot"><span class="annottext">IdCnt
+</span><a href="#local-6989586621679208621"><span class="hs-identifier hs-var">cnt</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679208626"><span class="annot"><span class="annottext">decls' :: [Declaration]
+</span><a href="#local-6989586621679208626"><span class="hs-identifier hs-var hs-var">decls'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Reader Env [Declaration] -&gt; Env -&gt; [Declaration]
 forall r a. Reader r a -&gt; r -&gt; a
 </span><span class="hs-identifier hs-var">runReader</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Declaration -&gt; ReaderT Env Identity Declaration)
 -&gt; [Declaration] -&gt; Reader Env [Declaration]
 forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
 (Traversable t, Monad m) =&gt;
 (a -&gt; m b) -&gt; t a -&gt; m (t b)
+forall (m :: * -&gt; *) a b. Monad m =&gt; (a -&gt; m b) -&gt; [a] -&gt; m [b]
 </span><span class="hs-identifier hs-var">mapM</span></span><span> </span><span class="annot"><span class="annottext">Declaration -&gt; ReaderT Env Identity Declaration
 </span><a href="Transformations.Cc.Cc.html#ccGDecl"><span class="hs-identifier hs-var">ccGDecl</span></a></span><span> </span><span class="annot"><span class="annottext">[Declaration]
-</span><a href="#local-6989586621679211212"><span class="hs-identifier hs-var">decls</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set Identifier' -&gt; Map Identifier' Expression -&gt; Env
+</span><a href="#local-6989586621679208620"><span class="hs-identifier hs-var">decls</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set Identifier' -&gt; Map Identifier' Expression -&gt; Env
 </span><a href="Transformations.Cc.Cc.html#Env"><span class="hs-identifier hs-var">Env</span></a></span><span> </span><span class="annot"><span class="annottext">Set Identifier'
-</span><a href="#local-6989586621679211206"><span class="hs-identifier hs-var">gIds</span></a></span><span> </span><span class="annot"><span class="annottext">Map Identifier' Expression
+</span><a href="#local-6989586621679208630"><span class="hs-identifier hs-var">gIds</span></a></span><span> </span><span class="annot"><span class="annottext">Map Identifier' Expression
 forall k a. Map k a
 </span><span class="hs-identifier hs-var">Map.empty</span></span><span class="hs-special">)</span><span>
-</span><span id="line-27"></span><span>      </span><span id="local-6989586621679211206"><span class="annot"><span class="annottext">gIds :: Set Identifier'
-</span><a href="#local-6989586621679211206"><span class="hs-identifier hs-var hs-var">gIds</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Identifier'] -&gt; Set Identifier'
+</span><span id="line-27"></span><span>      </span><span id="local-6989586621679208630"><span class="annot"><span class="annottext">gIds :: Set Identifier'
+</span><a href="#local-6989586621679208630"><span class="hs-identifier hs-var hs-var">gIds</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Identifier'] -&gt; Set Identifier'
 forall a. Ord a =&gt; [a] -&gt; Set a
 </span><span class="hs-identifier hs-var">Set.fromList</span></span><span> </span><span class="annot"><span class="annottext">([Identifier'] -&gt; Set Identifier')
 -&gt; [Identifier'] -&gt; Set Identifier'
@@ -57,15 +58,15 @@ forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#declId"><span class="hs-identifier hs-var">Ast.declId</span></a></span><span> </span><span class="annot"><span class="annottext">(Declaration -&gt; Identifier') -&gt; [Declaration] -&gt; [Identifier']
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[Declaration]
-</span><a href="#local-6989586621679211212"><span class="hs-identifier hs-var">decls</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679208620"><span class="hs-identifier hs-var">decls</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-28"></span><span>   </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">[Declaration] -&gt; IdCnt -&gt; Program
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#Program"><span class="hs-identifier hs-var">Ast.Program</span></a></span><span> </span><span class="annot"><span class="annottext">[Declaration]
-</span><a href="#local-6989586621679211210"><span class="hs-identifier hs-var">decls'</span></a></span><span> </span><span class="annot"><span class="annottext">IdCnt
-</span><a href="#local-6989586621679211211"><span class="hs-identifier hs-var">cnt</span></a></span><span>
+</span><a href="#local-6989586621679208626"><span class="hs-identifier hs-var">decls'</span></a></span><span> </span><span class="annot"><span class="annottext">IdCnt
+</span><a href="#local-6989586621679208621"><span class="hs-identifier hs-var">cnt</span></a></span><span>
 </span><span id="line-29"></span><span>
-</span><span id="line-30"></span><span class="hs-comment">-- * Internal</span><span>
+</span><span id="line-30"></span><span class="annot"><span class="hs-comment">-- * Internal</span></span><span>
 </span><span id="line-31"></span><span>
-</span><span id="line-32"></span><span class="hs-comment">-- ** Closure Converter Info</span><span>
+</span><span id="line-32"></span><span class="annot"><span class="hs-comment">-- ** Closure Converter Info</span></span><span>
 </span><span id="line-33"></span><span>
 </span><span id="line-34"></span><span class="hs-keyword">type</span><span> </span><span id="CcInfo"><span class="annot"><a href="Transformations.Cc.Cc.html#CcInfo"><span class="hs-identifier hs-var">CcInfo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Reader</span></span><span> </span><span class="annot"><a href="Transformations.Cc.Cc.html#Env"><span class="hs-identifier hs-type">Env</span></a></span><span>
 </span><span id="line-35"></span><span>
@@ -76,57 +77,59 @@ forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><a href="Transformations.Cc.Cc.html#declIdMappings"><span class="hs-identifier hs-var hs-var">declIdMappings</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier%27"><span class="hs-identifier hs-type">Ast.Identifier'</span></a></span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span>
 </span><span id="line-39"></span><span>  </span><span class="hs-special">}</span><span>
 </span><span id="line-40"></span><span>
-</span><span id="line-41"></span><span class="hs-comment">-- ** Closure Converters</span><span>
+</span><span id="line-41"></span><span class="annot"><span class="hs-comment">-- ** Closure Converters</span></span><span>
 </span><span id="line-42"></span><span>
 </span><span id="line-43"></span><span class="annot"><a href="Transformations.Cc.Cc.html#ccGDecl"><span class="hs-identifier hs-type">ccGDecl</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Declaration"><span class="hs-identifier hs-type">Ast.Declaration</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Cc.Cc.html#CcInfo"><span class="hs-identifier hs-type">CcInfo</span></a></span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Declaration"><span class="hs-identifier hs-type">Ast.Declaration</span></a></span><span>
 </span><span id="line-44"></span><span id="ccGDecl"><span class="annot"><span class="annottext">ccGDecl :: Declaration -&gt; ReaderT Env Identity Declaration
-</span><a href="Transformations.Cc.Cc.html#ccGDecl"><span class="hs-identifier hs-var hs-var">ccGDecl</span></a></span></span><span> </span><span id="local-6989586621679211197"><span class="annot"><span class="annottext">Declaration
-</span><a href="#local-6989586621679211197"><span class="hs-identifier hs-var">gDecl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Declaration
-</span><a href="#local-6989586621679211197"><span class="hs-identifier hs-var">gDecl</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-45"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#DeclVar"><span class="hs-identifier hs-type">Ast.DeclVar</span></a></span><span> </span><span id="local-6989586621679211195"><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211195"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span id="local-6989586621679211194"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211194"><span class="hs-identifier hs-var">val</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Declaration)
+</span><a href="Transformations.Cc.Cc.html#ccGDecl"><span class="hs-identifier hs-var hs-var">ccGDecl</span></a></span></span><span> </span><span id="local-6989586621679208644"><span class="annot"><span class="annottext">Declaration
+</span><a href="#local-6989586621679208644"><span class="hs-identifier hs-var">gDecl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Declaration
+</span><a href="#local-6989586621679208644"><span class="hs-identifier hs-var">gDecl</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-45"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#DeclVar"><span class="hs-identifier hs-type">Ast.DeclVar</span></a></span><span> </span><span id="local-6989586621679208646"><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679208646"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span id="local-6989586621679208647"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208647"><span class="hs-identifier hs-var">val</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Declaration)
 -&gt; Expression -&gt; ReaderT Env Identity Declaration
 forall a. (Expression -&gt; a) -&gt; Expression -&gt; CcInfo a
 </span><a href="Transformations.Cc.Cc.html#cc1"><span class="hs-identifier hs-var">cc1</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier' -&gt; Expression -&gt; Declaration
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#DeclVar"><span class="hs-identifier hs-var">Ast.DeclVar</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211195"><span class="hs-identifier hs-var">ident</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211194"><span class="hs-identifier hs-var">val</span></a></span><span>
-</span><span id="line-46"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#DeclFun"><span class="hs-identifier hs-type">Ast.DeclFun</span></a></span><span> </span><span id="local-6989586621679211191"><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211191"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span id="local-6989586621679211190"><span class="annot"><span class="annottext">IsRec
-</span><a href="#local-6989586621679211190"><span class="hs-identifier hs-var">isRec</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Fun"><span class="hs-identifier hs-type">Ast.Fun</span></a></span><span> </span><span id="local-6989586621679211188"><span class="annot"><span class="annottext">NonEmpty Identifier'
-</span><a href="#local-6989586621679211188"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679211187"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211187"><span class="hs-identifier hs-var">body</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-47"></span><span>    </span><span id="local-6989586621679211186"><span class="annot"><span class="annottext">Fun
-</span><a href="#local-6989586621679211186"><span class="hs-identifier hs-var">fun</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Fun) -&gt; Expression -&gt; CcInfo Fun
+</span><a href="#local-6989586621679208646"><span class="hs-identifier hs-var">ident</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208647"><span class="hs-identifier hs-var">val</span></a></span><span>
+</span><span id="line-46"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#DeclFun"><span class="hs-identifier hs-type">Ast.DeclFun</span></a></span><span> </span><span id="local-6989586621679208650"><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679208650"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span id="local-6989586621679208651"><span class="annot"><span class="annottext">IsRec
+</span><a href="#local-6989586621679208651"><span class="hs-identifier hs-var">isRec</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Fun"><span class="hs-identifier hs-type">Ast.Fun</span></a></span><span> </span><span id="local-6989586621679208653"><span class="annot"><span class="annottext">NonEmpty Identifier'
+</span><a href="#local-6989586621679208653"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679208654"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208654"><span class="hs-identifier hs-var">body</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-47"></span><span>    </span><span id="local-6989586621679208655"><span class="annot"><span class="annottext">Fun
+</span><a href="#local-6989586621679208655"><span class="hs-identifier hs-var">fun</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Fun) -&gt; Expression -&gt; CcInfo Fun
 forall a. (Expression -&gt; a) -&gt; Expression -&gt; CcInfo a
 </span><a href="Transformations.Cc.Cc.html#cc1"><span class="hs-identifier hs-var">cc1</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NonEmpty Identifier' -&gt; Expression -&gt; Fun
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#Fun"><span class="hs-identifier hs-var">Ast.Fun</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty Identifier'
-</span><a href="#local-6989586621679211188"><span class="hs-identifier hs-var">params</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211187"><span class="hs-identifier hs-var">body</span></a></span><span>
+</span><a href="#local-6989586621679208653"><span class="hs-identifier hs-var">params</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208654"><span class="hs-identifier hs-var">body</span></a></span><span>
 </span><span id="line-48"></span><span>    </span><span class="annot"><span class="annottext">Declaration -&gt; ReaderT Env Identity Declaration
+forall a. a -&gt; ReaderT Env Identity a
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Declaration -&gt; ReaderT Env Identity Declaration)
 -&gt; Declaration -&gt; ReaderT Env Identity Declaration
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Identifier' -&gt; IsRec -&gt; Fun -&gt; Declaration
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#DeclFun"><span class="hs-identifier hs-var">Ast.DeclFun</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211191"><span class="hs-identifier hs-var">ident</span></a></span><span> </span><span class="annot"><span class="annottext">IsRec
-</span><a href="#local-6989586621679211190"><span class="hs-identifier hs-var">isRec</span></a></span><span> </span><span class="annot"><span class="annottext">Fun
-</span><a href="#local-6989586621679211186"><span class="hs-identifier hs-var">fun</span></a></span><span>
+</span><a href="#local-6989586621679208650"><span class="hs-identifier hs-var">ident</span></a></span><span> </span><span class="annot"><span class="annottext">IsRec
+</span><a href="#local-6989586621679208651"><span class="hs-identifier hs-var">isRec</span></a></span><span> </span><span class="annot"><span class="annottext">Fun
+</span><a href="#local-6989586621679208655"><span class="hs-identifier hs-var">fun</span></a></span><span>
 </span><span id="line-49"></span><span>
 </span><span id="line-50"></span><span class="annot"><a href="Transformations.Cc.Cc.html#ccExpr"><span class="hs-identifier hs-type">ccExpr</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Cc.Cc.html#CcInfo"><span class="hs-identifier hs-type">CcInfo</span></a></span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span>
 </span><span id="line-51"></span><span id="ccExpr"><span class="annot"><span class="annottext">ccExpr :: Expression -&gt; CcInfo Expression
 </span><a href="Transformations.Cc.Cc.html#ccExpr"><span class="hs-identifier hs-var hs-var">ccExpr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
-</span><span id="line-52"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprId"><span class="hs-identifier hs-type">Ast.ExprId</span></a></span><span> </span><span id="local-6989586621679211183"><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211183"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-53"></span><span>    </span><span id="local-6989586621679211182"><span class="annot"><span class="annottext">Map Identifier' Expression
-</span><a href="#local-6989586621679211182"><span class="hs-identifier hs-var">ms</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Env -&gt; Map Identifier' Expression)
+</span><span id="line-52"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprId"><span class="hs-identifier hs-type">Ast.ExprId</span></a></span><span> </span><span id="local-6989586621679208658"><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679208658"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-53"></span><span>    </span><span id="local-6989586621679208659"><span class="annot"><span class="annottext">Map Identifier' Expression
+</span><a href="#local-6989586621679208659"><span class="hs-identifier hs-var">ms</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Env -&gt; Map Identifier' Expression)
 -&gt; ReaderT Env Identity (Map Identifier' Expression)
 forall r (m :: * -&gt; *) a. MonadReader r m =&gt; (r -&gt; a) -&gt; m a
 </span><span class="hs-identifier hs-var">asks</span></span><span> </span><span class="annot"><span class="annottext">Env -&gt; Map Identifier' Expression
-</span><a href="Transformations.Cc.Cc.html#declIdMappings"><span class="hs-identifier hs-var hs-var">declIdMappings</span></a></span><span>
+</span><a href="Transformations.Cc.Cc.html#declIdMappings"><span class="hs-identifier hs-var">declIdMappings</span></a></span><span>
 </span><span id="line-54"></span><span>    </span><span class="annot"><span class="annottext">Expression -&gt; CcInfo Expression
+forall a. a -&gt; ReaderT Env Identity a
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; CcInfo Expression)
 -&gt; Expression -&gt; CcInfo Expression
@@ -135,226 +138,230 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 forall a. a -&gt; Maybe a -&gt; a
 </span><span class="hs-identifier hs-var">fromMaybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier' -&gt; Expression
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprId"><span class="hs-identifier hs-var">Ast.ExprId</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211183"><span class="hs-identifier hs-var">ident</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map Identifier' Expression
-</span><a href="#local-6989586621679211182"><span class="hs-identifier hs-var">ms</span></a></span><span> </span><span class="annot"><span class="annottext">Map Identifier' Expression -&gt; Identifier' -&gt; Maybe Expression
+</span><a href="#local-6989586621679208658"><span class="hs-identifier hs-var">ident</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map Identifier' Expression
+</span><a href="#local-6989586621679208659"><span class="hs-identifier hs-var">ms</span></a></span><span> </span><span class="annot"><span class="annottext">Map Identifier' Expression -&gt; Identifier' -&gt; Maybe Expression
 forall k a. Ord k =&gt; Map k a -&gt; k -&gt; Maybe a
 </span><span class="hs-operator hs-var">Map.!?</span></span><span> </span><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211183"><span class="hs-identifier hs-var">ident</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-55"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprPrimVal"><span class="hs-identifier hs-type">Ast.ExprPrimVal</span></a></span><span> </span><span id="local-6989586621679211179"><span class="annot"><span class="annottext">PrimitiveValue
-</span><a href="#local-6989586621679211179"><span class="hs-identifier hs-var">val</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Expression -&gt; CcInfo Expression
+</span><a href="#local-6989586621679208658"><span class="hs-identifier hs-var">ident</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprPrimVal"><span class="hs-identifier hs-type">Ast.ExprPrimVal</span></a></span><span> </span><span id="local-6989586621679208662"><span class="annot"><span class="annottext">PrimitiveValue
+</span><a href="#local-6989586621679208662"><span class="hs-identifier hs-var">val</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Expression -&gt; CcInfo Expression
+forall a. a -&gt; ReaderT Env Identity a
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; CcInfo Expression)
 -&gt; Expression -&gt; CcInfo Expression
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">PrimitiveValue -&gt; Expression
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprPrimVal"><span class="hs-identifier hs-var">Ast.ExprPrimVal</span></a></span><span> </span><span class="annot"><span class="annottext">PrimitiveValue
-</span><a href="#local-6989586621679211179"><span class="hs-identifier hs-var">val</span></a></span><span>
-</span><span id="line-56"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprBinOp"><span class="hs-identifier hs-type">Ast.ExprBinOp</span></a></span><span> </span><span id="local-6989586621679211177"><span class="annot"><span class="annottext">BinaryOperator
-</span><a href="#local-6989586621679211177"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span id="local-6989586621679211176"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211176"><span class="hs-identifier hs-var">lhs</span></a></span></span><span> </span><span id="local-6989586621679211175"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211175"><span class="hs-identifier hs-var">rhs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression -&gt; Expression)
+</span><a href="#local-6989586621679208662"><span class="hs-identifier hs-var">val</span></a></span><span>
+</span><span id="line-56"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprBinOp"><span class="hs-identifier hs-type">Ast.ExprBinOp</span></a></span><span> </span><span id="local-6989586621679208664"><span class="annot"><span class="annottext">BinaryOperator
+</span><a href="#local-6989586621679208664"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span id="local-6989586621679208665"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208665"><span class="hs-identifier hs-var">lhs</span></a></span></span><span> </span><span id="local-6989586621679208666"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208666"><span class="hs-identifier hs-var">rhs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression -&gt; Expression)
 -&gt; Expression -&gt; Expression -&gt; CcInfo Expression
 forall a.
 (Expression -&gt; Expression -&gt; a)
 -&gt; Expression -&gt; Expression -&gt; CcInfo a
 </span><a href="Transformations.Cc.Cc.html#cc2"><span class="hs-identifier hs-var">cc2</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BinaryOperator -&gt; Expression -&gt; Expression -&gt; Expression
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprBinOp"><span class="hs-identifier hs-var">Ast.ExprBinOp</span></a></span><span> </span><span class="annot"><span class="annottext">BinaryOperator
-</span><a href="#local-6989586621679211177"><span class="hs-identifier hs-var">op</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211176"><span class="hs-identifier hs-var">lhs</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211175"><span class="hs-identifier hs-var">rhs</span></a></span><span>
-</span><span id="line-57"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprUnOp"><span class="hs-identifier hs-type">Ast.ExprUnOp</span></a></span><span> </span><span id="local-6989586621679211172"><span class="annot"><span class="annottext">UnaryOperator
-</span><a href="#local-6989586621679211172"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span id="local-6989586621679211171"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211171"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression) -&gt; Expression -&gt; CcInfo Expression
+</span><a href="#local-6989586621679208664"><span class="hs-identifier hs-var">op</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208665"><span class="hs-identifier hs-var">lhs</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208666"><span class="hs-identifier hs-var">rhs</span></a></span><span>
+</span><span id="line-57"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprUnOp"><span class="hs-identifier hs-type">Ast.ExprUnOp</span></a></span><span> </span><span id="local-6989586621679208669"><span class="annot"><span class="annottext">UnaryOperator
+</span><a href="#local-6989586621679208669"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span id="local-6989586621679208670"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208670"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression) -&gt; Expression -&gt; CcInfo Expression
 forall a. (Expression -&gt; a) -&gt; Expression -&gt; CcInfo a
 </span><a href="Transformations.Cc.Cc.html#cc1"><span class="hs-identifier hs-var">cc1</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">UnaryOperator -&gt; Expression -&gt; Expression
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprUnOp"><span class="hs-identifier hs-var">Ast.ExprUnOp</span></a></span><span> </span><span class="annot"><span class="annottext">UnaryOperator
-</span><a href="#local-6989586621679211172"><span class="hs-identifier hs-var">op</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211171"><span class="hs-identifier hs-var">x</span></a></span><span>
-</span><span id="line-58"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprApp"><span class="hs-identifier hs-type">Ast.ExprApp</span></a></span><span> </span><span id="local-6989586621679211169"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211169"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679211168"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211168"><span class="hs-identifier hs-var">arg</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression -&gt; Expression)
+</span><a href="#local-6989586621679208669"><span class="hs-identifier hs-var">op</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208670"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-58"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprApp"><span class="hs-identifier hs-type">Ast.ExprApp</span></a></span><span> </span><span id="local-6989586621679208672"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208672"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679208673"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208673"><span class="hs-identifier hs-var">arg</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression -&gt; Expression)
 -&gt; Expression -&gt; Expression -&gt; CcInfo Expression
 forall a.
 (Expression -&gt; Expression -&gt; a)
 -&gt; Expression -&gt; Expression -&gt; CcInfo a
 </span><a href="Transformations.Cc.Cc.html#cc2"><span class="hs-identifier hs-var">cc2</span></a></span><span> </span><span class="annot"><span class="annottext">Expression -&gt; Expression -&gt; Expression
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprApp"><span class="hs-identifier hs-var">Ast.ExprApp</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211169"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211168"><span class="hs-identifier hs-var">arg</span></a></span><span>
-</span><span id="line-59"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprIte"><span class="hs-identifier hs-type">Ast.ExprIte</span></a></span><span> </span><span id="local-6989586621679211166"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211166"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span id="local-6989586621679211165"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211165"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679211164"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211164"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression -&gt; Expression -&gt; Expression)
+</span><a href="#local-6989586621679208672"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208673"><span class="hs-identifier hs-var">arg</span></a></span><span>
+</span><span id="line-59"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprIte"><span class="hs-identifier hs-type">Ast.ExprIte</span></a></span><span> </span><span id="local-6989586621679208675"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208675"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span id="local-6989586621679208676"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208676"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679208677"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208677"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression -&gt; Expression -&gt; Expression)
 -&gt; Expression -&gt; Expression -&gt; Expression -&gt; CcInfo Expression
 forall a.
 (Expression -&gt; Expression -&gt; Expression -&gt; a)
 -&gt; Expression -&gt; Expression -&gt; Expression -&gt; CcInfo a
 </span><a href="Transformations.Cc.Cc.html#cc3"><span class="hs-identifier hs-var">cc3</span></a></span><span> </span><span class="annot"><span class="annottext">Expression -&gt; Expression -&gt; Expression -&gt; Expression
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprIte"><span class="hs-identifier hs-var">Ast.ExprIte</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211166"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211165"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211164"><span class="hs-identifier hs-var">e</span></a></span><span>
-</span><span id="line-60"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprLetIn"><span class="hs-identifier hs-type">Ast.ExprLetIn</span></a></span><span> </span><span id="local-6989586621679211161"><span class="annot"><span class="annottext">Declaration
-</span><a href="#local-6989586621679211161"><span class="hs-identifier hs-var">decl</span></a></span></span><span> </span><span id="local-6989586621679211160"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211160"><span class="hs-identifier hs-var">expr</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Declaration
-</span><a href="#local-6989586621679211161"><span class="hs-identifier hs-var">decl</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-61"></span><span>    </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#DeclVar"><span class="hs-identifier hs-type">Ast.DeclVar</span></a></span><span> </span><span id="local-6989586621679211159"><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211159"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span id="local-6989586621679211158"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211158"><span class="hs-identifier hs-var">value</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-62"></span><span>      </span><span id="local-6989586621679211157"><span class="annot"><span class="annottext">Declaration
-</span><a href="#local-6989586621679211157"><span class="hs-identifier hs-var">decl'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Declaration)
+</span><a href="#local-6989586621679208675"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208676"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208677"><span class="hs-identifier hs-var">e</span></a></span><span>
+</span><span id="line-60"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprLetIn"><span class="hs-identifier hs-type">Ast.ExprLetIn</span></a></span><span> </span><span id="local-6989586621679208680"><span class="annot"><span class="annottext">Declaration
+</span><a href="#local-6989586621679208680"><span class="hs-identifier hs-var">decl</span></a></span></span><span> </span><span id="local-6989586621679208681"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208681"><span class="hs-identifier hs-var">expr</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Declaration
+</span><a href="#local-6989586621679208680"><span class="hs-identifier hs-var">decl</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-61"></span><span>    </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#DeclVar"><span class="hs-identifier hs-type">Ast.DeclVar</span></a></span><span> </span><span id="local-6989586621679208682"><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679208682"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span id="local-6989586621679208683"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208683"><span class="hs-identifier hs-var">value</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-62"></span><span>      </span><span id="local-6989586621679208684"><span class="annot"><span class="annottext">Declaration
+</span><a href="#local-6989586621679208684"><span class="hs-identifier hs-var">decl'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Declaration)
 -&gt; Expression -&gt; ReaderT Env Identity Declaration
 forall a. (Expression -&gt; a) -&gt; Expression -&gt; CcInfo a
 </span><a href="Transformations.Cc.Cc.html#cc1"><span class="hs-identifier hs-var">cc1</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier' -&gt; Expression -&gt; Declaration
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#DeclVar"><span class="hs-identifier hs-var">Ast.DeclVar</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211159"><span class="hs-identifier hs-var">ident</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211158"><span class="hs-identifier hs-var">value</span></a></span><span>
+</span><a href="#local-6989586621679208682"><span class="hs-identifier hs-var">ident</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208683"><span class="hs-identifier hs-var">value</span></a></span><span>
 </span><span id="line-63"></span><span>      </span><span class="annot"><span class="annottext">(Expression -&gt; Expression) -&gt; Expression -&gt; CcInfo Expression
 forall a. (Expression -&gt; a) -&gt; Expression -&gt; CcInfo a
 </span><a href="Transformations.Cc.Cc.html#cc1"><span class="hs-identifier hs-var">cc1</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Declaration -&gt; Expression -&gt; Expression
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprLetIn"><span class="hs-identifier hs-var">Ast.ExprLetIn</span></a></span><span> </span><span class="annot"><span class="annottext">Declaration
-</span><a href="#local-6989586621679211157"><span class="hs-identifier hs-var">decl'</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211160"><span class="hs-identifier hs-var">expr</span></a></span><span>
-</span><span id="line-64"></span><span>    </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#DeclFun"><span class="hs-identifier hs-type">Ast.DeclFun</span></a></span><span> </span><span id="local-6989586621679211156"><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211156"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span id="local-6989586621679211155"><span class="annot"><span class="annottext">IsRec
-</span><a href="#local-6989586621679211155"><span class="hs-identifier hs-var">isRec</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Fun"><span class="hs-identifier hs-type">Ast.Fun</span></a></span><span> </span><span id="local-6989586621679211154"><span class="annot"><span class="annottext">NonEmpty Identifier'
-</span><a href="#local-6989586621679211154"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679211153"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211153"><span class="hs-identifier hs-var">body</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-65"></span><span>      </span><span id="local-6989586621679211152"><span class="annot"><span class="annottext">Set Identifier'
-</span><a href="#local-6989586621679211152"><span class="hs-identifier hs-var">gs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Env -&gt; Set Identifier') -&gt; ReaderT Env Identity (Set Identifier')
+</span><a href="#local-6989586621679208684"><span class="hs-identifier hs-var">decl'</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208681"><span class="hs-identifier hs-var">expr</span></a></span><span>
+</span><span id="line-64"></span><span>    </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#DeclFun"><span class="hs-identifier hs-type">Ast.DeclFun</span></a></span><span> </span><span id="local-6989586621679208685"><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679208685"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span id="local-6989586621679208686"><span class="annot"><span class="annottext">IsRec
+</span><a href="#local-6989586621679208686"><span class="hs-identifier hs-var">isRec</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Fun"><span class="hs-identifier hs-type">Ast.Fun</span></a></span><span> </span><span id="local-6989586621679208687"><span class="annot"><span class="annottext">NonEmpty Identifier'
+</span><a href="#local-6989586621679208687"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679208688"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208688"><span class="hs-identifier hs-var">body</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-65"></span><span>      </span><span id="local-6989586621679208689"><span class="annot"><span class="annottext">Set Identifier'
+</span><a href="#local-6989586621679208689"><span class="hs-identifier hs-var">gs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Env -&gt; Set Identifier') -&gt; ReaderT Env Identity (Set Identifier')
 forall r (m :: * -&gt; *) a. MonadReader r m =&gt; (r -&gt; a) -&gt; m a
 </span><span class="hs-identifier hs-var">asks</span></span><span> </span><span class="annot"><span class="annottext">Env -&gt; Set Identifier'
-</span><a href="Transformations.Cc.Cc.html#globalIds"><span class="hs-identifier hs-var hs-var">globalIds</span></a></span><span>
-</span><span id="line-66"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679211151"><span class="annot"><span class="annottext">fv :: [Identifier']
-</span><a href="#local-6989586621679211151"><span class="hs-identifier hs-var hs-var">fv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set Identifier' -&gt; [Identifier']
+</span><a href="Transformations.Cc.Cc.html#globalIds"><span class="hs-identifier hs-var">globalIds</span></a></span><span>
+</span><span id="line-66"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679208694"><span class="annot"><span class="annottext">fv :: [Identifier']
+</span><a href="#local-6989586621679208694"><span class="hs-identifier hs-var hs-var">fv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set Identifier' -&gt; [Identifier']
 forall a. Set a -&gt; [a]
 </span><span class="hs-identifier hs-var">Set.toList</span></span><span> </span><span class="annot"><span class="annottext">(Set Identifier' -&gt; [Identifier'])
 -&gt; Set Identifier' -&gt; [Identifier']
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Expression -&gt; Set Identifier'
 </span><a href="Transformations.Cc.Cc.html#findFv"><span class="hs-identifier hs-var">findFv</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211153"><span class="hs-identifier hs-var">body</span></a></span><span> </span><span class="annot"><span class="annottext">Set Identifier' -&gt; Set Identifier' -&gt; Set Identifier'
+</span><a href="#local-6989586621679208688"><span class="hs-identifier hs-var">body</span></a></span><span> </span><span class="annot"><span class="annottext">Set Identifier' -&gt; Set Identifier' -&gt; Set Identifier'
 forall a. Ord a =&gt; Set a -&gt; Set a -&gt; Set a
 </span><span class="hs-operator hs-var">\\</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NonEmpty Identifier' -&gt; Set Identifier'
 forall a. Ord a =&gt; NonEmpty a -&gt; Set a
 </span><a href="Transformations.Cc.Cc.html#toSet"><span class="hs-identifier hs-var">toSet</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211156"><span class="hs-identifier hs-var">ident</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier' -&gt; NonEmpty Identifier' -&gt; NonEmpty Identifier'
+</span><a href="#local-6989586621679208685"><span class="hs-identifier hs-var">ident</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier' -&gt; NonEmpty Identifier' -&gt; NonEmpty Identifier'
 forall a. a -&gt; NonEmpty a -&gt; NonEmpty a
 </span><span class="hs-operator hs-var">&lt;|</span></span><span> </span><span class="annot"><span class="annottext">NonEmpty Identifier'
-</span><a href="#local-6989586621679211154"><span class="hs-identifier hs-var">params</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Set Identifier' -&gt; Set Identifier' -&gt; Set Identifier'
+</span><a href="#local-6989586621679208687"><span class="hs-identifier hs-var">params</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Set Identifier' -&gt; Set Identifier' -&gt; Set Identifier'
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 </span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Set Identifier'
-</span><a href="#local-6989586621679211152"><span class="hs-identifier hs-var">gs</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679208689"><span class="hs-identifier hs-var">gs</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-67"></span><span>
-</span><span id="line-68"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679211147"><span class="annot"><span class="annottext">withNewMappings :: ReaderT Env Identity a -&gt; ReaderT Env Identity a
-</span><a href="#local-6989586621679211147"><span class="hs-identifier hs-var hs-var">withNewMappings</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-68"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679208709"><span class="annot"><span class="annottext">withNewMappings :: ReaderT Env Identity a -&gt; ReaderT Env Identity a
+</span><a href="#local-6989586621679208709"><span class="hs-identifier hs-var hs-var">withNewMappings</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-69"></span><span>            </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">[Identifier'] -&gt; IsRec
 forall (f :: * -&gt; *) a. Foldable f =&gt; f a -&gt; IsRec
 </span><span class="hs-identifier hs-var">notNull</span></span><span> </span><span class="annot"><span class="annottext">[Identifier']
-</span><a href="#local-6989586621679211151"><span class="hs-identifier hs-var">fv</span></a></span><span>
+</span><a href="#local-6989586621679208694"><span class="hs-identifier hs-var">fv</span></a></span><span>
 </span><span id="line-70"></span><span>              </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">(Env -&gt; Env) -&gt; ReaderT Env Identity a -&gt; ReaderT Env Identity a
+forall a.
+(Env -&gt; Env) -&gt; ReaderT Env Identity a -&gt; ReaderT Env Identity a
 forall r (m :: * -&gt; *) a. MonadReader r m =&gt; (r -&gt; r) -&gt; m a -&gt; m a
 </span><span class="hs-identifier hs-var">local</span></span><span> </span><span class="annot"><span class="annottext">((Env -&gt; Env) -&gt; ReaderT Env Identity a -&gt; ReaderT Env Identity a)
 -&gt; (Env -&gt; Env) -&gt; ReaderT Env Identity a -&gt; ReaderT Env Identity a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679211146"><span class="annot"><span class="annottext">Env
-</span><a href="#local-6989586621679211146"><span class="hs-identifier hs-var">env</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
-</span><span id="line-71"></span><span>                </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679211145"><span class="annot"><span class="annottext">app :: Expression
-</span><a href="#local-6989586621679211145"><span class="hs-identifier hs-var hs-var">app</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Expression -&gt; [Expression] -&gt; Expression
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679208710"><span class="annot"><span class="annottext">Env
+</span><a href="#local-6989586621679208710"><span class="hs-identifier hs-var">env</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-71"></span><span>                </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679208713"><span class="annot"><span class="annottext">app :: Expression
+</span><a href="#local-6989586621679208713"><span class="hs-identifier hs-var hs-var">app</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Expression -&gt; [Expression] -&gt; Expression
 forall (t :: * -&gt; *).
 Foldable t =&gt;
 Expression -&gt; t Expression -&gt; Expression
-</span><a href="#local-6989586621679211144"><span class="hs-identifier hs-var">apply</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier' -&gt; Expression
+</span><a href="#local-6989586621679208714"><span class="hs-identifier hs-var">apply</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier' -&gt; Expression
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprId"><span class="hs-identifier hs-var">Ast.ExprId</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211156"><span class="hs-identifier hs-var">ident</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier' -&gt; Expression
+</span><a href="#local-6989586621679208685"><span class="hs-identifier hs-var">ident</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier' -&gt; Expression
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprId"><span class="hs-identifier hs-var">Ast.ExprId</span></a></span><span> </span><span class="annot"><span class="annottext">(Identifier' -&gt; Expression) -&gt; [Identifier'] -&gt; [Expression]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[Identifier']
-</span><a href="#local-6989586621679211151"><span class="hs-identifier hs-var">fv</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-72"></span><span>                    </span><span id="local-6989586621679211143"><span class="annot"><span class="annottext">ms :: Map Identifier' Expression
-</span><a href="#local-6989586621679211143"><span class="hs-identifier hs-var hs-var">ms</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679208694"><span class="hs-identifier hs-var">fv</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-72"></span><span>                    </span><span id="local-6989586621679208716"><span class="annot"><span class="annottext">ms :: Map Identifier' Expression
+</span><a href="#local-6989586621679208716"><span class="hs-identifier hs-var hs-var">ms</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Identifier'
 -&gt; Expression
 -&gt; Map Identifier' Expression
 -&gt; Map Identifier' Expression
 forall k a. Ord k =&gt; k -&gt; a -&gt; Map k a -&gt; Map k a
 </span><span class="hs-identifier hs-var">Map.insert</span></span><span> </span><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211156"><span class="hs-identifier hs-var">ident</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211145"><span class="hs-identifier hs-var">app</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Env -&gt; Map Identifier' Expression
-</span><a href="Transformations.Cc.Cc.html#declIdMappings"><span class="hs-identifier hs-var hs-var">declIdMappings</span></a></span><span> </span><span class="annot"><span class="annottext">Env
-</span><a href="#local-6989586621679211146"><span class="hs-identifier hs-var">env</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679208685"><span class="hs-identifier hs-var">ident</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208713"><span class="hs-identifier hs-var">app</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Env -&gt; Map Identifier' Expression
+</span><a href="Transformations.Cc.Cc.html#declIdMappings"><span class="hs-identifier hs-var">declIdMappings</span></a></span><span> </span><span class="annot"><span class="annottext">Env
+</span><a href="#local-6989586621679208710"><span class="hs-identifier hs-var">env</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-73"></span><span>                 </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">Env
-</span><a href="#local-6989586621679211146"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">declIdMappings :: Map Identifier' Expression
+</span><a href="#local-6989586621679208710"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">declIdMappings :: Map Identifier' Expression
 </span><a href="Transformations.Cc.Cc.html#declIdMappings"><span class="hs-identifier hs-var">declIdMappings</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Identifier' Expression
-</span><a href="#local-6989586621679211143"><span class="hs-identifier hs-var">ms</span></a></span><span class="hs-special">}</span><span>
+</span><a href="#local-6989586621679208716"><span class="hs-identifier hs-var">ms</span></a></span><span class="hs-special">}</span><span>
 </span><span id="line-74"></span><span>              </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">ReaderT Env Identity a -&gt; ReaderT Env Identity a
 forall a. a -&gt; a
 </span><span class="hs-identifier hs-var">id</span></span><span>
 </span><span id="line-75"></span><span>
 </span><span id="line-76"></span><span>      </span><span class="annot"><span class="annottext">CcInfo Expression -&gt; CcInfo Expression
-forall a. ReaderT Env Identity a -&gt; ReaderT Env Identity a
-</span><a href="#local-6989586621679211147"><span class="hs-identifier hs-var">withNewMappings</span></a></span><span> </span><span class="annot"><span class="annottext">(CcInfo Expression -&gt; CcInfo Expression)
+forall {a}. ReaderT Env Identity a -&gt; ReaderT Env Identity a
+</span><a href="#local-6989586621679208709"><span class="hs-identifier hs-var">withNewMappings</span></a></span><span> </span><span class="annot"><span class="annottext">(CcInfo Expression -&gt; CcInfo Expression)
 -&gt; CcInfo Expression -&gt; CcInfo Expression
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-77"></span><span>        </span><span id="local-6989586621679211140"><span class="annot"><span class="annottext">Fun
-</span><a href="#local-6989586621679211140"><span class="hs-identifier hs-var">closedFun</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Fun) -&gt; Expression -&gt; CcInfo Fun
+</span><span id="line-77"></span><span>        </span><span id="local-6989586621679208719"><span class="annot"><span class="annottext">Fun
+</span><a href="#local-6989586621679208719"><span class="hs-identifier hs-var">closedFun</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Fun) -&gt; Expression -&gt; CcInfo Fun
 forall a. (Expression -&gt; a) -&gt; Expression -&gt; CcInfo a
 </span><a href="Transformations.Cc.Cc.html#cc1"><span class="hs-identifier hs-var">cc1</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NonEmpty Identifier' -&gt; Expression -&gt; Fun
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#Fun"><span class="hs-identifier hs-var">Ast.Fun</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Identifier'] -&gt; NonEmpty Identifier' -&gt; NonEmpty Identifier'
 forall a. [a] -&gt; NonEmpty a -&gt; NonEmpty a
 </span><a href="Transformations.Cc.Cc.html#prependList"><span class="hs-identifier hs-var">prependList</span></a></span><span> </span><span class="annot"><span class="annottext">[Identifier']
-</span><a href="#local-6989586621679211151"><span class="hs-identifier hs-var">fv</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty Identifier'
-</span><a href="#local-6989586621679211154"><span class="hs-identifier hs-var">params</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211153"><span class="hs-identifier hs-var">body</span></a></span><span>
-</span><span id="line-78"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679211138"><span class="annot"><span class="annottext">decl' :: Declaration
-</span><a href="#local-6989586621679211138"><span class="hs-identifier hs-var hs-var">decl'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Identifier' -&gt; IsRec -&gt; Fun -&gt; Declaration
+</span><a href="#local-6989586621679208694"><span class="hs-identifier hs-var">fv</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty Identifier'
+</span><a href="#local-6989586621679208687"><span class="hs-identifier hs-var">params</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208688"><span class="hs-identifier hs-var">body</span></a></span><span>
+</span><span id="line-78"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679208721"><span class="annot"><span class="annottext">decl' :: Declaration
+</span><a href="#local-6989586621679208721"><span class="hs-identifier hs-var hs-var">decl'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Identifier' -&gt; IsRec -&gt; Fun -&gt; Declaration
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#DeclFun"><span class="hs-identifier hs-var">Ast.DeclFun</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211156"><span class="hs-identifier hs-var">ident</span></a></span><span> </span><span class="annot"><span class="annottext">IsRec
-</span><a href="#local-6989586621679211155"><span class="hs-identifier hs-var">isRec</span></a></span><span> </span><span class="annot"><span class="annottext">Fun
-</span><a href="#local-6989586621679211140"><span class="hs-identifier hs-var">closedFun</span></a></span><span>
+</span><a href="#local-6989586621679208685"><span class="hs-identifier hs-var">ident</span></a></span><span> </span><span class="annot"><span class="annottext">IsRec
+</span><a href="#local-6989586621679208686"><span class="hs-identifier hs-var">isRec</span></a></span><span> </span><span class="annot"><span class="annottext">Fun
+</span><a href="#local-6989586621679208719"><span class="hs-identifier hs-var">closedFun</span></a></span><span>
 </span><span id="line-79"></span><span>        </span><span class="annot"><span class="annottext">(Expression -&gt; Expression) -&gt; Expression -&gt; CcInfo Expression
 forall a. (Expression -&gt; a) -&gt; Expression -&gt; CcInfo a
 </span><a href="Transformations.Cc.Cc.html#cc1"><span class="hs-identifier hs-var">cc1</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Declaration -&gt; Expression -&gt; Expression
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprLetIn"><span class="hs-identifier hs-var">Ast.ExprLetIn</span></a></span><span> </span><span class="annot"><span class="annottext">Declaration
-</span><a href="#local-6989586621679211138"><span class="hs-identifier hs-var">decl'</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211160"><span class="hs-identifier hs-var">expr</span></a></span><span>
-</span><span id="line-80"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprFun"><span class="hs-identifier hs-type">Ast.ExprFun</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Fun"><span class="hs-identifier hs-type">Ast.Fun</span></a></span><span> </span><span id="local-6989586621679211136"><span class="annot"><span class="annottext">NonEmpty Identifier'
-</span><a href="#local-6989586621679211136"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679211135"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211135"><span class="hs-identifier hs-var">body</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-81"></span><span>    </span><span id="local-6989586621679211134"><span class="annot"><span class="annottext">Set Identifier'
-</span><a href="#local-6989586621679211134"><span class="hs-identifier hs-var">gs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Env -&gt; Set Identifier') -&gt; ReaderT Env Identity (Set Identifier')
+</span><a href="#local-6989586621679208721"><span class="hs-identifier hs-var">decl'</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208681"><span class="hs-identifier hs-var">expr</span></a></span><span>
+</span><span id="line-80"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprFun"><span class="hs-identifier hs-type">Ast.ExprFun</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Fun"><span class="hs-identifier hs-type">Ast.Fun</span></a></span><span> </span><span id="local-6989586621679208723"><span class="annot"><span class="annottext">NonEmpty Identifier'
+</span><a href="#local-6989586621679208723"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679208724"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208724"><span class="hs-identifier hs-var">body</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-81"></span><span>    </span><span id="local-6989586621679208725"><span class="annot"><span class="annottext">Set Identifier'
+</span><a href="#local-6989586621679208725"><span class="hs-identifier hs-var">gs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Env -&gt; Set Identifier') -&gt; ReaderT Env Identity (Set Identifier')
 forall r (m :: * -&gt; *) a. MonadReader r m =&gt; (r -&gt; a) -&gt; m a
 </span><span class="hs-identifier hs-var">asks</span></span><span> </span><span class="annot"><span class="annottext">Env -&gt; Set Identifier'
-</span><a href="Transformations.Cc.Cc.html#globalIds"><span class="hs-identifier hs-var hs-var">globalIds</span></a></span><span>
-</span><span id="line-82"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679211133"><span class="annot"><span class="annottext">fv :: [Identifier']
-</span><a href="#local-6989586621679211133"><span class="hs-identifier hs-var hs-var">fv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set Identifier' -&gt; [Identifier']
+</span><a href="Transformations.Cc.Cc.html#globalIds"><span class="hs-identifier hs-var">globalIds</span></a></span><span>
+</span><span id="line-82"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679208729"><span class="annot"><span class="annottext">fv :: [Identifier']
+</span><a href="#local-6989586621679208729"><span class="hs-identifier hs-var hs-var">fv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set Identifier' -&gt; [Identifier']
 forall a. Set a -&gt; [a]
 </span><span class="hs-identifier hs-var">Set.toList</span></span><span> </span><span class="annot"><span class="annottext">(Set Identifier' -&gt; [Identifier'])
 -&gt; Set Identifier' -&gt; [Identifier']
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Expression -&gt; Set Identifier'
 </span><a href="Transformations.Cc.Cc.html#findFv"><span class="hs-identifier hs-var">findFv</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211135"><span class="hs-identifier hs-var">body</span></a></span><span> </span><span class="annot"><span class="annottext">Set Identifier' -&gt; Set Identifier' -&gt; Set Identifier'
+</span><a href="#local-6989586621679208724"><span class="hs-identifier hs-var">body</span></a></span><span> </span><span class="annot"><span class="annottext">Set Identifier' -&gt; Set Identifier' -&gt; Set Identifier'
 forall a. Ord a =&gt; Set a -&gt; Set a -&gt; Set a
 </span><span class="hs-operator hs-var">\\</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NonEmpty Identifier' -&gt; Set Identifier'
 forall a. Ord a =&gt; NonEmpty a -&gt; Set a
 </span><a href="Transformations.Cc.Cc.html#toSet"><span class="hs-identifier hs-var">toSet</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty Identifier'
-</span><a href="#local-6989586621679211136"><span class="hs-identifier hs-var">params</span></a></span><span> </span><span class="annot"><span class="annottext">Set Identifier' -&gt; Set Identifier' -&gt; Set Identifier'
+</span><a href="#local-6989586621679208723"><span class="hs-identifier hs-var">params</span></a></span><span> </span><span class="annot"><span class="annottext">Set Identifier' -&gt; Set Identifier' -&gt; Set Identifier'
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 </span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Set Identifier'
-</span><a href="#local-6989586621679211134"><span class="hs-identifier hs-var">gs</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679208725"><span class="hs-identifier hs-var">gs</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-83"></span><span>
-</span><span id="line-84"></span><span>    </span><span id="local-6989586621679211132"><span class="annot"><span class="annottext">Fun
-</span><a href="#local-6989586621679211132"><span class="hs-identifier hs-var">closedFun</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Fun) -&gt; Expression -&gt; CcInfo Fun
+</span><span id="line-84"></span><span>    </span><span id="local-6989586621679208730"><span class="annot"><span class="annottext">Fun
+</span><a href="#local-6989586621679208730"><span class="hs-identifier hs-var">closedFun</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Fun) -&gt; Expression -&gt; CcInfo Fun
 forall a. (Expression -&gt; a) -&gt; Expression -&gt; CcInfo a
 </span><a href="Transformations.Cc.Cc.html#cc1"><span class="hs-identifier hs-var">cc1</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">NonEmpty Identifier' -&gt; Expression -&gt; Fun
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#Fun"><span class="hs-identifier hs-var">Ast.Fun</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Identifier'] -&gt; NonEmpty Identifier' -&gt; NonEmpty Identifier'
 forall a. [a] -&gt; NonEmpty a -&gt; NonEmpty a
 </span><a href="Transformations.Cc.Cc.html#prependList"><span class="hs-identifier hs-var">prependList</span></a></span><span> </span><span class="annot"><span class="annottext">[Identifier']
-</span><a href="#local-6989586621679211133"><span class="hs-identifier hs-var">fv</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty Identifier'
-</span><a href="#local-6989586621679211136"><span class="hs-identifier hs-var">params</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211135"><span class="hs-identifier hs-var">body</span></a></span><span>
+</span><a href="#local-6989586621679208729"><span class="hs-identifier hs-var">fv</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty Identifier'
+</span><a href="#local-6989586621679208723"><span class="hs-identifier hs-var">params</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208724"><span class="hs-identifier hs-var">body</span></a></span><span>
 </span><span id="line-85"></span><span>    </span><span class="annot"><span class="annottext">Expression -&gt; CcInfo Expression
+forall a. a -&gt; ReaderT Env Identity a
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; CcInfo Expression)
 -&gt; Expression -&gt; CcInfo Expression
@@ -363,18 +370,21 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 forall (t :: * -&gt; *).
 Foldable t =&gt;
 Expression -&gt; t Expression -&gt; Expression
-</span><a href="#local-6989586621679211144"><span class="hs-identifier hs-var">apply</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Fun -&gt; Expression
+</span><a href="#local-6989586621679208714"><span class="hs-identifier hs-var">apply</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Fun -&gt; Expression
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprFun"><span class="hs-identifier hs-var">Ast.ExprFun</span></a></span><span> </span><span class="annot"><span class="annottext">Fun
-</span><a href="#local-6989586621679211132"><span class="hs-identifier hs-var">closedFun</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier' -&gt; Expression
+</span><a href="#local-6989586621679208730"><span class="hs-identifier hs-var">closedFun</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier' -&gt; Expression
 </span><a href="Transformations.Simplifier.SimplifiedAst.html#ExprId"><span class="hs-identifier hs-var">Ast.ExprId</span></a></span><span> </span><span class="annot"><span class="annottext">(Identifier' -&gt; Expression) -&gt; [Identifier'] -&gt; [Expression]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[Identifier']
-</span><a href="#local-6989586621679211133"><span class="hs-identifier hs-var">fv</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679208729"><span class="hs-identifier hs-var">fv</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-86"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-87"></span><span>    </span><span id="local-6989586621679211262"><span class="annot"><a href="#local-6989586621679211144"><span class="hs-identifier hs-type">apply</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Foldable</span></span><span> </span><span class="annot"><a href="#local-6989586621679211262"><span class="hs-identifier hs-type">t</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679211262"><span class="hs-identifier hs-type">t</span></a></span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span></span><span>
-</span><span id="line-88"></span><span>    </span><span id="local-6989586621679211144"><span class="annot"><span class="annottext">apply :: Expression -&gt; t Expression -&gt; Expression
-</span><a href="#local-6989586621679211144"><span class="hs-identifier hs-var hs-var">apply</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression -&gt; Expression)
+</span><span id="line-87"></span><span>    </span><span id="local-6989586621679208538"><span class="annot"><a href="#local-6989586621679208714"><span class="hs-identifier hs-type">apply</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Foldable</span></span><span> </span><span class="annot"><a href="#local-6989586621679208538"><span class="hs-identifier hs-type">t</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679208538"><span class="hs-identifier hs-type">t</span></a></span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span></span><span>
+</span><span id="line-88"></span><span>    </span><span id="local-6989586621679208714"><span class="annot"><span class="annottext">apply :: forall (t :: * -&gt; *).
+Foldable t =&gt;
+Expression -&gt; t Expression -&gt; Expression
+</span><a href="#local-6989586621679208714"><span class="hs-identifier hs-var hs-var">apply</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression -&gt; Expression)
 -&gt; Expression -&gt; t Expression -&gt; Expression
+forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b
 forall (t :: * -&gt; *) b a.
 Foldable t =&gt;
 (b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b
@@ -384,116 +394,117 @@ Foldable t =&gt;
 </span><span id="line-90"></span><span class="annot"><a href="Transformations.Cc.Cc.html#findFv"><span class="hs-identifier hs-type">findFv</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier%27"><span class="hs-identifier hs-type">Ast.Identifier'</span></a></span><span>
 </span><span id="line-91"></span><span id="findFv"><span class="annot"><span class="annottext">findFv :: Expression -&gt; Set Identifier'
 </span><a href="Transformations.Cc.Cc.html#findFv"><span class="hs-identifier hs-var hs-var">findFv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
-</span><span id="line-92"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprId"><span class="hs-identifier hs-type">Ast.ExprId</span></a></span><span> </span><span id="local-6989586621679211131"><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211131"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Identifier' -&gt; Set Identifier'
+</span><span id="line-92"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprId"><span class="hs-identifier hs-type">Ast.ExprId</span></a></span><span> </span><span id="local-6989586621679208733"><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679208733"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Identifier' -&gt; Set Identifier'
 forall a. a -&gt; Set a
 </span><span class="hs-identifier hs-var">Set.singleton</span></span><span> </span><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211131"><span class="hs-identifier hs-var">ident</span></a></span><span>
+</span><a href="#local-6989586621679208733"><span class="hs-identifier hs-var">ident</span></a></span><span>
 </span><span id="line-93"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprPrimVal"><span class="hs-identifier hs-type">Ast.ExprPrimVal</span></a></span><span> </span><span class="annot"><span class="annottext">PrimitiveValue
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Set Identifier'
 forall a. Set a
 </span><span class="hs-identifier hs-var">Set.empty</span></span><span>
 </span><span id="line-94"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprBinOp"><span class="hs-identifier hs-type">Ast.ExprBinOp</span></a></span><span> </span><span class="annot"><span class="annottext">BinaryOperator
-</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679211128"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211128"><span class="hs-identifier hs-var">lhs</span></a></span></span><span> </span><span id="local-6989586621679211127"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211127"><span class="hs-identifier hs-var">rhs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[Expression] -&gt; Set Identifier'
-</span><a href="#local-6989586621679211126"><span class="hs-identifier hs-var">findFv'</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211128"><span class="hs-identifier hs-var">lhs</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211127"><span class="hs-identifier hs-var">rhs</span></a></span><span class="hs-special">]</span><span>
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679208736"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208736"><span class="hs-identifier hs-var">lhs</span></a></span></span><span> </span><span id="local-6989586621679208737"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208737"><span class="hs-identifier hs-var">rhs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[Expression] -&gt; Set Identifier'
+</span><a href="#local-6989586621679208738"><span class="hs-identifier hs-var">findFv'</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208736"><span class="hs-identifier hs-var">lhs</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208737"><span class="hs-identifier hs-var">rhs</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-95"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprUnOp"><span class="hs-identifier hs-type">Ast.ExprUnOp</span></a></span><span> </span><span class="annot"><span class="annottext">UnaryOperator
-</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679211125"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211125"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Expression -&gt; Set Identifier'
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679208739"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208739"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Expression -&gt; Set Identifier'
 </span><a href="Transformations.Cc.Cc.html#findFv"><span class="hs-identifier hs-var">findFv</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211125"><span class="hs-identifier hs-var">x</span></a></span><span>
-</span><span id="line-96"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprApp"><span class="hs-identifier hs-type">Ast.ExprApp</span></a></span><span> </span><span id="local-6989586621679211124"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211124"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679211123"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211123"><span class="hs-identifier hs-var">arg</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[Expression] -&gt; Set Identifier'
-</span><a href="#local-6989586621679211126"><span class="hs-identifier hs-var">findFv'</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211124"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211123"><span class="hs-identifier hs-var">arg</span></a></span><span class="hs-special">]</span><span>
-</span><span id="line-97"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprIte"><span class="hs-identifier hs-type">Ast.ExprIte</span></a></span><span> </span><span id="local-6989586621679211122"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211122"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span id="local-6989586621679211121"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211121"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679211120"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211120"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[Expression] -&gt; Set Identifier'
-</span><a href="#local-6989586621679211126"><span class="hs-identifier hs-var">findFv'</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211122"><span class="hs-identifier hs-var">c</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211121"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211120"><span class="hs-identifier hs-var">e</span></a></span><span class="hs-special">]</span><span>
-</span><span id="line-98"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprLetIn"><span class="hs-identifier hs-type">Ast.ExprLetIn</span></a></span><span> </span><span id="local-6989586621679211119"><span class="annot"><span class="annottext">Declaration
-</span><a href="#local-6989586621679211119"><span class="hs-identifier hs-var">decl</span></a></span></span><span> </span><span id="local-6989586621679211118"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211118"><span class="hs-identifier hs-var">expr</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Declaration
-</span><a href="#local-6989586621679211119"><span class="hs-identifier hs-var">decl</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-99"></span><span>    </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#DeclVar"><span class="hs-identifier hs-type">Ast.DeclVar</span></a></span><span> </span><span id="local-6989586621679211117"><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211117"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span id="local-6989586621679211116"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211116"><span class="hs-identifier hs-var">value</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
-</span><span id="line-100"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679211115"><span class="annot"><span class="annottext">fv :: Set Identifier'
-</span><a href="#local-6989586621679211115"><span class="hs-identifier hs-var hs-var">fv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Expression] -&gt; Set Identifier'
-</span><a href="#local-6989586621679211126"><span class="hs-identifier hs-var">findFv'</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211116"><span class="hs-identifier hs-var">value</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211118"><span class="hs-identifier hs-var">expr</span></a></span><span class="hs-special">]</span><span>
+</span><a href="#local-6989586621679208739"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-96"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprApp"><span class="hs-identifier hs-type">Ast.ExprApp</span></a></span><span> </span><span id="local-6989586621679208740"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208740"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679208741"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208741"><span class="hs-identifier hs-var">arg</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[Expression] -&gt; Set Identifier'
+</span><a href="#local-6989586621679208738"><span class="hs-identifier hs-var">findFv'</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208740"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208741"><span class="hs-identifier hs-var">arg</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-97"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprIte"><span class="hs-identifier hs-type">Ast.ExprIte</span></a></span><span> </span><span id="local-6989586621679208742"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208742"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span id="local-6989586621679208743"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208743"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679208744"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208744"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[Expression] -&gt; Set Identifier'
+</span><a href="#local-6989586621679208738"><span class="hs-identifier hs-var">findFv'</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208742"><span class="hs-identifier hs-var">c</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208743"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208744"><span class="hs-identifier hs-var">e</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-98"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprLetIn"><span class="hs-identifier hs-type">Ast.ExprLetIn</span></a></span><span> </span><span id="local-6989586621679208745"><span class="annot"><span class="annottext">Declaration
+</span><a href="#local-6989586621679208745"><span class="hs-identifier hs-var">decl</span></a></span></span><span> </span><span id="local-6989586621679208746"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208746"><span class="hs-identifier hs-var">expr</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Declaration
+</span><a href="#local-6989586621679208745"><span class="hs-identifier hs-var">decl</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-99"></span><span>    </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#DeclVar"><span class="hs-identifier hs-type">Ast.DeclVar</span></a></span><span> </span><span id="local-6989586621679208747"><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679208747"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span id="local-6989586621679208748"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208748"><span class="hs-identifier hs-var">value</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-100"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679208749"><span class="annot"><span class="annottext">fv :: Set Identifier'
+</span><a href="#local-6989586621679208749"><span class="hs-identifier hs-var hs-var">fv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Expression] -&gt; Set Identifier'
+</span><a href="#local-6989586621679208738"><span class="hs-identifier hs-var">findFv'</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208748"><span class="hs-identifier hs-var">value</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208746"><span class="hs-identifier hs-var">expr</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-101"></span><span>       </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">Identifier' -&gt; Set Identifier' -&gt; Set Identifier'
 forall a. Ord a =&gt; a -&gt; Set a -&gt; Set a
 </span><span class="hs-identifier hs-var">Set.delete</span></span><span> </span><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211117"><span class="hs-identifier hs-var">ident</span></a></span><span> </span><span class="annot"><span class="annottext">Set Identifier'
-</span><a href="#local-6989586621679211115"><span class="hs-identifier hs-var">fv</span></a></span><span>
-</span><span id="line-102"></span><span>    </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#DeclFun"><span class="hs-identifier hs-type">Ast.DeclFun</span></a></span><span> </span><span id="local-6989586621679211113"><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211113"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span class="annot"><span class="annottext">IsRec
-</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Fun"><span class="hs-identifier hs-type">Ast.Fun</span></a></span><span> </span><span id="local-6989586621679211112"><span class="annot"><span class="annottext">NonEmpty Identifier'
-</span><a href="#local-6989586621679211112"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679211111"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211111"><span class="hs-identifier hs-var">body</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
-</span><span id="line-103"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679211110"><span class="annot"><span class="annottext">fv :: Set Identifier'
-</span><a href="#local-6989586621679211110"><span class="hs-identifier hs-var hs-var">fv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Expression] -&gt; Set Identifier'
-</span><a href="#local-6989586621679211126"><span class="hs-identifier hs-var">findFv'</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211111"><span class="hs-identifier hs-var">body</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211118"><span class="hs-identifier hs-var">expr</span></a></span><span class="hs-special">]</span><span>
+</span><a href="#local-6989586621679208747"><span class="hs-identifier hs-var">ident</span></a></span><span> </span><span class="annot"><span class="annottext">Set Identifier'
+</span><a href="#local-6989586621679208749"><span class="hs-identifier hs-var">fv</span></a></span><span>
+</span><span id="line-102"></span><span>    </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#DeclFun"><span class="hs-identifier hs-type">Ast.DeclFun</span></a></span><span> </span><span id="local-6989586621679208751"><span class="annot"><span class="annottext">Identifier'
+</span><a href="#local-6989586621679208751"><span class="hs-identifier hs-var">ident</span></a></span></span><span> </span><span class="annot"><span class="annottext">IsRec
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Fun"><span class="hs-identifier hs-type">Ast.Fun</span></a></span><span> </span><span id="local-6989586621679208752"><span class="annot"><span class="annottext">NonEmpty Identifier'
+</span><a href="#local-6989586621679208752"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679208753"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208753"><span class="hs-identifier hs-var">body</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-103"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679208754"><span class="annot"><span class="annottext">fv :: Set Identifier'
+</span><a href="#local-6989586621679208754"><span class="hs-identifier hs-var hs-var">fv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Expression] -&gt; Set Identifier'
+</span><a href="#local-6989586621679208738"><span class="hs-identifier hs-var">findFv'</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208753"><span class="hs-identifier hs-var">body</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208746"><span class="hs-identifier hs-var">expr</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-104"></span><span>       </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">Set Identifier'
-</span><a href="#local-6989586621679211110"><span class="hs-identifier hs-var">fv</span></a></span><span> </span><span class="annot"><span class="annottext">Set Identifier' -&gt; Set Identifier' -&gt; Set Identifier'
+</span><a href="#local-6989586621679208754"><span class="hs-identifier hs-var">fv</span></a></span><span> </span><span class="annot"><span class="annottext">Set Identifier' -&gt; Set Identifier' -&gt; Set Identifier'
 forall a. Ord a =&gt; Set a -&gt; Set a -&gt; Set a
 </span><span class="hs-operator hs-var">\\</span></span><span> </span><span class="annot"><span class="annottext">NonEmpty Identifier' -&gt; Set Identifier'
 forall a. Ord a =&gt; NonEmpty a -&gt; Set a
 </span><a href="Transformations.Cc.Cc.html#toSet"><span class="hs-identifier hs-var">toSet</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier'
-</span><a href="#local-6989586621679211113"><span class="hs-identifier hs-var">ident</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier' -&gt; NonEmpty Identifier' -&gt; NonEmpty Identifier'
+</span><a href="#local-6989586621679208751"><span class="hs-identifier hs-var">ident</span></a></span><span> </span><span class="annot"><span class="annottext">Identifier' -&gt; NonEmpty Identifier' -&gt; NonEmpty Identifier'
 forall a. a -&gt; NonEmpty a -&gt; NonEmpty a
 </span><span class="hs-operator hs-var">&lt;|</span></span><span> </span><span class="annot"><span class="annottext">NonEmpty Identifier'
-</span><a href="#local-6989586621679211112"><span class="hs-identifier hs-var">params</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-105"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprFun"><span class="hs-identifier hs-type">Ast.ExprFun</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Fun"><span class="hs-identifier hs-type">Ast.Fun</span></a></span><span> </span><span id="local-6989586621679211109"><span class="annot"><span class="annottext">NonEmpty Identifier'
-</span><a href="#local-6989586621679211109"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679211108"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211108"><span class="hs-identifier hs-var">body</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Expression -&gt; Set Identifier'
+</span><a href="#local-6989586621679208752"><span class="hs-identifier hs-var">params</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-105"></span><span>  </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#ExprFun"><span class="hs-identifier hs-type">Ast.ExprFun</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Fun"><span class="hs-identifier hs-type">Ast.Fun</span></a></span><span> </span><span id="local-6989586621679208755"><span class="annot"><span class="annottext">NonEmpty Identifier'
+</span><a href="#local-6989586621679208755"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679208756"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208756"><span class="hs-identifier hs-var">body</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Expression -&gt; Set Identifier'
 </span><a href="Transformations.Cc.Cc.html#findFv"><span class="hs-identifier hs-var">findFv</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211108"><span class="hs-identifier hs-var">body</span></a></span><span> </span><span class="annot"><span class="annottext">Set Identifier' -&gt; Set Identifier' -&gt; Set Identifier'
+</span><a href="#local-6989586621679208756"><span class="hs-identifier hs-var">body</span></a></span><span> </span><span class="annot"><span class="annottext">Set Identifier' -&gt; Set Identifier' -&gt; Set Identifier'
 forall a. Ord a =&gt; Set a -&gt; Set a -&gt; Set a
 </span><span class="hs-operator hs-var">\\</span></span><span> </span><span class="annot"><span class="annottext">NonEmpty Identifier' -&gt; Set Identifier'
 forall a. Ord a =&gt; NonEmpty a -&gt; Set a
 </span><a href="Transformations.Cc.Cc.html#toSet"><span class="hs-identifier hs-var">toSet</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty Identifier'
-</span><a href="#local-6989586621679211109"><span class="hs-identifier hs-var">params</span></a></span><span>
+</span><a href="#local-6989586621679208755"><span class="hs-identifier hs-var">params</span></a></span><span>
 </span><span id="line-106"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-107"></span><span>    </span><span class="annot"><a href="#local-6989586621679211126"><span class="hs-identifier hs-type">findFv'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier%27"><span class="hs-identifier hs-type">Ast.Identifier'</span></a></span><span>
-</span><span id="line-108"></span><span>    </span><span id="local-6989586621679211126"><span class="annot"><span class="annottext">findFv' :: [Expression] -&gt; Set Identifier'
-</span><a href="#local-6989586621679211126"><span class="hs-identifier hs-var hs-var">findFv'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Base [Expression] (Set Identifier') -&gt; Set Identifier')
+</span><span id="line-107"></span><span>    </span><span class="annot"><a href="#local-6989586621679208738"><span class="hs-identifier hs-type">findFv'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier%27"><span class="hs-identifier hs-type">Ast.Identifier'</span></a></span><span>
+</span><span id="line-108"></span><span>    </span><span id="local-6989586621679208738"><span class="annot"><span class="annottext">findFv' :: [Expression] -&gt; Set Identifier'
+</span><a href="#local-6989586621679208738"><span class="hs-identifier hs-var hs-var">findFv'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Base [Expression] (Set Identifier') -&gt; Set Identifier')
 -&gt; [Expression] -&gt; Set Identifier'
 forall t a. Recursive t =&gt; (Base t a -&gt; a) -&gt; t -&gt; a
-</span><span class="hs-identifier hs-var">cata</span></span><span> </span><span class="annot"><span class="annottext">Base [Expression] (Set Identifier') -&gt; Set Identifier'
-ListF Expression (Set Identifier') -&gt; Set Identifier'
-</span><a href="#local-6989586621679211107"><span class="hs-identifier hs-var">merger</span></a></span><span>
+forall a. (Base [Expression] a -&gt; a) -&gt; [Expression] -&gt; a
+</span><span class="hs-identifier hs-var">cata</span></span><span> </span><span class="annot"><span class="annottext">ListF Expression (Set Identifier') -&gt; Set Identifier'
+Base [Expression] (Set Identifier') -&gt; Set Identifier'
+</span><a href="#local-6989586621679208757"><span class="hs-identifier hs-var">merger</span></a></span><span>
 </span><span id="line-109"></span><span>      </span><span class="hs-keyword">where</span><span>
-</span><span id="line-110"></span><span>        </span><span id="local-6989586621679211107"><span class="annot"><span class="annottext">merger :: ListF Expression (Set Identifier') -&gt; Set Identifier'
-</span><a href="#local-6989586621679211107"><span class="hs-identifier hs-var hs-var">merger</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Cons</span></span><span> </span><span id="local-6989586621679211105"><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211105"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679211104"><span class="annot"><span class="annottext">Set Identifier'
-</span><a href="#local-6989586621679211104"><span class="hs-identifier hs-var">accum</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set Identifier'
-</span><a href="#local-6989586621679211104"><span class="hs-identifier hs-var">accum</span></a></span><span> </span><span class="annot"><span class="annottext">Set Identifier' -&gt; Set Identifier' -&gt; Set Identifier'
+</span><span id="line-110"></span><span>        </span><span id="local-6989586621679208757"><span class="annot"><span class="annottext">merger :: ListF Expression (Set Identifier') -&gt; Set Identifier'
+</span><a href="#local-6989586621679208757"><span class="hs-identifier hs-var hs-var">merger</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Cons</span></span><span> </span><span id="local-6989586621679208761"><span class="annot"><span class="annottext">Expression
+</span><a href="#local-6989586621679208761"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679208762"><span class="annot"><span class="annottext">Set Identifier'
+</span><a href="#local-6989586621679208762"><span class="hs-identifier hs-var">accum</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set Identifier'
+</span><a href="#local-6989586621679208762"><span class="hs-identifier hs-var">accum</span></a></span><span> </span><span class="annot"><span class="annottext">Set Identifier' -&gt; Set Identifier' -&gt; Set Identifier'
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 </span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Expression -&gt; Set Identifier'
 </span><a href="Transformations.Cc.Cc.html#findFv"><span class="hs-identifier hs-var">findFv</span></a></span><span> </span><span class="annot"><span class="annottext">Expression
-</span><a href="#local-6989586621679211105"><span class="hs-identifier hs-var">x</span></a></span><span>
-</span><span id="line-111"></span><span>        </span><span class="annot"><a href="#local-6989586621679211107"><span class="hs-identifier hs-var">merger</span></a></span><span> </span><span class="annot"><span class="annottext">ListF Expression (Set Identifier')
+</span><a href="#local-6989586621679208761"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-111"></span><span>        </span><span class="annot"><a href="#local-6989586621679208757"><span class="hs-identifier hs-var">merger</span></a></span><span> </span><span class="annot"><span class="annottext">ListF Expression (Set Identifier')
 </span><span class="hs-identifier hs-var">Nil</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set Identifier'
 forall a. Set a
 </span><span class="hs-identifier hs-var">Set.empty</span></span><span>
 </span><span id="line-112"></span><span>
-</span><span id="line-113"></span><span class="hs-comment">-- ** Collection Utils</span><span>
+</span><span id="line-113"></span><span class="annot"><span class="hs-comment">-- ** Collection Utils</span></span><span>
 </span><span id="line-114"></span><span>
-</span><span id="line-115"></span><span id="local-6989586621679211270"><span class="annot"><a href="Transformations.Cc.Cc.html#toSet"><span class="hs-identifier hs-type">toSet</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679211270"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NonEmpty</span></span><span> </span><span class="annot"><a href="#local-6989586621679211270"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><a href="#local-6989586621679211270"><span class="hs-identifier hs-type">a</span></a></span></span><span>
-</span><span id="line-116"></span><span id="toSet"><span class="annot"><span class="annottext">toSet :: NonEmpty a -&gt; Set a
+</span><span id="line-115"></span><span id="local-6989586621679208526"><span class="annot"><a href="Transformations.Cc.Cc.html#toSet"><span class="hs-identifier hs-type">toSet</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679208526"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NonEmpty</span></span><span> </span><span class="annot"><a href="#local-6989586621679208526"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><a href="#local-6989586621679208526"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-116"></span><span id="toSet"><span class="annot"><span class="annottext">toSet :: forall a. Ord a =&gt; NonEmpty a -&gt; Set a
 </span><a href="Transformations.Cc.Cc.html#toSet"><span class="hs-identifier hs-var hs-var">toSet</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[a] -&gt; Set a
 forall a. Ord a =&gt; [a] -&gt; Set a
 </span><span class="hs-identifier hs-var">Set.fromList</span></span><span> </span><span class="annot"><span class="annottext">([a] -&gt; Set a) -&gt; (NonEmpty a -&gt; [a]) -&gt; NonEmpty a -&gt; Set a
@@ -502,62 +513,64 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 forall a. NonEmpty a -&gt; [a]
 </span><span class="hs-identifier hs-var">NE.toList</span></span><span>
 </span><span id="line-117"></span><span>
-</span><span id="line-118"></span><span id="local-6989586621679211258"><span class="annot"><a href="Transformations.Cc.Cc.html#prependList"><span class="hs-identifier hs-type">prependList</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679211258"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NonEmpty</span></span><span> </span><span class="annot"><a href="#local-6989586621679211258"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NonEmpty</span></span><span> </span><span class="annot"><a href="#local-6989586621679211258"><span class="hs-identifier hs-type">a</span></a></span></span><span>
-</span><span id="line-119"></span><span id="prependList"><span class="annot"><span class="annottext">prependList :: [a] -&gt; NonEmpty a -&gt; NonEmpty a
-</span><a href="Transformations.Cc.Cc.html#prependList"><span class="hs-identifier hs-var hs-var">prependList</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span id="local-6989586621679211100"><span class="annot"><span class="annottext">NonEmpty a
-</span><a href="#local-6989586621679211100"><span class="hs-identifier hs-var">ne</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NonEmpty a
-</span><a href="#local-6989586621679211100"><span class="hs-identifier hs-var">ne</span></a></span><span>
-</span><span id="line-120"></span><span class="annot"><a href="Transformations.Cc.Cc.html#prependList"><span class="hs-identifier hs-var">prependList</span></a></span><span> </span><span id="local-6989586621679211099"><span class="annot"><span class="annottext">[a]
-</span><a href="#local-6989586621679211099"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679211098"><span class="annot"><span class="annottext">NonEmpty a
-</span><a href="#local-6989586621679211098"><span class="hs-identifier hs-var">ne</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[a] -&gt; NonEmpty a
-forall a. [a] -&gt; NonEmpty a
+</span><span id="line-118"></span><span id="local-6989586621679208542"><span class="annot"><a href="Transformations.Cc.Cc.html#prependList"><span class="hs-identifier hs-type">prependList</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679208542"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NonEmpty</span></span><span> </span><span class="annot"><a href="#local-6989586621679208542"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NonEmpty</span></span><span> </span><span class="annot"><a href="#local-6989586621679208542"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-119"></span><span id="prependList"><span class="annot"><span class="annottext">prependList :: forall a. [a] -&gt; NonEmpty a -&gt; NonEmpty a
+</span><a href="Transformations.Cc.Cc.html#prependList"><span class="hs-identifier hs-var hs-var">prependList</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span id="local-6989586621679208772"><span class="annot"><span class="annottext">NonEmpty a
+</span><a href="#local-6989586621679208772"><span class="hs-identifier hs-var">ne</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NonEmpty a
+</span><a href="#local-6989586621679208772"><span class="hs-identifier hs-var">ne</span></a></span><span>
+</span><span id="line-120"></span><span class="annot"><a href="Transformations.Cc.Cc.html#prependList"><span class="hs-identifier hs-var">prependList</span></a></span><span> </span><span id="local-6989586621679208773"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679208773"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679208774"><span class="annot"><span class="annottext">NonEmpty a
+</span><a href="#local-6989586621679208774"><span class="hs-identifier hs-var">ne</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[a] -&gt; NonEmpty a
+forall a. HasCallStack =&gt; [a] -&gt; NonEmpty a
 </span><span class="hs-identifier hs-var">NE.fromList</span></span><span> </span><span class="annot"><span class="annottext">[a]
-</span><a href="#local-6989586621679211099"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty a -&gt; NonEmpty a -&gt; NonEmpty a
+</span><a href="#local-6989586621679208773"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="annot"><span class="annottext">NonEmpty a -&gt; NonEmpty a -&gt; NonEmpty a
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 </span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">NonEmpty a
-</span><a href="#local-6989586621679211098"><span class="hs-identifier hs-var">ne</span></a></span><span>
+</span><a href="#local-6989586621679208774"><span class="hs-identifier hs-var">ne</span></a></span><span>
 </span><span id="line-121"></span><span>
-</span><span id="line-122"></span><span class="hs-comment">-- ** Utils</span><span>
+</span><span id="line-122"></span><span class="annot"><span class="hs-comment">-- ** Utils</span></span><span>
 </span><span id="line-123"></span><span>
-</span><span id="line-124"></span><span id="local-6989586621679211291"><span class="annot"><a href="Transformations.Cc.Cc.html#cc1"><span class="hs-identifier hs-type">cc1</span></a></span><span> </span><span class="hs-glyph">::</span><span>
-</span><span id="line-125"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679211291"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
-</span><span id="line-126"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Cc.Cc.html#CcInfo"><span class="hs-identifier hs-type">CcInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679211291"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span>
-</span><span id="line-127"></span><span id="cc1"><span class="annot"><span class="annottext">cc1 :: (Expression -&gt; a) -&gt; Expression -&gt; CcInfo a
+</span><span id="line-124"></span><span id="local-6989586621679208506"><span class="annot"><a href="Transformations.Cc.Cc.html#cc1"><span class="hs-identifier hs-type">cc1</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-125"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679208506"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-126"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Cc.Cc.html#CcInfo"><span class="hs-identifier hs-type">CcInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679208506"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-127"></span><span id="cc1"><span class="annot"><span class="annottext">cc1 :: forall a. (Expression -&gt; a) -&gt; Expression -&gt; CcInfo a
 </span><a href="Transformations.Cc.Cc.html#cc1"><span class="hs-identifier hs-var hs-var">cc1</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; CcInfo Expression)
--&gt; (Expression -&gt; a) -&gt; Expression -&gt; CcInfo a
+-&gt; (Expression -&gt; a) -&gt; Expression -&gt; ReaderT Env Identity a
 forall (m :: * -&gt; *) a' a b.
 Monad m =&gt;
 (a' -&gt; m a) -&gt; (a -&gt; b) -&gt; a' -&gt; m b
 </span><a href="MonadUtils.html#liftM1%27"><span class="hs-identifier hs-var">liftM1'</span></a></span><span> </span><span class="annot"><span class="annottext">Expression -&gt; CcInfo Expression
 </span><a href="Transformations.Cc.Cc.html#ccExpr"><span class="hs-identifier hs-var">ccExpr</span></a></span><span>
 </span><span id="line-128"></span><span>
-</span><span id="line-129"></span><span id="local-6989586621679211275"><span class="annot"><a href="Transformations.Cc.Cc.html#cc2"><span class="hs-identifier hs-type">cc2</span></a></span><span> </span><span class="hs-glyph">::</span><span>
-</span><span id="line-130"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679211275"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
-</span><span id="line-131"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Cc.Cc.html#CcInfo"><span class="hs-identifier hs-type">CcInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679211275"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span>
-</span><span id="line-132"></span><span id="cc2"><span class="annot"><span class="annottext">cc2 :: (Expression -&gt; Expression -&gt; a)
+</span><span id="line-129"></span><span id="local-6989586621679208520"><span class="annot"><a href="Transformations.Cc.Cc.html#cc2"><span class="hs-identifier hs-type">cc2</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-130"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679208520"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-131"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Cc.Cc.html#CcInfo"><span class="hs-identifier hs-type">CcInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679208520"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-132"></span><span id="cc2"><span class="annot"><span class="annottext">cc2 :: forall a.
+(Expression -&gt; Expression -&gt; a)
 -&gt; Expression -&gt; Expression -&gt; CcInfo a
 </span><a href="Transformations.Cc.Cc.html#cc2"><span class="hs-identifier hs-var hs-var">cc2</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; CcInfo Expression)
 -&gt; (Expression -&gt; Expression -&gt; a)
 -&gt; Expression
 -&gt; Expression
--&gt; CcInfo a
+-&gt; ReaderT Env Identity a
 forall (m :: * -&gt; *) a' a b.
 Monad m =&gt;
 (a' -&gt; m a) -&gt; (a -&gt; a -&gt; b) -&gt; a' -&gt; a' -&gt; m b
 </span><a href="MonadUtils.html#liftM2%27"><span class="hs-identifier hs-var">liftM2'</span></a></span><span> </span><span class="annot"><span class="annottext">Expression -&gt; CcInfo Expression
 </span><a href="Transformations.Cc.Cc.html#ccExpr"><span class="hs-identifier hs-var">ccExpr</span></a></span><span>
 </span><span id="line-133"></span><span>
-</span><span id="line-134"></span><span id="local-6989586621679211273"><span class="annot"><a href="Transformations.Cc.Cc.html#cc3"><span class="hs-identifier hs-type">cc3</span></a></span><span> </span><span class="hs-glyph">::</span><span>
-</span><span id="line-135"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679211273"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
-</span><span id="line-136"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Cc.Cc.html#CcInfo"><span class="hs-identifier hs-type">CcInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679211273"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span>
-</span><span id="line-137"></span><span id="cc3"><span class="annot"><span class="annottext">cc3 :: (Expression -&gt; Expression -&gt; Expression -&gt; a)
+</span><span id="line-134"></span><span id="local-6989586621679208522"><span class="annot"><a href="Transformations.Cc.Cc.html#cc3"><span class="hs-identifier hs-type">cc3</span></a></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-135"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679208522"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-136"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Simplifier.SimplifiedAst.html#Expression"><span class="hs-identifier hs-type">Ast.Expression</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Transformations.Cc.Cc.html#CcInfo"><span class="hs-identifier hs-type">CcInfo</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679208522"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-137"></span><span id="cc3"><span class="annot"><span class="annottext">cc3 :: forall a.
+(Expression -&gt; Expression -&gt; Expression -&gt; a)
 -&gt; Expression -&gt; Expression -&gt; Expression -&gt; CcInfo a
 </span><a href="Transformations.Cc.Cc.html#cc3"><span class="hs-identifier hs-var hs-var">cc3</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; CcInfo Expression)
 -&gt; (Expression -&gt; Expression -&gt; Expression -&gt; a)
 -&gt; Expression
 -&gt; Expression
 -&gt; Expression
--&gt; CcInfo a
+-&gt; ReaderT Env Identity a
 forall (m :: * -&gt; *) a' a b.
 Monad m =&gt;
 (a' -&gt; m a) -&gt; (a -&gt; a -&gt; a -&gt; b) -&gt; a' -&gt; a' -&gt; a' -&gt; m b

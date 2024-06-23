@@ -6,33 +6,33 @@
 </span><span id="line-6"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Trees.Common.html"><span class="hs-identifier">Trees.Common</span></a></span><span>
 </span><span id="line-7"></span><span>
 </span><span id="line-8"></span><span class="hs-keyword">data</span><span> </span><span id="Program"><span class="annot"><a href="Transformations.Ll.Lfr.html#Program"><span class="hs-identifier hs-var">Program</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Program"><span class="annot"><a href="Transformations.Ll.Lfr.html#Program"><span class="hs-identifier hs-var">Program</span></a></span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Transformations.Ll.Lfr.html#GlobalDeclaration"><span class="hs-identifier hs-type">GlobalDeclaration</span></a></span><span class="hs-special">]</span><span> </span><span class="annot"><a href="Trees.Common.html#IdCnt"><span class="hs-identifier hs-type">IdCnt</span></a></span><span>
-</span><span id="line-9"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679210500"><span id="local-6989586621679210502"><span id="local-6989586621679210504"><span class="annot"><span class="annottext">Int -&gt; Program -&gt; ShowS
+</span><span id="line-9"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679207409"><span id="local-6989586621679207418"><span id="local-6989586621679207422"><span class="annot"><span class="annottext">Int -&gt; Program -&gt; ShowS
 [Program] -&gt; ShowS
 Program -&gt; String
 (Int -&gt; Program -&gt; ShowS)
 -&gt; (Program -&gt; String) -&gt; ([Program] -&gt; ShowS) -&gt; Show Program
 forall a.
 (Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
-showList :: [Program] -&gt; ShowS
-$cshowList :: [Program] -&gt; ShowS
-show :: Program -&gt; String
-$cshow :: Program -&gt; String
-showsPrec :: Int -&gt; Program -&gt; ShowS
 $cshowsPrec :: Int -&gt; Program -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679210495"><span id="local-6989586621679210497"><span class="annot"><span class="annottext">Program -&gt; Program -&gt; Bool
+showsPrec :: Int -&gt; Program -&gt; ShowS
+$cshow :: Program -&gt; String
+show :: Program -&gt; String
+$cshowList :: [Program] -&gt; ShowS
+showList :: [Program] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207427"><span id="local-6989586621679207434"><span class="annot"><span class="annottext">Program -&gt; Program -&gt; Bool
 (Program -&gt; Program -&gt; Bool)
 -&gt; (Program -&gt; Program -&gt; Bool) -&gt; Eq Program
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
-/= :: Program -&gt; Program -&gt; Bool
-$c/= :: Program -&gt; Program -&gt; Bool
-== :: Program -&gt; Program -&gt; Bool
 $c== :: Program -&gt; Program -&gt; Bool
+== :: Program -&gt; Program -&gt; Bool
+$c/= :: Program -&gt; Program -&gt; Bool
+/= :: Program -&gt; Program -&gt; Bool
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-10"></span><span>
 </span><span id="line-11"></span><span class="hs-keyword">data</span><span> </span><span id="GlobalDeclaration"><span class="annot"><a href="Transformations.Ll.Lfr.html#GlobalDeclaration"><span class="hs-identifier hs-var">GlobalDeclaration</span></a></span></span><span>
 </span><span id="line-12"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="GlobVarDecl"><span class="annot"><a href="Transformations.Ll.Lfr.html#GlobVarDecl"><span class="hs-identifier hs-var">GlobVarDecl</span></a></span></span><span> </span><span class="annot"><a href="Transformations.Ll.Lfr.html#VarDeclaration"><span class="hs-identifier hs-type">VarDeclaration</span></a></span><span>
 </span><span id="line-13"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="GlobFunDecl"><span class="annot"><a href="Transformations.Ll.Lfr.html#GlobFunDecl"><span class="hs-identifier hs-var">GlobFunDecl</span></a></span></span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier%27"><span class="hs-identifier hs-type">Identifier'</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Trees.Common.html#Identifier%27"><span class="hs-identifier hs-type">Identifier'</span></a></span><span class="hs-special">]</span><span> </span><span class="annot"><a href="Transformations.Ll.Lfr.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
-</span><span id="line-14"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679210485"><span id="local-6989586621679210487"><span id="local-6989586621679210489"><span class="annot"><span class="annottext">Int -&gt; GlobalDeclaration -&gt; ShowS
+</span><span id="line-14"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679207442"><span id="local-6989586621679207453"><span id="local-6989586621679207456"><span class="annot"><span class="annottext">Int -&gt; GlobalDeclaration -&gt; ShowS
 [GlobalDeclaration] -&gt; ShowS
 GlobalDeclaration -&gt; String
 (Int -&gt; GlobalDeclaration -&gt; ShowS)
@@ -41,25 +41,25 @@ GlobalDeclaration -&gt; String
 -&gt; Show GlobalDeclaration
 forall a.
 (Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
-showList :: [GlobalDeclaration] -&gt; ShowS
-$cshowList :: [GlobalDeclaration] -&gt; ShowS
-show :: GlobalDeclaration -&gt; String
-$cshow :: GlobalDeclaration -&gt; String
-showsPrec :: Int -&gt; GlobalDeclaration -&gt; ShowS
 $cshowsPrec :: Int -&gt; GlobalDeclaration -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679210481"><span id="local-6989586621679210483"><span class="annot"><span class="annottext">GlobalDeclaration -&gt; GlobalDeclaration -&gt; Bool
+showsPrec :: Int -&gt; GlobalDeclaration -&gt; ShowS
+$cshow :: GlobalDeclaration -&gt; String
+show :: GlobalDeclaration -&gt; String
+$cshowList :: [GlobalDeclaration] -&gt; ShowS
+showList :: [GlobalDeclaration] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207459"><span id="local-6989586621679207468"><span class="annot"><span class="annottext">GlobalDeclaration -&gt; GlobalDeclaration -&gt; Bool
 (GlobalDeclaration -&gt; GlobalDeclaration -&gt; Bool)
 -&gt; (GlobalDeclaration -&gt; GlobalDeclaration -&gt; Bool)
 -&gt; Eq GlobalDeclaration
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
-/= :: GlobalDeclaration -&gt; GlobalDeclaration -&gt; Bool
-$c/= :: GlobalDeclaration -&gt; GlobalDeclaration -&gt; Bool
-== :: GlobalDeclaration -&gt; GlobalDeclaration -&gt; Bool
 $c== :: GlobalDeclaration -&gt; GlobalDeclaration -&gt; Bool
+== :: GlobalDeclaration -&gt; GlobalDeclaration -&gt; Bool
+$c/= :: GlobalDeclaration -&gt; GlobalDeclaration -&gt; Bool
+/= :: GlobalDeclaration -&gt; GlobalDeclaration -&gt; Bool
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-15"></span><span>
 </span><span id="line-16"></span><span class="hs-keyword">data</span><span> </span><span id="VarDeclaration"><span class="annot"><a href="Transformations.Ll.Lfr.html#VarDeclaration"><span class="hs-identifier hs-var">VarDeclaration</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="VarDecl"><span class="annot"><a href="Transformations.Ll.Lfr.html#VarDecl"><span class="hs-identifier hs-var">VarDecl</span></a></span></span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier%27"><span class="hs-identifier hs-type">Identifier'</span></a></span><span> </span><span class="annot"><a href="Transformations.Ll.Lfr.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
-</span><span id="line-17"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679210474"><span id="local-6989586621679210476"><span id="local-6989586621679210478"><span class="annot"><span class="annottext">Int -&gt; VarDeclaration -&gt; ShowS
+</span><span id="line-17"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679207472"><span id="local-6989586621679207477"><span id="local-6989586621679207480"><span class="annot"><span class="annottext">Int -&gt; VarDeclaration -&gt; ShowS
 [VarDeclaration] -&gt; ShowS
 VarDeclaration -&gt; String
 (Int -&gt; VarDeclaration -&gt; ShowS)
@@ -68,20 +68,20 @@ VarDeclaration -&gt; String
 -&gt; Show VarDeclaration
 forall a.
 (Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
-showList :: [VarDeclaration] -&gt; ShowS
-$cshowList :: [VarDeclaration] -&gt; ShowS
-show :: VarDeclaration -&gt; String
-$cshow :: VarDeclaration -&gt; String
-showsPrec :: Int -&gt; VarDeclaration -&gt; ShowS
 $cshowsPrec :: Int -&gt; VarDeclaration -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679210470"><span id="local-6989586621679210472"><span class="annot"><span class="annottext">VarDeclaration -&gt; VarDeclaration -&gt; Bool
+showsPrec :: Int -&gt; VarDeclaration -&gt; ShowS
+$cshow :: VarDeclaration -&gt; String
+show :: VarDeclaration -&gt; String
+$cshowList :: [VarDeclaration] -&gt; ShowS
+showList :: [VarDeclaration] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207483"><span id="local-6989586621679207487"><span class="annot"><span class="annottext">VarDeclaration -&gt; VarDeclaration -&gt; Bool
 (VarDeclaration -&gt; VarDeclaration -&gt; Bool)
 -&gt; (VarDeclaration -&gt; VarDeclaration -&gt; Bool) -&gt; Eq VarDeclaration
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
-/= :: VarDeclaration -&gt; VarDeclaration -&gt; Bool
-$c/= :: VarDeclaration -&gt; VarDeclaration -&gt; Bool
-== :: VarDeclaration -&gt; VarDeclaration -&gt; Bool
 $c== :: VarDeclaration -&gt; VarDeclaration -&gt; Bool
+== :: VarDeclaration -&gt; VarDeclaration -&gt; Bool
+$c/= :: VarDeclaration -&gt; VarDeclaration -&gt; Bool
+/= :: VarDeclaration -&gt; VarDeclaration -&gt; Bool
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-18"></span><span>
 </span><span id="line-19"></span><span class="hs-keyword">data</span><span> </span><span id="Expression"><span class="annot"><a href="Transformations.Ll.Lfr.html#Expression"><span class="hs-identifier hs-var">Expression</span></a></span></span><span>
@@ -92,7 +92,7 @@ $c== :: VarDeclaration -&gt; VarDeclaration -&gt; Bool
 </span><span id="line-24"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ExprApp"><span class="annot"><a href="Transformations.Ll.Lfr.html#ExprApp"><span class="hs-identifier hs-var">ExprApp</span></a></span></span><span> </span><span class="annot"><a href="Transformations.Ll.Lfr.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span> </span><span class="annot"><a href="Transformations.Ll.Lfr.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
 </span><span id="line-25"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ExprIte"><span class="annot"><a href="Transformations.Ll.Lfr.html#ExprIte"><span class="hs-identifier hs-var">ExprIte</span></a></span></span><span> </span><span class="annot"><a href="Transformations.Ll.Lfr.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span> </span><span class="annot"><a href="Transformations.Ll.Lfr.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span> </span><span class="annot"><a href="Transformations.Ll.Lfr.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
 </span><span id="line-26"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ExprLetIn"><span class="annot"><a href="Transformations.Ll.Lfr.html#ExprLetIn"><span class="hs-identifier hs-var">ExprLetIn</span></a></span></span><span> </span><span class="annot"><a href="Transformations.Ll.Lfr.html#VarDeclaration"><span class="hs-identifier hs-type">VarDeclaration</span></a></span><span> </span><span class="annot"><a href="Transformations.Ll.Lfr.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
-</span><span id="line-27"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679210454"><span id="local-6989586621679210456"><span id="local-6989586621679210458"><span class="annot"><span class="annottext">Int -&gt; Expression -&gt; ShowS
+</span><span id="line-27"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679207497"><span id="local-6989586621679207523"><span id="local-6989586621679207526"><span class="annot"><span class="annottext">Int -&gt; Expression -&gt; ShowS
 [Expression] -&gt; ShowS
 Expression -&gt; String
 (Int -&gt; Expression -&gt; ShowS)
@@ -101,19 +101,19 @@ Expression -&gt; String
 -&gt; Show Expression
 forall a.
 (Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
-showList :: [Expression] -&gt; ShowS
-$cshowList :: [Expression] -&gt; ShowS
-show :: Expression -&gt; String
-$cshow :: Expression -&gt; String
-showsPrec :: Int -&gt; Expression -&gt; ShowS
 $cshowsPrec :: Int -&gt; Expression -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679210450"><span id="local-6989586621679210452"><span class="annot"><span class="annottext">Expression -&gt; Expression -&gt; Bool
+showsPrec :: Int -&gt; Expression -&gt; ShowS
+$cshow :: Expression -&gt; String
+show :: Expression -&gt; String
+$cshowList :: [Expression] -&gt; ShowS
+showList :: [Expression] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207529"><span id="local-6989586621679207548"><span class="annot"><span class="annottext">Expression -&gt; Expression -&gt; Bool
 (Expression -&gt; Expression -&gt; Bool)
 -&gt; (Expression -&gt; Expression -&gt; Bool) -&gt; Eq Expression
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
-/= :: Expression -&gt; Expression -&gt; Bool
-$c/= :: Expression -&gt; Expression -&gt; Bool
-== :: Expression -&gt; Expression -&gt; Bool
 $c== :: Expression -&gt; Expression -&gt; Bool
+== :: Expression -&gt; Expression -&gt; Bool
+$c/= :: Expression -&gt; Expression -&gt; Bool
+/= :: Expression -&gt; Expression -&gt; Bool
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-28"></span></pre></body></html>

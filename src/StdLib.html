@@ -13,11 +13,11 @@
 </span><span id="line-13"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Functor.Foldable</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">hylo</span></span><span class="hs-special">)</span><span>
 </span><span id="line-14"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Trees.Common.html"><span class="hs-identifier">Trees.Common</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Trees.Common.html#Arity"><span class="hs-identifier">Arity</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier">Identifier</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier">Type</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-15"></span><span>
-</span><span id="line-16"></span><span class="hs-comment">-- * Standard Library</span><span>
+</span><span id="line-16"></span><span class="annot"><span class="hs-comment">-- * Standard Library</span></span><span>
 </span><span id="line-17"></span><span>
 </span><span id="line-18"></span><span class="hs-keyword">type</span><span> </span><span id="TypedDeclaration"><span class="annot"><a href="StdLib.html#TypedDeclaration"><span class="hs-identifier hs-var">TypedDeclaration</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-19"></span><span>
-</span><span id="line-20"></span><span class="hs-comment">-- | The list of typed standard declarations.</span><span>
+</span><span id="line-20"></span><span class="annot"><span class="hs-comment">-- | The list of typed standard declarations.</span></span><span>
 </span><span id="line-21"></span><span class="annot"><a href="StdLib.html#typedDecls"><span class="hs-identifier hs-type">typedDecls</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="StdLib.html#TypedDeclaration"><span class="hs-identifier hs-type">TypedDeclaration</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-22"></span><span id="typedDecls"><span class="annot"><span class="annottext">typedDecls :: [TypedDeclaration]
 </span><a href="StdLib.html#typedDecls"><span class="hs-identifier hs-var hs-var">typedDecls</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">TypedDeclaration
@@ -25,7 +25,7 @@
 </span><a href="StdLib.html#printBoolDecl"><span class="hs-identifier hs-var">printBoolDecl</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">TypedDeclaration
 </span><a href="StdLib.html#printIntDecl"><span class="hs-identifier hs-var">printIntDecl</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-23"></span><span>
-</span><span id="line-24"></span><span class="hs-comment">-- | The list of standard declarations.</span><span>
+</span><span id="line-24"></span><span class="annot"><span class="hs-comment">-- | The list of standard declarations.</span></span><span>
 </span><span id="line-25"></span><span class="annot"><a href="StdLib.html#decls"><span class="hs-identifier hs-type">decls</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-26"></span><span id="decls"><span class="annot"><span class="annottext">decls :: [Identifier]
 </span><a href="StdLib.html#decls"><span class="hs-identifier hs-var hs-var">decls</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TypedDeclaration -&gt; Identifier
@@ -38,12 +38,12 @@ forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span id="line-27"></span><span>
 </span><span id="line-28"></span><span class="hs-keyword">type</span><span> </span><span id="DeclarationWithArity"><span class="annot"><a href="StdLib.html#DeclarationWithArity"><span class="hs-identifier hs-var">DeclarationWithArity</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Trees.Common.html#Arity"><span class="hs-identifier hs-type">Arity</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-29"></span><span>
-</span><span id="line-30"></span><span class="hs-comment">-- | The list of all (including internal) standard declarations with their arity.</span><span>
+</span><span id="line-30"></span><span class="annot"><span class="hs-comment">-- | The list of all (including internal) standard declarations with their arity.</span></span><span>
 </span><span id="line-31"></span><span class="annot"><a href="StdLib.html#allDeclsWithArity"><span class="hs-identifier hs-type">allDeclsWithArity</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="StdLib.html#DeclarationWithArity"><span class="hs-identifier hs-type">DeclarationWithArity</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-32"></span><span id="allDeclsWithArity"><span class="annot"><span class="annottext">allDeclsWithArity :: [DeclarationWithArity]
 </span><a href="StdLib.html#allDeclsWithArity"><span class="hs-identifier hs-var hs-var">allDeclsWithArity</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TypedDeclaration -&gt; DeclarationWithArity
-forall a. (a, Type) -&gt; (a, Arity)
-</span><a href="#local-6989586621679211065"><span class="hs-identifier hs-var">convert</span></a></span><span> </span><span class="annot"><span class="annottext">(TypedDeclaration -&gt; DeclarationWithArity)
+forall {a}. (a, Type) -&gt; (a, Arity)
+</span><a href="#local-6989586621679208453"><span class="hs-identifier hs-var">convert</span></a></span><span> </span><span class="annot"><span class="annottext">(TypedDeclaration -&gt; DeclarationWithArity)
 -&gt; [TypedDeclaration] -&gt; [DeclarationWithArity]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[TypedDeclaration]
@@ -55,43 +55,44 @@ forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 </span><a href="StdLib.html#funToPafDecl"><span class="hs-identifier hs-var">funToPafDecl</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">DeclarationWithArity
 </span><a href="StdLib.html#applyDecl"><span class="hs-identifier hs-var">applyDecl</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-33"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-34"></span><span>    </span><span id="local-6989586621679211065"><span class="annot"><span class="annottext">convert :: (a, Type) -&gt; (a, Arity)
-</span><a href="#local-6989586621679211065"><span class="hs-identifier hs-var hs-var">convert</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679211061"><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679211061"><span class="hs-identifier hs-var">ident</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679211060"><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679211060"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679211061"><span class="hs-identifier hs-var">ident</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Arity
-</span><a href="#local-6989586621679211059"><span class="hs-identifier hs-var">calcArity</span></a></span><span> </span><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679211060"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span>    </span><span id="local-6989586621679208453"><span class="annot"><span class="annottext">convert :: (a, Type) -&gt; (a, Arity)
+</span><a href="#local-6989586621679208453"><span class="hs-identifier hs-var hs-var">convert</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679208457"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679208457"><span class="hs-identifier hs-var">ident</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679208458"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679208458"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679208457"><span class="hs-identifier hs-var">ident</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Arity
+</span><a href="#local-6989586621679208459"><span class="hs-identifier hs-var">calcArity</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679208458"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-35"></span><span>
-</span><span id="line-36"></span><span>    </span><span class="annot"><a href="#local-6989586621679211059"><span class="hs-identifier hs-type">calcArity</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Trees.Common.html#Arity"><span class="hs-identifier hs-type">Arity</span></a></span><span>
-</span><span id="line-37"></span><span>    </span><span id="local-6989586621679211059"><span class="annot"><span class="annottext">calcArity :: Type -&gt; Arity
-</span><a href="#local-6989586621679211059"><span class="hs-identifier hs-var hs-var">calcArity</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(ListF Type Arity -&gt; Arity)
+</span><span id="line-36"></span><span>    </span><span class="annot"><a href="#local-6989586621679208459"><span class="hs-identifier hs-type">calcArity</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Trees.Common.html#Arity"><span class="hs-identifier hs-type">Arity</span></a></span><span>
+</span><span id="line-37"></span><span>    </span><span id="local-6989586621679208459"><span class="annot"><span class="annottext">calcArity :: Type -&gt; Arity
+</span><a href="#local-6989586621679208459"><span class="hs-identifier hs-var hs-var">calcArity</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(ListF Type Arity -&gt; Arity)
 -&gt; (Type -&gt; ListF Type Type) -&gt; Type -&gt; Arity
 forall (f :: * -&gt; *) b a.
 Functor f =&gt;
 (f b -&gt; b) -&gt; (a -&gt; f a) -&gt; a -&gt; b
 </span><span class="hs-identifier hs-var">hylo</span></span><span> </span><span class="annot"><span class="annottext">ListF Type Arity -&gt; Arity
+forall a. ListF Type a -&gt; Arity
 forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Arity
 </span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="annot"><span class="annottext">Type -&gt; ListF Type Type
-</span><a href="#local-6989586621679211057"><span class="hs-identifier hs-var">getParams</span></a></span><span>
+</span><a href="#local-6989586621679208461"><span class="hs-identifier hs-var">getParams</span></a></span><span>
 </span><span id="line-38"></span><span>
-</span><span id="line-39"></span><span>    </span><span class="annot"><a href="#local-6989586621679211057"><span class="hs-identifier hs-type">getParams</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ListF</span></span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span>
-</span><span id="line-40"></span><span>    </span><span id="local-6989586621679211057"><span class="annot"><span class="annottext">getParams :: Type -&gt; ListF Type Type
-</span><a href="#local-6989586621679211057"><span class="hs-identifier hs-var hs-var">getParams</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Trees.Common.html#TFun"><span class="hs-identifier hs-type">TFun</span></a></span><span> </span><span id="local-6989586621679211055"><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679211055"><span class="hs-identifier hs-var">pT</span></a></span></span><span> </span><span id="local-6989586621679211054"><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679211054"><span class="hs-identifier hs-var">retT</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Type -&gt; ListF Type Type
+</span><span id="line-39"></span><span>    </span><span class="annot"><a href="#local-6989586621679208461"><span class="hs-identifier hs-type">getParams</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ListF</span></span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span>
+</span><span id="line-40"></span><span>    </span><span id="local-6989586621679208461"><span class="annot"><span class="annottext">getParams :: Type -&gt; ListF Type Type
+</span><a href="#local-6989586621679208461"><span class="hs-identifier hs-var hs-var">getParams</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Trees.Common.html#TFun"><span class="hs-identifier hs-type">TFun</span></a></span><span> </span><span id="local-6989586621679208463"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679208463"><span class="hs-identifier hs-var">pT</span></a></span></span><span> </span><span id="local-6989586621679208464"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679208464"><span class="hs-identifier hs-var">retT</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Type -&gt; ListF Type Type
 forall a b. a -&gt; b -&gt; ListF a b
 </span><span class="hs-identifier hs-var">Cons</span></span><span> </span><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679211055"><span class="hs-identifier hs-var">pT</span></a></span><span> </span><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679211054"><span class="hs-identifier hs-var">retT</span></a></span><span>
-</span><span id="line-41"></span><span>    </span><span class="annot"><a href="#local-6989586621679211057"><span class="hs-identifier hs-var">getParams</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679208463"><span class="hs-identifier hs-var">pT</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679208464"><span class="hs-identifier hs-var">retT</span></a></span><span>
+</span><span id="line-41"></span><span>    </span><span class="annot"><a href="#local-6989586621679208461"><span class="hs-identifier hs-var">getParams</span></a></span><span> </span><span class="annot"><span class="annottext">Type
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ListF Type Type
 forall a b. ListF a b
 </span><span class="hs-identifier hs-var">Nil</span></span><span>
 </span><span id="line-42"></span><span>
-</span><span id="line-43"></span><span class="hs-comment">-- ** Function Declarations</span><span>
+</span><span id="line-43"></span><span class="annot"><span class="hs-comment">-- ** Function Declarations</span></span><span>
 </span><span id="line-44"></span><span>
-</span><span id="line-45"></span><span class="hs-comment">-- | The @not@ function declaration (@not : bool -&gt; bool@).</span><span>
+</span><span id="line-45"></span><span class="annot"><span class="hs-comment">-- | The @not@ function declaration (@not : bool -&gt; bool@).</span></span><span>
 </span><span id="line-46"></span><span class="annot"><a href="StdLib.html#notDecl"><span class="hs-identifier hs-type">notDecl</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="StdLib.html#TypedDeclaration"><span class="hs-identifier hs-type">TypedDeclaration</span></a></span><span>
 </span><span id="line-47"></span><span id="notDecl"><span class="annot"><span class="annottext">notDecl :: TypedDeclaration
 </span><a href="StdLib.html#notDecl"><span class="hs-identifier hs-var hs-var">notDecl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier
@@ -100,7 +101,7 @@ forall a b. ListF a b
 </span><a href="Trees.Common.html#TBool"><span class="hs-identifier hs-var">TBool</span></a></span><span> </span><span class="annot"><span class="annottext">Type
 </span><a href="Trees.Common.html#TBool"><span class="hs-identifier hs-var">TBool</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-48"></span><span>
-</span><span id="line-49"></span><span class="hs-comment">-- | The @print_bool@ function declaration (@print_bool : bool -&gt; unit@).</span><span>
+</span><span id="line-49"></span><span class="annot"><span class="hs-comment">-- | The @print_bool@ function declaration (@print_bool : bool -&gt; unit@).</span></span><span>
 </span><span id="line-50"></span><span class="annot"><a href="StdLib.html#printBoolDecl"><span class="hs-identifier hs-type">printBoolDecl</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="StdLib.html#TypedDeclaration"><span class="hs-identifier hs-type">TypedDeclaration</span></a></span><span>
 </span><span id="line-51"></span><span id="printBoolDecl"><span class="annot"><span class="annottext">printBoolDecl :: TypedDeclaration
 </span><a href="StdLib.html#printBoolDecl"><span class="hs-identifier hs-var hs-var">printBoolDecl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier
@@ -109,7 +110,7 @@ forall a b. ListF a b
 </span><a href="Trees.Common.html#TBool"><span class="hs-identifier hs-var">TBool</span></a></span><span> </span><span class="annot"><span class="annottext">Type
 </span><a href="Trees.Common.html#TUnit"><span class="hs-identifier hs-var">TUnit</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-52"></span><span>
-</span><span id="line-53"></span><span class="hs-comment">-- | The @print_int@ function declaration (@print_int : int -&gt; unit@).</span><span>
+</span><span id="line-53"></span><span class="annot"><span class="hs-comment">-- | The @print_int@ function declaration (@print_int : int -&gt; unit@).</span></span><span>
 </span><span id="line-54"></span><span class="annot"><a href="StdLib.html#printIntDecl"><span class="hs-identifier hs-type">printIntDecl</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="StdLib.html#TypedDeclaration"><span class="hs-identifier hs-type">TypedDeclaration</span></a></span><span>
 </span><span id="line-55"></span><span id="printIntDecl"><span class="annot"><span class="annottext">printIntDecl :: TypedDeclaration
 </span><a href="StdLib.html#printIntDecl"><span class="hs-identifier hs-var hs-var">printIntDecl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Identifier
@@ -118,7 +119,7 @@ forall a b. ListF a b
 </span><a href="Trees.Common.html#TInt"><span class="hs-identifier hs-var">TInt</span></a></span><span> </span><span class="annot"><span class="annottext">Type
 </span><a href="Trees.Common.html#TUnit"><span class="hs-identifier hs-var">TUnit</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-56"></span><span>
-</span><span id="line-57"></span><span class="hs-comment">-- ** Internal Function Declarations</span><span>
+</span><span id="line-57"></span><span class="annot"><span class="hs-comment">-- ** Internal Function Declarations</span></span><span>
 </span><span id="line-58"></span><span>
 </span><span id="line-59"></span><span class="annot"><a href="StdLib.html#divDecl"><span class="hs-identifier hs-type">divDecl</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="StdLib.html#DeclarationWithArity"><span class="hs-identifier hs-type">DeclarationWithArity</span></a></span><span>
 </span><span id="line-60"></span><span id="divDecl"><span class="annot"><span class="annottext">divDecl :: DeclarationWithArity

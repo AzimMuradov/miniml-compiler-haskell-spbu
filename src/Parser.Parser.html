@@ -12,9 +12,9 @@
 </span><span id="line-12"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Text.Megaparsec</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">MonadParsec</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">many</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">parseMaybe</span></span><span class="hs-special">)</span><span>
 </span><span id="line-13"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Trees.Common.html"><span class="hs-identifier">Trees.Common</span></a></span><span>
 </span><span id="line-14"></span><span>
-</span><span id="line-15"></span><span class="hs-comment">-- * Program Parser</span><span>
+</span><span id="line-15"></span><span class="annot"><span class="hs-comment">-- * Program Parser</span></span><span>
 </span><span id="line-16"></span><span>
-</span><span id="line-17"></span><span class="hs-comment">-- | Parser entry point</span><span>
+</span><span id="line-17"></span><span class="annot"><span class="hs-comment">-- | Parser entry point</span></span><span>
 </span><span id="line-18"></span><span class="annot"><a href="Parser.Parser.html#parseProgram"><span class="hs-identifier hs-type">parseProgram</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Parser.Ast.html#Program"><span class="hs-identifier hs-type">Program</span></a></span><span>
 </span><span id="line-19"></span><span id="parseProgram"><span class="annot"><span class="annottext">parseProgram :: Text -&gt; Maybe Program
 </span><a href="Parser.Parser.html#parseProgram"><span class="hs-identifier hs-var hs-var">parseProgram</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Parsec Void Text Program -&gt; Text -&gt; Maybe Program
@@ -24,15 +24,21 @@ forall e s a. (Ord e, Stream s) =&gt; Parsec e s a -&gt; s -&gt; Maybe a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Parser ()
 </span><a href="Parser.Lexer.html#sc"><span class="hs-identifier hs-var">sc</span></a></span><span> </span><span class="annot"><span class="annottext">Parser () -&gt; Parsec Void Text Program -&gt; Parsec Void Text Program
+forall a b.
+ParsecT Void Text Identity a
+-&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f b
 </span><span class="hs-operator hs-var">*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Parsec Void Text Program
 </span><a href="Parser.Parser.html#programP"><span class="hs-identifier hs-var">programP</span></a></span><span> </span><span class="annot"><span class="annottext">Parsec Void Text Program -&gt; Parser () -&gt; Parsec Void Text Program
+forall a b.
+ParsecT Void Text Identity a
+-&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">Parser ()
 forall e s (m :: * -&gt; *). MonadParsec e s m =&gt; m ()
 </span><span class="hs-identifier hs-var">eof</span></span><span>
 </span><span id="line-20"></span><span>
-</span><span id="line-21"></span><span class="hs-comment">-- * Internal</span><span>
+</span><span id="line-21"></span><span class="annot"><span class="hs-comment">-- * Internal</span></span><span>
 </span><span id="line-22"></span><span>
 </span><span id="line-23"></span><span class="annot"><a href="Parser.Parser.html#programP"><span class="hs-identifier hs-type">programP</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Parser.Lexer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="Parser.Ast.html#Program"><span class="hs-identifier hs-type">Program</span></a></span><span>
 </span><span id="line-24"></span><span id="programP"><span class="annot"><span class="annottext">programP :: Parsec Void Text Program
@@ -48,6 +54,9 @@ forall (m :: * -&gt; *) a. MonadPlus m =&gt; m a -&gt; m [a]
 </span><a href="Parser.Lexer.html#semicolon2"><span class="hs-identifier hs-var">semicolon2</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity [Text]
 -&gt; ParsecT Void Text Identity [Statement]
 -&gt; ParsecT Void Text Identity [Statement]
+forall a b.
+ParsecT Void Text Identity a
+-&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f b
 </span><span class="hs-operator hs-var">*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Statement
 -&gt; ParsecT Void Text Identity [Statement]
@@ -56,6 +65,9 @@ forall (m :: * -&gt; *) a. MonadPlus m =&gt; m a -&gt; m [a]
 </span><a href="Parser.Parser.html#stmtP"><span class="hs-identifier hs-var">stmtP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Statement
 -&gt; ParsecT Void Text Identity [Text]
 -&gt; ParsecT Void Text Identity Statement
+forall a b.
+ParsecT Void Text Identity a
+-&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 -&gt; ParsecT Void Text Identity [Text]
@@ -84,7 +96,7 @@ forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Declaration
 </span><a href="Parser.Parser.html#declP"><span class="hs-identifier hs-var">declP</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-28"></span><span>
-</span><span id="line-29"></span><span class="hs-comment">-- ** User Declaration Parsers</span><span>
+</span><span id="line-29"></span><span class="annot"><span class="hs-comment">-- ** User Declaration Parsers</span></span><span>
 </span><span id="line-30"></span><span>
 </span><span id="line-31"></span><span class="annot"><a href="Parser.Parser.html#declP"><span class="hs-identifier hs-type">declP</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Parser.Lexer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="Parser.Ast.html#Declaration"><span class="hs-identifier hs-type">Declaration</span></a></span><span>
 </span><span id="line-32"></span><span id="declP"><span class="annot"><span class="annottext">declP :: ParsecT Void Text Identity Declaration
@@ -94,12 +106,12 @@ forall (f :: * -&gt; *) a.
 (Foldable f, Functor f) =&gt;
 f (Parser a) -&gt; Parser a
 </span><a href="Parser.Utils.html#choice%27"><span class="hs-identifier hs-var">choice'</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">ParsecT Void Text Identity Declaration
-</span><a href="#local-6989586621679211827"><span class="hs-identifier hs-var">recFunDeclP</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Declaration
-</span><a href="#local-6989586621679211826"><span class="hs-identifier hs-var">funDeclP</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Declaration
-</span><a href="#local-6989586621679211825"><span class="hs-identifier hs-var">varDeclP</span></a></span><span class="hs-special">]</span><span>
+</span><a href="#local-6989586621679209707"><span class="hs-identifier hs-var">recFunDeclP</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Declaration
+</span><a href="#local-6989586621679209708"><span class="hs-identifier hs-var">funDeclP</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Declaration
+</span><a href="#local-6989586621679209709"><span class="hs-identifier hs-var">varDeclP</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-33"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-34"></span><span>    </span><span id="local-6989586621679211825"><span class="annot"><span class="annottext">varDeclP :: ParsecT Void Text Identity Declaration
-</span><a href="#local-6989586621679211825"><span class="hs-identifier hs-var hs-var">varDeclP</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text, Maybe Type) -&gt; Expression -&gt; Declaration
+</span><span id="line-34"></span><span>    </span><span id="local-6989586621679209709"><span class="annot"><span class="annottext">varDeclP :: ParsecT Void Text Identity Declaration
+</span><a href="#local-6989586621679209709"><span class="hs-identifier hs-var hs-var">varDeclP</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text, Maybe Type) -&gt; Expression -&gt; Declaration
 </span><a href="Parser.Ast.html#DeclVar"><span class="hs-identifier hs-var">DeclVar</span></a></span><span> </span><span class="annot"><span class="annottext">((Text, Maybe Type) -&gt; Expression -&gt; Declaration)
 -&gt; ParsecT Void Text Identity Text
 -&gt; ParsecT
@@ -107,6 +119,8 @@ f (Parser a) -&gt; Parser a
      Text
      Identity
      ((Text, Maybe Type) -&gt; Expression -&gt; Declaration)
+forall a b.
+a -&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#kwLet"><span class="hs-identifier hs-var">kwLet</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT
@@ -116,21 +130,30 @@ forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
   ((Text, Maybe Type) -&gt; Expression -&gt; Declaration)
 -&gt; ParsecT Void Text Identity (Text, Maybe Type)
 -&gt; ParsecT Void Text Identity (Expression -&gt; Declaration)
+forall a b.
+ParsecT Void Text Identity (a -&gt; b)
+-&gt; ParsecT Void Text Identity a -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Text, Maybe Type)
-</span><a href="#local-6989586621679211821"><span class="hs-identifier hs-var">varSigP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Expression -&gt; Declaration)
+</span><a href="#local-6989586621679209718"><span class="hs-identifier hs-var">varSigP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Expression -&gt; Declaration)
 -&gt; ParsecT Void Text Identity Text
 -&gt; ParsecT Void Text Identity (Expression -&gt; Declaration)
+forall a b.
+ParsecT Void Text Identity a
+-&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#eq"><span class="hs-identifier hs-var">eq</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Expression -&gt; Declaration)
 -&gt; ParsecT Void Text Identity Expression
 -&gt; ParsecT Void Text Identity Declaration
+forall a b.
+ParsecT Void Text Identity (a -&gt; b)
+-&gt; ParsecT Void Text Identity a -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Expression
 </span><a href="Parser.Parser.html#exprP"><span class="hs-identifier hs-var">exprP</span></a></span><span>
-</span><span id="line-35"></span><span>    </span><span id="local-6989586621679211826"><span class="annot"><span class="annottext">funDeclP :: ParsecT Void Text Identity Declaration
-</span><a href="#local-6989586621679211826"><span class="hs-identifier hs-var hs-var">funDeclP</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; IsRec -&gt; Fun -&gt; Declaration)
+</span><span id="line-35"></span><span>    </span><span id="local-6989586621679209708"><span class="annot"><span class="annottext">funDeclP :: ParsecT Void Text Identity Declaration
+</span><a href="#local-6989586621679209708"><span class="hs-identifier hs-var hs-var">funDeclP</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; IsRec -&gt; Fun -&gt; Declaration)
 -&gt; IsRec -&gt; Text -&gt; Fun -&gt; Declaration
 forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
 </span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; IsRec -&gt; Fun -&gt; Declaration
@@ -138,22 +161,30 @@ forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
 </span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Fun -&gt; Declaration)
 -&gt; ParsecT Void Text Identity Text
 -&gt; ParsecT Void Text Identity (Text -&gt; Fun -&gt; Declaration)
+forall a b.
+a -&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#kwLet"><span class="hs-identifier hs-var">kwLet</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Text -&gt; Fun -&gt; Declaration)
 -&gt; ParsecT Void Text Identity Text
 -&gt; ParsecT Void Text Identity (Fun -&gt; Declaration)
+forall a b.
+ParsecT Void Text Identity (a -&gt; b)
+-&gt; ParsecT Void Text Identity a -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#identifierP"><span class="hs-identifier hs-var">identifierP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Fun -&gt; Declaration)
 -&gt; ParsecT Void Text Identity Fun
 -&gt; ParsecT Void Text Identity Declaration
+forall a b.
+ParsecT Void Text Identity (a -&gt; b)
+-&gt; ParsecT Void Text Identity a -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text -&gt; ParsecT Void Text Identity Fun
 </span><a href="Parser.Parser.html#funP"><span class="hs-identifier hs-var">funP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#eq"><span class="hs-identifier hs-var">eq</span></a></span><span>
-</span><span id="line-36"></span><span>    </span><span id="local-6989586621679211827"><span class="annot"><span class="annottext">recFunDeclP :: ParsecT Void Text Identity Declaration
-</span><a href="#local-6989586621679211827"><span class="hs-identifier hs-var hs-var">recFunDeclP</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; IsRec -&gt; Fun -&gt; Declaration)
+</span><span id="line-36"></span><span>    </span><span id="local-6989586621679209707"><span class="annot"><span class="annottext">recFunDeclP :: ParsecT Void Text Identity Declaration
+</span><a href="#local-6989586621679209707"><span class="hs-identifier hs-var hs-var">recFunDeclP</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; IsRec -&gt; Fun -&gt; Declaration)
 -&gt; IsRec -&gt; Text -&gt; Fun -&gt; Declaration
 forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
 </span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; IsRec -&gt; Fun -&gt; Declaration
@@ -161,28 +192,39 @@ forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
 </span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Fun -&gt; Declaration)
 -&gt; ParsecT Void Text Identity Text
 -&gt; ParsecT Void Text Identity (Text -&gt; Fun -&gt; Declaration)
+forall a b.
+a -&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#kwLet"><span class="hs-identifier hs-var">kwLet</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Text -&gt; Fun -&gt; Declaration)
 -&gt; ParsecT Void Text Identity Text
 -&gt; ParsecT Void Text Identity (Text -&gt; Fun -&gt; Declaration)
+forall a b.
+ParsecT Void Text Identity a
+-&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#kwRec"><span class="hs-identifier hs-var">kwRec</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Text -&gt; Fun -&gt; Declaration)
 -&gt; ParsecT Void Text Identity Text
 -&gt; ParsecT Void Text Identity (Fun -&gt; Declaration)
+forall a b.
+ParsecT Void Text Identity (a -&gt; b)
+-&gt; ParsecT Void Text Identity a -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#identifierP"><span class="hs-identifier hs-var">identifierP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Fun -&gt; Declaration)
 -&gt; ParsecT Void Text Identity Fun
 -&gt; ParsecT Void Text Identity Declaration
+forall a b.
+ParsecT Void Text Identity (a -&gt; b)
+-&gt; ParsecT Void Text Identity a -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text -&gt; ParsecT Void Text Identity Fun
 </span><a href="Parser.Parser.html#funP"><span class="hs-identifier hs-var">funP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#eq"><span class="hs-identifier hs-var">eq</span></a></span><span>
 </span><span id="line-37"></span><span>
-</span><span id="line-38"></span><span>    </span><span id="local-6989586621679211821"><span class="annot"><span class="annottext">varSigP :: ParsecT Void Text Identity (Text, Maybe Type)
-</span><a href="#local-6989586621679211821"><span class="hs-identifier hs-var hs-var">varSigP</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Text, Maybe Type)
+</span><span id="line-38"></span><span>    </span><span id="local-6989586621679209718"><span class="annot"><span class="annottext">varSigP :: ParsecT Void Text Identity (Text, Maybe Type)
+</span><a href="#local-6989586621679209718"><span class="hs-identifier hs-var hs-var">varSigP</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Text, Maybe Type)
 -&gt; ParsecT Void Text Identity (Text, Maybe Type)
 forall a. Parser a -&gt; Parser a
 </span><a href="Parser.Utils.html#manyParens"><span class="hs-identifier hs-var">manyParens</span></a></span><span> </span><span class="annot"><span class="annottext">(ParsecT Void Text Identity (Text, Maybe Type)
@@ -200,11 +242,14 @@ forall a. Parser a -&gt; Parser a
 </span><a href="Parser.Lexer.html#identifierP"><span class="hs-identifier hs-var">identifierP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Maybe Type -&gt; (Text, Maybe Type))
 -&gt; ParsecT Void Text Identity (Maybe Type)
 -&gt; ParsecT Void Text Identity (Text, Maybe Type)
+forall a b.
+ParsecT Void Text Identity (a -&gt; b)
+-&gt; ParsecT Void Text Identity a -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Maybe Type)
 </span><a href="Parser.Parser.html#optionalTypeAnnotationP"><span class="hs-identifier hs-var">optionalTypeAnnotationP</span></a></span><span>
 </span><span id="line-39"></span><span>
-</span><span id="line-40"></span><span class="hs-comment">-- ** Expression Parsers</span><span>
+</span><span id="line-40"></span><span class="annot"><span class="hs-comment">-- ** Expression Parsers</span></span><span>
 </span><span id="line-41"></span><span>
 </span><span id="line-42"></span><span class="annot"><a href="Parser.Parser.html#exprP"><span class="hs-identifier hs-type">exprP</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Parser.Lexer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
 </span><span id="line-43"></span><span id="exprP"><span class="annot"><span class="annottext">exprP :: ParsecT Void Text Identity Expression
@@ -241,11 +286,17 @@ forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><a href="Parser.Parser.html#declP"><span class="hs-identifier hs-var">declP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Expression -&gt; Expression)
 -&gt; ParsecT Void Text Identity Text
 -&gt; ParsecT Void Text Identity (Expression -&gt; Expression)
+forall a b.
+ParsecT Void Text Identity a
+-&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#kwIn"><span class="hs-identifier hs-var">kwIn</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Expression -&gt; Expression)
 -&gt; ParsecT Void Text Identity Expression
 -&gt; ParsecT Void Text Identity Expression
+forall a b.
+ParsecT Void Text Identity (a -&gt; b)
+-&gt; ParsecT Void Text Identity a -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Expression
 </span><a href="Parser.Parser.html#exprP"><span class="hs-identifier hs-var">exprP</span></a></span><span class="hs-special">,</span><span>
@@ -260,11 +311,16 @@ forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><a href="Parser.Ast.html#ExprFun"><span class="hs-identifier hs-var">ExprFun</span></a></span><span> </span><span class="annot"><span class="annottext">(Fun -&gt; Expression)
 -&gt; ParsecT Void Text Identity Text
 -&gt; ParsecT Void Text Identity (Fun -&gt; Expression)
+forall a b.
+a -&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#kwFun"><span class="hs-identifier hs-var">kwFun</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Fun -&gt; Expression)
 -&gt; ParsecT Void Text Identity Fun
 -&gt; ParsecT Void Text Identity Expression
+forall a b.
+ParsecT Void Text Identity (a -&gt; b)
+-&gt; ParsecT Void Text Identity a -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text -&gt; ParsecT Void Text Identity Fun
 </span><a href="Parser.Parser.html#funP"><span class="hs-identifier hs-var">funP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
@@ -277,6 +333,8 @@ forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f
      Text
      Identity
      (Expression -&gt; Expression -&gt; Expression -&gt; Expression)
+forall a b.
+a -&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#kwIf"><span class="hs-identifier hs-var">kwIf</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT
@@ -287,27 +345,42 @@ forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
 -&gt; ParsecT Void Text Identity Expression
 -&gt; ParsecT
      Void Text Identity (Expression -&gt; Expression -&gt; Expression)
+forall a b.
+ParsecT Void Text Identity (a -&gt; b)
+-&gt; ParsecT Void Text Identity a -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Expression
 </span><a href="Parser.Parser.html#exprP"><span class="hs-identifier hs-var">exprP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Expression -&gt; Expression -&gt; Expression)
 -&gt; ParsecT Void Text Identity Text
 -&gt; ParsecT
      Void Text Identity (Expression -&gt; Expression -&gt; Expression)
+forall a b.
+ParsecT Void Text Identity a
+-&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#kwThen"><span class="hs-identifier hs-var">kwThen</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Expression -&gt; Expression -&gt; Expression)
 -&gt; ParsecT Void Text Identity Expression
 -&gt; ParsecT Void Text Identity (Expression -&gt; Expression)
+forall a b.
+ParsecT Void Text Identity (a -&gt; b)
+-&gt; ParsecT Void Text Identity a -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Expression
 </span><a href="Parser.Parser.html#exprP"><span class="hs-identifier hs-var">exprP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Expression -&gt; Expression)
 -&gt; ParsecT Void Text Identity Text
 -&gt; ParsecT Void Text Identity (Expression -&gt; Expression)
+forall a b.
+ParsecT Void Text Identity a
+-&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#kwElse"><span class="hs-identifier hs-var">kwElse</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Expression -&gt; Expression)
 -&gt; ParsecT Void Text Identity Expression
 -&gt; ParsecT Void Text Identity Expression
+forall a b.
+ParsecT Void Text Identity (a -&gt; b)
+-&gt; ParsecT Void Text Identity a -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Expression
 </span><a href="Parser.Parser.html#exprP"><span class="hs-identifier hs-var">exprP</span></a></span><span class="hs-special">,</span><span>
@@ -320,7 +393,7 @@ forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><a href="Parser.Lexer.html#identifierP"><span class="hs-identifier hs-var">identifierP</span></a></span><span>
 </span><span id="line-54"></span><span>    </span><span class="hs-special">]</span><span>
 </span><span id="line-55"></span><span>
-</span><span id="line-56"></span><span class="hs-comment">-- ** Operation Parsers</span><span>
+</span><span id="line-56"></span><span class="annot"><span class="hs-comment">-- ** Operation Parsers</span></span><span>
 </span><span id="line-57"></span><span>
 </span><span id="line-58"></span><span class="annot"><a href="Parser.Parser.html#opsTable"><span class="hs-identifier hs-type">opsTable</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Operator</span></span><span> </span><span class="annot"><a href="Parser.Lexer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span class="hs-special">]</span><span class="hs-special">]</span><span>
 </span><span id="line-59"></span><span id="opsTable"><span class="annot"><span class="annottext">opsTable :: [[Operator (ParsecT Void Text Identity) Expression]]
@@ -421,6 +494,7 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression -&gt; Expression)
 -&gt; ParsecT
      Void Text Identity (Expression -&gt; Expression -&gt; Expression)
+forall a. a -&gt; ParsecT Void Text Identity a
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Expression -&gt; Expression -&gt; Expression
 </span><a href="Parser.Ast.html#ExprApp"><span class="hs-identifier hs-var">ExprApp</span></a></span><span>
@@ -429,9 +503,9 @@ forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span id="line-79"></span><span id="binLeftOp"><span class="annot"><span class="annottext">binLeftOp :: Text
 -&gt; BinaryOperator
 -&gt; Operator (ParsecT Void Text Identity) Expression
-</span><a href="Parser.Parser.html#binLeftOp"><span class="hs-identifier hs-var hs-var">binLeftOp</span></a></span></span><span> </span><span id="local-6989586621679211776"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679211776"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679211775"><span class="annot"><span class="annottext">BinaryOperator
-</span><a href="#local-6989586621679211775"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Expression -&gt; Expression -&gt; Expression)
+</span><a href="Parser.Parser.html#binLeftOp"><span class="hs-identifier hs-var hs-var">binLeftOp</span></a></span></span><span> </span><span id="local-6989586621679209775"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679209775"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679209776"><span class="annot"><span class="annottext">BinaryOperator
+</span><a href="#local-6989586621679209776"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Expression -&gt; Expression -&gt; Expression)
 -&gt; Operator (ParsecT Void Text Identity) Expression
 forall (m :: * -&gt; *) a. m (a -&gt; a -&gt; a) -&gt; Operator m a
 </span><span class="hs-identifier hs-var">InfixL</span></span><span> </span><span class="annot"><span class="annottext">(ParsecT
@@ -443,79 +517,81 @@ forall (m :: * -&gt; *) a. m (a -&gt; a -&gt; a) -&gt; Operator m a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">BinaryOperator -&gt; Expression -&gt; Expression -&gt; Expression
 </span><a href="Parser.Ast.html#ExprBinOp"><span class="hs-identifier hs-var">ExprBinOp</span></a></span><span> </span><span class="annot"><span class="annottext">BinaryOperator
-</span><a href="#local-6989586621679211775"><span class="hs-identifier hs-var">op</span></a></span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression -&gt; Expression)
+</span><a href="#local-6989586621679209776"><span class="hs-identifier hs-var">op</span></a></span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression -&gt; Expression)
 -&gt; ParsecT Void Text Identity Text
 -&gt; ParsecT
      Void Text Identity (Expression -&gt; Expression -&gt; Expression)
+forall a b.
+a -&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#symbol"><span class="hs-identifier hs-var">symbol</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679211776"><span class="hs-identifier hs-var">name</span></a></span><span>
+</span><a href="#local-6989586621679209775"><span class="hs-identifier hs-var">name</span></a></span><span>
 </span><span id="line-80"></span><span>
 </span><span id="line-81"></span><span class="annot"><a href="Parser.Parser.html#boolOp"><span class="hs-identifier hs-type">boolOp</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Trees.Common.html#BooleanOperator"><span class="hs-identifier hs-type">BooleanOperator</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Operator</span></span><span> </span><span class="annot"><a href="Parser.Lexer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
 </span><span id="line-82"></span><span id="boolOp"><span class="annot"><span class="annottext">boolOp :: Text
 -&gt; BooleanOperator
 -&gt; Operator (ParsecT Void Text Identity) Expression
-</span><a href="Parser.Parser.html#boolOp"><span class="hs-identifier hs-var hs-var">boolOp</span></a></span></span><span> </span><span id="local-6989586621679211772"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679211772"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679211771"><span class="annot"><span class="annottext">BooleanOperator
-</span><a href="#local-6989586621679211771"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="Parser.Parser.html#boolOp"><span class="hs-identifier hs-var hs-var">boolOp</span></a></span></span><span> </span><span id="local-6989586621679209779"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679209779"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679209780"><span class="annot"><span class="annottext">BooleanOperator
+</span><a href="#local-6989586621679209780"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
 -&gt; BinaryOperator
 -&gt; Operator (ParsecT Void Text Identity) Expression
 </span><a href="Parser.Parser.html#binLeftOp"><span class="hs-identifier hs-var">binLeftOp</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679211772"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">(BinaryOperator
+</span><a href="#local-6989586621679209779"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">(BinaryOperator
  -&gt; Operator (ParsecT Void Text Identity) Expression)
 -&gt; BinaryOperator
 -&gt; Operator (ParsecT Void Text Identity) Expression
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">BooleanOperator -&gt; BinaryOperator
 </span><a href="Trees.Common.html#BoolOp"><span class="hs-identifier hs-var">BoolOp</span></a></span><span> </span><span class="annot"><span class="annottext">BooleanOperator
-</span><a href="#local-6989586621679211771"><span class="hs-identifier hs-var">op</span></a></span><span>
+</span><a href="#local-6989586621679209780"><span class="hs-identifier hs-var">op</span></a></span><span>
 </span><span id="line-83"></span><span>
 </span><span id="line-84"></span><span class="annot"><a href="Parser.Parser.html#arithOp"><span class="hs-identifier hs-type">arithOp</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Trees.Common.html#ArithmeticOperator"><span class="hs-identifier hs-type">ArithmeticOperator</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Operator</span></span><span> </span><span class="annot"><a href="Parser.Lexer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
 </span><span id="line-85"></span><span id="arithOp"><span class="annot"><span class="annottext">arithOp :: Text
 -&gt; ArithmeticOperator
 -&gt; Operator (ParsecT Void Text Identity) Expression
-</span><a href="Parser.Parser.html#arithOp"><span class="hs-identifier hs-var hs-var">arithOp</span></a></span></span><span> </span><span id="local-6989586621679211769"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679211769"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679211768"><span class="annot"><span class="annottext">ArithmeticOperator
-</span><a href="#local-6989586621679211768"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="Parser.Parser.html#arithOp"><span class="hs-identifier hs-var hs-var">arithOp</span></a></span></span><span> </span><span id="local-6989586621679209782"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679209782"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679209783"><span class="annot"><span class="annottext">ArithmeticOperator
+</span><a href="#local-6989586621679209783"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
 -&gt; BinaryOperator
 -&gt; Operator (ParsecT Void Text Identity) Expression
 </span><a href="Parser.Parser.html#binLeftOp"><span class="hs-identifier hs-var">binLeftOp</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679211769"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">(BinaryOperator
+</span><a href="#local-6989586621679209782"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">(BinaryOperator
  -&gt; Operator (ParsecT Void Text Identity) Expression)
 -&gt; BinaryOperator
 -&gt; Operator (ParsecT Void Text Identity) Expression
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ArithmeticOperator -&gt; BinaryOperator
 </span><a href="Trees.Common.html#ArithOp"><span class="hs-identifier hs-var">ArithOp</span></a></span><span> </span><span class="annot"><span class="annottext">ArithmeticOperator
-</span><a href="#local-6989586621679211768"><span class="hs-identifier hs-var">op</span></a></span><span>
+</span><a href="#local-6989586621679209783"><span class="hs-identifier hs-var">op</span></a></span><span>
 </span><span id="line-86"></span><span>
 </span><span id="line-87"></span><span class="annot"><a href="Parser.Parser.html#compOp"><span class="hs-identifier hs-type">compOp</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Trees.Common.html#ComparisonOperator"><span class="hs-identifier hs-type">ComparisonOperator</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Operator</span></span><span> </span><span class="annot"><a href="Parser.Lexer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
 </span><span id="line-88"></span><span id="compOp"><span class="annot"><span class="annottext">compOp :: Text
 -&gt; ComparisonOperator
 -&gt; Operator (ParsecT Void Text Identity) Expression
-</span><a href="Parser.Parser.html#compOp"><span class="hs-identifier hs-var hs-var">compOp</span></a></span></span><span> </span><span id="local-6989586621679211766"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679211766"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679211765"><span class="annot"><span class="annottext">ComparisonOperator
-</span><a href="#local-6989586621679211765"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="Parser.Parser.html#compOp"><span class="hs-identifier hs-var hs-var">compOp</span></a></span></span><span> </span><span id="local-6989586621679209785"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679209785"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679209786"><span class="annot"><span class="annottext">ComparisonOperator
+</span><a href="#local-6989586621679209786"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
 -&gt; BinaryOperator
 -&gt; Operator (ParsecT Void Text Identity) Expression
 </span><a href="Parser.Parser.html#binLeftOp"><span class="hs-identifier hs-var">binLeftOp</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679211766"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">(BinaryOperator
+</span><a href="#local-6989586621679209785"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">(BinaryOperator
  -&gt; Operator (ParsecT Void Text Identity) Expression)
 -&gt; BinaryOperator
 -&gt; Operator (ParsecT Void Text Identity) Expression
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ComparisonOperator -&gt; BinaryOperator
 </span><a href="Trees.Common.html#CompOp"><span class="hs-identifier hs-var">CompOp</span></a></span><span> </span><span class="annot"><span class="annottext">ComparisonOperator
-</span><a href="#local-6989586621679211765"><span class="hs-identifier hs-var">op</span></a></span><span>
+</span><a href="#local-6989586621679209786"><span class="hs-identifier hs-var">op</span></a></span><span>
 </span><span id="line-89"></span><span>
 </span><span id="line-90"></span><span class="annot"><a href="Parser.Parser.html#unOp"><span class="hs-identifier hs-type">unOp</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Trees.Common.html#UnaryOperator"><span class="hs-identifier hs-type">UnaryOperator</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Operator</span></span><span> </span><span class="annot"><a href="Parser.Lexer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="Parser.Ast.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
 </span><span id="line-91"></span><span id="unOp"><span class="annot"><span class="annottext">unOp :: Text
 -&gt; UnaryOperator
 -&gt; Operator (ParsecT Void Text Identity) Expression
-</span><a href="Parser.Parser.html#unOp"><span class="hs-identifier hs-var hs-var">unOp</span></a></span></span><span> </span><span id="local-6989586621679211763"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679211763"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679211762"><span class="annot"><span class="annottext">UnaryOperator
-</span><a href="#local-6989586621679211762"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Expression -&gt; Expression)
+</span><a href="Parser.Parser.html#unOp"><span class="hs-identifier hs-var hs-var">unOp</span></a></span></span><span> </span><span id="local-6989586621679209788"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679209788"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679209789"><span class="annot"><span class="annottext">UnaryOperator
+</span><a href="#local-6989586621679209789"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Expression -&gt; Expression)
 -&gt; Operator (ParsecT Void Text Identity) Expression
 forall (m :: * -&gt; *) a. m (a -&gt; a) -&gt; Operator m a
 </span><span class="hs-identifier hs-var">Prefix</span></span><span> </span><span class="annot"><span class="annottext">(ParsecT Void Text Identity (Expression -&gt; Expression)
@@ -525,15 +601,17 @@ forall (m :: * -&gt; *) a. m (a -&gt; a) -&gt; Operator m a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">UnaryOperator -&gt; Expression -&gt; Expression
 </span><a href="Parser.Ast.html#ExprUnOp"><span class="hs-identifier hs-var">ExprUnOp</span></a></span><span> </span><span class="annot"><span class="annottext">UnaryOperator
-</span><a href="#local-6989586621679211762"><span class="hs-identifier hs-var">op</span></a></span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression)
+</span><a href="#local-6989586621679209789"><span class="hs-identifier hs-var">op</span></a></span><span> </span><span class="annot"><span class="annottext">(Expression -&gt; Expression)
 -&gt; ParsecT Void Text Identity Text
 -&gt; ParsecT Void Text Identity (Expression -&gt; Expression)
+forall a b.
+a -&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#symbol"><span class="hs-identifier hs-var">symbol</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679211763"><span class="hs-identifier hs-var">name</span></a></span><span>
+</span><a href="#local-6989586621679209788"><span class="hs-identifier hs-var">name</span></a></span><span>
 </span><span id="line-92"></span><span>
-</span><span id="line-93"></span><span class="hs-comment">-- ** Type Parsers</span><span>
+</span><span id="line-93"></span><span class="annot"><span class="hs-comment">-- ** Type Parsers</span></span><span>
 </span><span id="line-94"></span><span>
 </span><span id="line-95"></span><span class="annot"><a href="Parser.Parser.html#typeP"><span class="hs-identifier hs-type">typeP</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Parser.Lexer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span>
 </span><span id="line-96"></span><span id="typeP"><span class="annot"><span class="annottext">typeP :: Parser Type
@@ -548,22 +626,28 @@ f (Parser a) -&gt; Parser a
 -&gt; Parser Type -&gt; ParsecT Void Text Identity (Type -&gt; Type)
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Parser Type
-</span><a href="#local-6989586621679211757"><span class="hs-identifier hs-var">primitiveOrInParensTypeP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Type -&gt; Type)
+</span><a href="#local-6989586621679209794"><span class="hs-identifier hs-var">primitiveOrInParensTypeP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Type -&gt; Type)
 -&gt; ParsecT Void Text Identity Text
 -&gt; ParsecT Void Text Identity (Type -&gt; Type)
+forall a b.
+ParsecT Void Text Identity a
+-&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#arrow"><span class="hs-identifier hs-var">arrow</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Type -&gt; Type)
 -&gt; Parser Type -&gt; Parser Type
+forall a b.
+ParsecT Void Text Identity (a -&gt; b)
+-&gt; ParsecT Void Text Identity a -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Parser Type
 </span><a href="Parser.Parser.html#typeP"><span class="hs-identifier hs-var">typeP</span></a></span><span class="hs-special">,</span><span>
 </span><span id="line-99"></span><span>      </span><span class="annot"><span class="annottext">Parser Type
-</span><a href="#local-6989586621679211757"><span class="hs-identifier hs-var">primitiveOrInParensTypeP</span></a></span><span>
+</span><a href="#local-6989586621679209794"><span class="hs-identifier hs-var">primitiveOrInParensTypeP</span></a></span><span>
 </span><span id="line-100"></span><span>    </span><span class="hs-special">]</span><span>
 </span><span id="line-101"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-102"></span><span>    </span><span id="local-6989586621679211757"><span class="annot"><span class="annottext">primitiveOrInParensTypeP :: Parser Type
-</span><a href="#local-6989586621679211757"><span class="hs-identifier hs-var hs-var">primitiveOrInParensTypeP</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Parser Type] -&gt; Parser Type
+</span><span id="line-102"></span><span>    </span><span id="local-6989586621679209794"><span class="annot"><span class="annottext">primitiveOrInParensTypeP :: Parser Type
+</span><a href="#local-6989586621679209794"><span class="hs-identifier hs-var hs-var">primitiveOrInParensTypeP</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Parser Type] -&gt; Parser Type
 forall (f :: * -&gt; *) a.
 (Foldable f, Functor f) =&gt;
 f (Parser a) -&gt; Parser a
@@ -571,9 +655,9 @@ f (Parser a) -&gt; Parser a
 forall a. Parser a -&gt; Parser a
 </span><a href="Parser.Utils.html#parens"><span class="hs-identifier hs-var">parens</span></a></span><span> </span><span class="annot"><span class="annottext">Parser Type
 </span><a href="Parser.Parser.html#typeP"><span class="hs-identifier hs-var">typeP</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Parser Type
-</span><a href="#local-6989586621679211756"><span class="hs-identifier hs-var">primitiveTypeP</span></a></span><span class="hs-special">]</span><span>
-</span><span id="line-103"></span><span>    </span><span id="local-6989586621679211756"><span class="annot"><span class="annottext">primitiveTypeP :: Parser Type
-</span><a href="#local-6989586621679211756"><span class="hs-identifier hs-var hs-var">primitiveTypeP</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="#local-6989586621679209797"><span class="hs-identifier hs-var">primitiveTypeP</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-103"></span><span>    </span><span id="local-6989586621679209797"><span class="annot"><span class="annottext">primitiveTypeP :: Parser Type
+</span><a href="#local-6989586621679209797"><span class="hs-identifier hs-var hs-var">primitiveTypeP</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-104"></span><span>      </span><span class="annot"><span class="annottext">[Parser Type] -&gt; Parser Type
 forall (f :: * -&gt; *) a.
 (Foldable f, Functor f) =&gt;
@@ -581,22 +665,28 @@ f (Parser a) -&gt; Parser a
 </span><a href="Parser.Utils.html#choice%27"><span class="hs-identifier hs-var">choice'</span></a></span><span>
 </span><span id="line-105"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">Type
 </span><a href="Trees.Common.html#TUnit"><span class="hs-identifier hs-var">TUnit</span></a></span><span> </span><span class="annot"><span class="annottext">Type -&gt; ParsecT Void Text Identity Text -&gt; Parser Type
+forall a b.
+a -&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#kwUnit"><span class="hs-identifier hs-var">kwUnit</span></a></span><span class="hs-special">,</span><span>
 </span><span id="line-106"></span><span>          </span><span class="annot"><span class="annottext">Type
 </span><a href="Trees.Common.html#TBool"><span class="hs-identifier hs-var">TBool</span></a></span><span> </span><span class="annot"><span class="annottext">Type -&gt; ParsecT Void Text Identity Text -&gt; Parser Type
+forall a b.
+a -&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#kwBool"><span class="hs-identifier hs-var">kwBool</span></a></span><span class="hs-special">,</span><span>
 </span><span id="line-107"></span><span>          </span><span class="annot"><span class="annottext">Type
 </span><a href="Trees.Common.html#TInt"><span class="hs-identifier hs-var">TInt</span></a></span><span> </span><span class="annot"><span class="annottext">Type -&gt; ParsecT Void Text Identity Text -&gt; Parser Type
+forall a b.
+a -&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#kwInt"><span class="hs-identifier hs-var">kwInt</span></a></span><span>
 </span><span id="line-108"></span><span>        </span><span class="hs-special">]</span><span>
 </span><span id="line-109"></span><span>
-</span><span id="line-110"></span><span class="hs-comment">-- ** Primitive Value Parser</span><span>
+</span><span id="line-110"></span><span class="annot"><span class="hs-comment">-- ** Primitive Value Parser</span></span><span>
 </span><span id="line-111"></span><span>
 </span><span id="line-112"></span><span class="annot"><a href="Parser.Parser.html#primValExprP"><span class="hs-identifier hs-type">primValExprP</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Parser.Lexer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="Trees.Common.html#PrimitiveValue"><span class="hs-identifier hs-type">PrimitiveValue</span></a></span><span>
 </span><span id="line-113"></span><span id="primValExprP"><span class="annot"><span class="annottext">primValExprP :: ParsecT Void Text Identity PrimitiveValue
@@ -611,6 +701,8 @@ f (Parser a) -&gt; Parser a
 </span><a href="Trees.Common.html#PrimValUnit"><span class="hs-identifier hs-var">PrimValUnit</span></a></span><span> </span><span class="annot"><span class="annottext">PrimitiveValue
 -&gt; ParsecT Void Text Identity Text
 -&gt; ParsecT Void Text Identity PrimitiveValue
+forall a b.
+a -&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#unitLitP"><span class="hs-identifier hs-var">unitLitP</span></a></span><span class="hs-special">,</span><span>
@@ -630,12 +722,12 @@ forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><a href="Parser.Lexer.html#intLitP"><span class="hs-identifier hs-var">intLitP</span></a></span><span>
 </span><span id="line-118"></span><span>    </span><span class="hs-special">]</span><span>
 </span><span id="line-119"></span><span>
-</span><span id="line-120"></span><span class="hs-comment">-- ** Function Parser</span><span>
+</span><span id="line-120"></span><span class="annot"><span class="hs-comment">-- ** Function Parser</span></span><span>
 </span><span id="line-121"></span><span>
 </span><span id="line-122"></span><span class="annot"><a href="Parser.Parser.html#funP"><span class="hs-identifier hs-type">funP</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Parser.Lexer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Parser.Lexer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="Parser.Ast.html#Fun"><span class="hs-identifier hs-type">Fun</span></a></span><span>
 </span><span id="line-123"></span><span id="funP"><span class="annot"><span class="annottext">funP :: ParsecT Void Text Identity Text -&gt; ParsecT Void Text Identity Fun
-</span><a href="Parser.Parser.html#funP"><span class="hs-identifier hs-var hs-var">funP</span></a></span></span><span> </span><span id="local-6989586621679211743"><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
-</span><a href="#local-6989586621679211743"><span class="hs-identifier hs-var">sepSymbolP</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NonEmpty (Text, Maybe Type) -&gt; Maybe Type -&gt; Expression -&gt; Fun
+</span><a href="Parser.Parser.html#funP"><span class="hs-identifier hs-var hs-var">funP</span></a></span></span><span> </span><span id="local-6989586621679209815"><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
+</span><a href="#local-6989586621679209815"><span class="hs-identifier hs-var">sepSymbolP</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NonEmpty (Text, Maybe Type) -&gt; Maybe Type -&gt; Expression -&gt; Fun
 </span><a href="Parser.Ast.html#Fun"><span class="hs-identifier hs-var">Fun</span></a></span><span> </span><span class="annot"><span class="annottext">(NonEmpty (Text, Maybe Type) -&gt; Maybe Type -&gt; Expression -&gt; Fun)
 -&gt; ParsecT Void Text Identity (NonEmpty (Text, Maybe Type))
 -&gt; ParsecT Void Text Identity (Maybe Type -&gt; Expression -&gt; Fun)
@@ -647,16 +739,25 @@ forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f (NonEmpty a)
 </span><a href="Parser.Parser.html#parameterP"><span class="hs-identifier hs-var">parameterP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Maybe Type -&gt; Expression -&gt; Fun)
 -&gt; ParsecT Void Text Identity (Maybe Type)
 -&gt; ParsecT Void Text Identity (Expression -&gt; Fun)
+forall a b.
+ParsecT Void Text Identity (a -&gt; b)
+-&gt; ParsecT Void Text Identity a -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Maybe Type)
 </span><a href="Parser.Parser.html#optionalTypeAnnotationP"><span class="hs-identifier hs-var">optionalTypeAnnotationP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Expression -&gt; Fun)
 -&gt; ParsecT Void Text Identity Text
 -&gt; ParsecT Void Text Identity (Expression -&gt; Fun)
+forall a b.
+ParsecT Void Text Identity a
+-&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
-</span><a href="#local-6989586621679211743"><span class="hs-identifier hs-var">sepSymbolP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Expression -&gt; Fun)
+</span><a href="#local-6989586621679209815"><span class="hs-identifier hs-var">sepSymbolP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Expression -&gt; Fun)
 -&gt; ParsecT Void Text Identity Expression
 -&gt; ParsecT Void Text Identity Fun
+forall a b.
+ParsecT Void Text Identity (a -&gt; b)
+-&gt; ParsecT Void Text Identity a -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Expression
 </span><a href="Parser.Parser.html#exprP"><span class="hs-identifier hs-var">exprP</span></a></span><span>
@@ -688,11 +789,17 @@ forall a. Parser a -&gt; Parser a
 </span><a href="Parser.Lexer.html#identifierP"><span class="hs-identifier hs-var">identifierP</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Maybe Type -&gt; (Text, Maybe Type))
 -&gt; ParsecT Void Text Identity Text
 -&gt; ParsecT Void Text Identity (Maybe Type -&gt; (Text, Maybe Type))
+forall a b.
+ParsecT Void Text Identity a
+-&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity a
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
 </span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#colon"><span class="hs-identifier hs-var">colon</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity (Maybe Type -&gt; (Text, Maybe Type))
 -&gt; ParsecT Void Text Identity (Maybe Type)
 -&gt; ParsecT Void Text Identity (Text, Maybe Type)
+forall a b.
+ParsecT Void Text Identity (a -&gt; b)
+-&gt; ParsecT Void Text Identity a -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;*&gt;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Type -&gt; Maybe Type
 forall a. a -&gt; Maybe a
@@ -701,7 +808,7 @@ forall a. a -&gt; Maybe a
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Parser Type
 </span><a href="Parser.Parser.html#typeP"><span class="hs-identifier hs-var">typeP</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
-</span><span id="line-129"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="hs-special">,</span></span><span class="annot"><span class="annottext">Maybe Type
+</span><span id="line-129"></span><span>      </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="annot"><span class="annottext">Maybe Type
 forall a. Maybe a
 </span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; (Text, Maybe Type))
 -&gt; ParsecT Void Text Identity Text
@@ -719,6 +826,9 @@ forall a. Parser a -&gt; Parser a
 forall a. Parser a -&gt; Parser (Maybe a)
 </span><a href="Parser.Utils.html#optional%27"><span class="hs-identifier hs-var">optional'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text
 </span><a href="Parser.Lexer.html#colon"><span class="hs-identifier hs-var">colon</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void Text Identity Text -&gt; Parser Type -&gt; Parser Type
+forall a b.
+ParsecT Void Text Identity a
+-&gt; ParsecT Void Text Identity b -&gt; ParsecT Void Text Identity b
 forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f b
 </span><span class="hs-operator hs-var">*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Parser Type
 </span><a href="Parser.Parser.html#typeP"><span class="hs-identifier hs-var">typeP</span></a></span><span class="hs-special">)</span><span>
