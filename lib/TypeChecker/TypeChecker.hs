@@ -58,10 +58,11 @@ inferStatements' ((StmtDecl (DeclVar (ident, t) val)) : stmts) _ = do
 inferStatements' ((StmtDecl (DeclFun ident isRec fun)) : stmts) _ = do
   funT <-
     if isRec
-      then inferFun fun
-      else do
+      then do
         funT <- fresh
-        withBinding ident (Forall [] funT) $ inferFun fun
+        funT' <- withBinding ident (Forall [] funT) $ inferFun fun
+        withBinding ident (Forall [] funT') $ inferFun fun
+      else inferFun fun
   funUT <- generalize funT
   withBinding ident funUT $ inferStatements' stmts (return funT)
 
@@ -107,10 +108,11 @@ inferLetIn (DeclVar (ident, t) val) expr = do
 inferLetIn (DeclFun ident isRec fun) expr = do
   funT <-
     if isRec
-      then inferFun fun
-      else do
+      then do
         funT <- fresh
-        withBinding ident (Forall [] funT) $ inferFun fun
+        funT' <- withBinding ident (Forall [] funT) $ inferFun fun
+        withBinding ident (Forall [] funT') $ inferFun fun
+      else inferFun fun
   funUT <- generalize funT
   withBinding ident funUT $ inferExpr expr
 
