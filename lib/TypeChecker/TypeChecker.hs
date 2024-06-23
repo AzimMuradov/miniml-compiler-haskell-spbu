@@ -49,19 +49,26 @@ inferStatements' [] pr = pr
 inferStatements' ((StmtExpr e) : xs) _ = do
   res <- inferExpr e
   inferStatements' xs (return res)
-inferStatements' ((StmtDecl (DeclVar (ident, t) body)) : xs) _ = do
-  res <- inferExpr body
-  vType <- maybe (return res) ((=:=) res <$> fromTypeToUType) t
-  pvType <- generalize vType
-  withBinding ident pvType (inferStatements' xs $ return vType)
-inferStatements' ((StmtDecl (DeclFun ident False fun)) : xs) _ = do
-  res <- inferFun fun
-  withBinding ident (Forall [] res) (inferStatements' xs $ return res)
-inferStatements' ((StmtDecl (DeclFun ident True fun)) : xs) _ = do
+inferStatements' ((StmtDecl (DeclVar (x, Just pty) xdef)) : xs) _ = do
+  let upty = toUPolytype (Forall [] $ toTypeF pty)
+  upty' <- skolemize upty
+  bl <- inferExpr xdef
+  tt <- bl =:= upty'
+  withBinding x upty $ inferStatements' xs (return tt)
+inferStatements' ((StmtDecl (DeclVar (x, Nothing) xdef)) : xs) _ = do
+  ty <- inferExpr xdef
+  pty <- generalize ty
+  withBinding x pty $ inferStatements' xs (return ty)
+inferStatements' ((StmtDecl (DeclFun f False fun)) : xs) _ = do
+  fdef <- inferFun fun
+  pfdef <- generalize fdef
+  withBinding f pfdef $ inferStatements' xs (return fdef)
+inferStatements' ((StmtDecl (DeclFun f True fun)) : xs) _ = do
   preT <- fresh
-  next <- withBinding ident (Forall [] preT) $ inferFun fun
-  after <- withBinding ident (Forall [] next) $ inferFun fun
-  withBinding ident (Forall [] after) (inferStatements' xs $ return next)
+  next <- withBinding f (Forall [] preT) $ inferFun fun
+  after <- withBinding f (Forall [] next) $ inferFun fun
+  pfdef <- generalize after
+  withBinding f pfdef (inferStatements' xs $ return next)
 
 inferExpr :: Expression -> Infer UType
 inferExpr (ExprId x) = lookup (Var x)
