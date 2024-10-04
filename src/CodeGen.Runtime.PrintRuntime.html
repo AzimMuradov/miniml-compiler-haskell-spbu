@@ -9,21 +9,21 @@
 </span><span id="line-9"></span><span>
 </span><span id="line-10"></span><span class="annot"><a href="CodeGen.Runtime.PrintRuntime.html#printCRuntime"><span class="hs-identifier hs-type">printCRuntime</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
 </span><span id="line-11"></span><span id="printCRuntime"><span class="annot"><span class="annottext">printCRuntime :: FilePath -&gt; IO ()
-</span><a href="CodeGen.Runtime.PrintRuntime.html#printCRuntime"><span class="hs-identifier hs-var hs-var">printCRuntime</span></a></span></span><span> </span><span id="local-6989586621679215717"><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679215717"><span class="hs-identifier hs-var">outputFilePath</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-12"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679215718"><span class="annot"><span class="annottext">runtimeFileText :: Text
-</span><a href="#local-6989586621679215718"><span class="hs-identifier hs-var hs-var">runtimeFileText</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Text
+</span><a href="CodeGen.Runtime.PrintRuntime.html#printCRuntime"><span class="hs-identifier hs-var hs-var">printCRuntime</span></a></span></span><span> </span><span id="local-6989586621679215473"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679215473"><span class="hs-identifier hs-var">outputFilePath</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-12"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679215474"><span class="annot"><span class="annottext">runtimeFileText :: Text
+</span><a href="#local-6989586621679215474"><span class="hs-identifier hs-var hs-var">runtimeFileText</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Text
 </span><span class="hs-identifier hs-var">Txt.decodeUtf8</span></span><span> </span><span class="hs-special">$</span><span class="hs-special">(</span><span class="hs-identifier">makeRelativeToProject</span><span> </span><span class="hs-string">&quot;lib/CodeGen/Runtime/runtime.c&quot;</span><span> </span><span class="hs-operator">&gt;&gt;=</span><span> </span><span class="hs-identifier">embedFile</span><span class="hs-special">)</span><span>
 </span><span id="line-13"></span><span>  </span><span class="annot"><span class="annottext">FilePath -&gt; IOMode -&gt; (Handle -&gt; IO ()) -&gt; IO ()
 forall r. FilePath -&gt; IOMode -&gt; (Handle -&gt; IO r) -&gt; IO r
 </span><span class="hs-identifier hs-var">withFile</span></span><span> </span><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679215717"><span class="hs-identifier hs-var">outputFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">IOMode
+</span><a href="#local-6989586621679215473"><span class="hs-identifier hs-var">outputFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">IOMode
 </span><span class="hs-identifier hs-var">WriteMode</span></span><span> </span><span class="annot"><span class="annottext">((Handle -&gt; IO ()) -&gt; IO ()) -&gt; (Handle -&gt; IO ()) -&gt; IO ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679215722"><span class="annot"><span class="annottext">Handle
-</span><a href="#local-6989586621679215722"><span class="hs-identifier hs-var">handle</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679215478"><span class="annot"><span class="annottext">Handle
+</span><a href="#local-6989586621679215478"><span class="hs-identifier hs-var">handle</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
 </span><span id="line-14"></span><span>    </span><span class="annot"><span class="annottext">Handle -&gt; Text -&gt; IO ()
 </span><span class="hs-identifier hs-var">Txt.hPutStr</span></span><span> </span><span class="annot"><span class="annottext">Handle
-</span><a href="#local-6989586621679215722"><span class="hs-identifier hs-var">handle</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679215718"><span class="hs-identifier hs-var">runtimeFileText</span></a></span><span>
+</span><a href="#local-6989586621679215478"><span class="hs-identifier hs-var">handle</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679215474"><span class="hs-identifier hs-var">runtimeFileText</span></a></span><span>
 </span><span id="line-15"></span></pre></body></html>

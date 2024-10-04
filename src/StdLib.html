@@ -43,7 +43,7 @@ forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span id="line-32"></span><span id="allDeclsWithArity"><span class="annot"><span class="annottext">allDeclsWithArity :: [DeclarationWithArity]
 </span><a href="StdLib.html#allDeclsWithArity"><span class="hs-identifier hs-var hs-var">allDeclsWithArity</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TypedDeclaration -&gt; DeclarationWithArity
 forall {a}. (a, Type) -&gt; (a, Arity)
-</span><a href="#local-6989586621679217815"><span class="hs-identifier hs-var">convert</span></a></span><span> </span><span class="annot"><span class="annottext">(TypedDeclaration -&gt; DeclarationWithArity)
+</span><a href="#local-6989586621679217586"><span class="hs-identifier hs-var">convert</span></a></span><span> </span><span class="annot"><span class="annottext">(TypedDeclaration -&gt; DeclarationWithArity)
 -&gt; [TypedDeclaration] -&gt; [DeclarationWithArity]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[TypedDeclaration]
@@ -55,17 +55,17 @@ forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 </span><a href="StdLib.html#funToPafDecl"><span class="hs-identifier hs-var">funToPafDecl</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">DeclarationWithArity
 </span><a href="StdLib.html#applyDecl"><span class="hs-identifier hs-var">applyDecl</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-33"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-34"></span><span>    </span><span id="local-6989586621679217815"><span class="annot"><span class="annottext">convert :: (a, Type) -&gt; (a, Arity)
-</span><a href="#local-6989586621679217815"><span class="hs-identifier hs-var hs-var">convert</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679217819"><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679217819"><span class="hs-identifier hs-var">ident</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679217820"><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679217820"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679217819"><span class="hs-identifier hs-var">ident</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Arity
-</span><a href="#local-6989586621679217821"><span class="hs-identifier hs-var">calcArity</span></a></span><span> </span><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679217820"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span>    </span><span id="local-6989586621679217586"><span class="annot"><span class="annottext">convert :: (a, Type) -&gt; (a, Arity)
+</span><a href="#local-6989586621679217586"><span class="hs-identifier hs-var hs-var">convert</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679217590"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679217590"><span class="hs-identifier hs-var">ident</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679217591"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679217591"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679217590"><span class="hs-identifier hs-var">ident</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Arity
+</span><a href="#local-6989586621679217592"><span class="hs-identifier hs-var">calcArity</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679217591"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-35"></span><span>
-</span><span id="line-36"></span><span>    </span><span class="annot"><a href="#local-6989586621679217821"><span class="hs-identifier hs-type">calcArity</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Trees.Common.html#Arity"><span class="hs-identifier hs-type">Arity</span></a></span><span>
-</span><span id="line-37"></span><span>    </span><span id="local-6989586621679217821"><span class="annot"><span class="annottext">calcArity :: Type -&gt; Arity
-</span><a href="#local-6989586621679217821"><span class="hs-identifier hs-var hs-var">calcArity</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(ListF Type Arity -&gt; Arity)
+</span><span id="line-36"></span><span>    </span><span class="annot"><a href="#local-6989586621679217592"><span class="hs-identifier hs-type">calcArity</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Trees.Common.html#Arity"><span class="hs-identifier hs-type">Arity</span></a></span><span>
+</span><span id="line-37"></span><span>    </span><span id="local-6989586621679217592"><span class="annot"><span class="annottext">calcArity :: Type -&gt; Arity
+</span><a href="#local-6989586621679217592"><span class="hs-identifier hs-var hs-var">calcArity</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(ListF Type Arity -&gt; Arity)
 -&gt; (Type -&gt; ListF Type Type) -&gt; Type -&gt; Arity
 forall (f :: * -&gt; *) b a.
 Functor f =&gt;
@@ -74,18 +74,18 @@ Functor f =&gt;
 forall a. ListF Type a -&gt; Arity
 forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Arity
 </span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="annot"><span class="annottext">Type -&gt; ListF Type Type
-</span><a href="#local-6989586621679217823"><span class="hs-identifier hs-var">getParams</span></a></span><span>
+</span><a href="#local-6989586621679217594"><span class="hs-identifier hs-var">getParams</span></a></span><span>
 </span><span id="line-38"></span><span>
-</span><span id="line-39"></span><span>    </span><span class="annot"><a href="#local-6989586621679217823"><span class="hs-identifier hs-type">getParams</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ListF</span></span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span>
-</span><span id="line-40"></span><span>    </span><span id="local-6989586621679217823"><span class="annot"><span class="annottext">getParams :: Type -&gt; ListF Type Type
-</span><a href="#local-6989586621679217823"><span class="hs-identifier hs-var hs-var">getParams</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Trees.Common.html#TFun"><span class="hs-identifier hs-type">TFun</span></a></span><span> </span><span id="local-6989586621679217825"><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679217825"><span class="hs-identifier hs-var">pT</span></a></span></span><span> </span><span id="local-6989586621679217826"><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679217826"><span class="hs-identifier hs-var">retT</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Type -&gt; ListF Type Type
+</span><span id="line-39"></span><span>    </span><span class="annot"><a href="#local-6989586621679217594"><span class="hs-identifier hs-type">getParams</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ListF</span></span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span>
+</span><span id="line-40"></span><span>    </span><span id="local-6989586621679217594"><span class="annot"><span class="annottext">getParams :: Type -&gt; ListF Type Type
+</span><a href="#local-6989586621679217594"><span class="hs-identifier hs-var hs-var">getParams</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Trees.Common.html#TFun"><span class="hs-identifier hs-type">TFun</span></a></span><span> </span><span id="local-6989586621679217596"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679217596"><span class="hs-identifier hs-var">pT</span></a></span></span><span> </span><span id="local-6989586621679217597"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679217597"><span class="hs-identifier hs-var">retT</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Type -&gt; ListF Type Type
 forall a b. a -&gt; b -&gt; ListF a b
 </span><span class="hs-identifier hs-var">Cons</span></span><span> </span><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679217825"><span class="hs-identifier hs-var">pT</span></a></span><span> </span><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679217826"><span class="hs-identifier hs-var">retT</span></a></span><span>
-</span><span id="line-41"></span><span>    </span><span class="annot"><a href="#local-6989586621679217823"><span class="hs-identifier hs-var">getParams</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679217596"><span class="hs-identifier hs-var">pT</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679217597"><span class="hs-identifier hs-var">retT</span></a></span><span>
+</span><span id="line-41"></span><span>    </span><span class="annot"><a href="#local-6989586621679217594"><span class="hs-identifier hs-var">getParams</span></a></span><span> </span><span class="annot"><span class="annottext">Type
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ListF Type Type
 forall a b. ListF a b
 </span><span class="hs-identifier hs-var">Nil</span></span><span>

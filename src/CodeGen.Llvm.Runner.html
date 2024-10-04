@@ -21,71 +21,71 @@
 </span><span id="line-21"></span><span>
 </span><span id="line-22"></span><span class="annot"><a href="CodeGen.Llvm.Runner.html#run"><span class="hs-identifier hs-type">run</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><a href="CodeGen.RunResult.html#RunResult"><span class="hs-identifier hs-type">RR.RunResult</span></a></span><span>
 </span><span id="line-23"></span><span id="run"><span class="annot"><span class="annottext">run :: Text -&gt; IO RunResult
-</span><a href="CodeGen.Llvm.Runner.html#run"><span class="hs-identifier hs-var hs-var">run</span></a></span></span><span> </span><span id="local-6989586621679221726"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679221726"><span class="hs-identifier hs-var">text</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-24"></span><span>  </span><span class="annot"><a href="CodeGen.TimedValue.html#TimedValue"><span class="hs-identifier hs-type">TimedValue</span></a></span><span> </span><span id="local-6989586621679221727"><span class="annot"><span class="annottext">Either Text ()
-</span><a href="#local-6989586621679221727"><span class="hs-identifier hs-var">compResult</span></a></span></span><span> </span><span id="local-6989586621679221728"><span class="annot"><span class="annottext">Nanoseconds
-</span><a href="#local-6989586621679221728"><span class="hs-identifier hs-var">compTime</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Text -&gt; String -&gt; IO (TimedValue (Either Text ()))
+</span><a href="CodeGen.Llvm.Runner.html#run"><span class="hs-identifier hs-var hs-var">run</span></a></span></span><span> </span><span id="local-6989586621679221495"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679221495"><span class="hs-identifier hs-var">text</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-24"></span><span>  </span><span class="annot"><a href="CodeGen.TimedValue.html#TimedValue"><span class="hs-identifier hs-type">TimedValue</span></a></span><span> </span><span id="local-6989586621679221496"><span class="annot"><span class="annottext">Either Text ()
+</span><a href="#local-6989586621679221496"><span class="hs-identifier hs-var">compResult</span></a></span></span><span> </span><span id="local-6989586621679221497"><span class="annot"><span class="annottext">Nanoseconds
+</span><a href="#local-6989586621679221497"><span class="hs-identifier hs-var">compTime</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Text -&gt; String -&gt; IO (TimedValue (Either Text ()))
 </span><a href="CodeGen.Llvm.Runner.html#compileToBinary"><span class="hs-identifier hs-var">compileToBinary</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679221726"><span class="hs-identifier hs-var">text</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221729"><span class="hs-identifier hs-var">outputFilePath</span></a></span><span>
+</span><a href="#local-6989586621679221495"><span class="hs-identifier hs-var">text</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679221498"><span class="hs-identifier hs-var">outputFilePath</span></a></span><span>
 </span><span id="line-25"></span><span>
 </span><span id="line-26"></span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Either Text ()
-</span><a href="#local-6989586621679221727"><span class="hs-identifier hs-var">compResult</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><a href="#local-6989586621679221496"><span class="hs-identifier hs-var">compResult</span></a></span><span> </span><span class="hs-keyword">of</span><span>
 </span><span id="line-27"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-28"></span><span>      </span><span class="annot"><a href="CodeGen.TimedValue.html#TimedValue"><span class="hs-identifier hs-type">TimedValue</span></a></span><span> </span><span id="local-6989586621679221730"><span class="annot"><span class="annottext">Either (String, String, Int) String
-</span><a href="#local-6989586621679221730"><span class="hs-identifier hs-var">runResult</span></a></span></span><span> </span><span id="local-6989586621679221731"><span class="annot"><span class="annottext">Nanoseconds
-</span><a href="#local-6989586621679221731"><span class="hs-identifier hs-var">runTime</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO (TimedValue (Either (String, String, Int) String))
-</span><a href="#local-6989586621679221732"><span class="hs-identifier hs-var">runCompiledModule</span></a></span><span>
+</span><span id="line-28"></span><span>      </span><span class="annot"><a href="CodeGen.TimedValue.html#TimedValue"><span class="hs-identifier hs-type">TimedValue</span></a></span><span> </span><span id="local-6989586621679221499"><span class="annot"><span class="annottext">Either (String, String, Int) String
+</span><a href="#local-6989586621679221499"><span class="hs-identifier hs-var">runResult</span></a></span></span><span> </span><span id="local-6989586621679221500"><span class="annot"><span class="annottext">Nanoseconds
+</span><a href="#local-6989586621679221500"><span class="hs-identifier hs-var">runTime</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO (TimedValue (Either (String, String, Int) String))
+</span><a href="#local-6989586621679221501"><span class="hs-identifier hs-var">runCompiledModule</span></a></span><span>
 </span><span id="line-29"></span><span>      </span><span class="annot"><span class="annottext">RunResult -&gt; IO RunResult
 forall a. a -&gt; IO a
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(RunResult -&gt; IO RunResult) -&gt; RunResult -&gt; IO RunResult
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Either (String, String, Int) String
-</span><a href="#local-6989586621679221730"><span class="hs-identifier hs-var">runResult</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-30"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span id="local-6989586621679221733"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221733"><span class="hs-identifier hs-var">out</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><a href="#local-6989586621679221499"><span class="hs-identifier hs-var">runResult</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-30"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span id="local-6989586621679221502"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679221502"><span class="hs-identifier hs-var">out</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-31"></span><span>          </span><span class="annot"><a href="CodeGen.RunResult.html#Success"><span class="hs-identifier hs-type">RR.Success</span></a></span><span>
 </span><span id="line-32"></span><span>            </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">stdout :: Text
 </span><a href="CodeGen.RunResult.html#stdout"><span class="hs-identifier hs-var">RR.stdout</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Text
 forall a b. ConvertibleStrings a b =&gt; a -&gt; b
 </span><span class="hs-identifier hs-var">cs</span></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221733"><span class="hs-identifier hs-var">out</span></a></span><span class="hs-special">,</span><span>
+</span><a href="#local-6989586621679221502"><span class="hs-identifier hs-var">out</span></a></span><span class="hs-special">,</span><span>
 </span><span id="line-33"></span><span>              </span><span class="annot"><span class="annottext">compTime :: Nanoseconds
 </span><a href="CodeGen.RunResult.html#compTime"><span class="hs-identifier hs-var">RR.compTime</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Nanoseconds
-</span><a href="#local-6989586621679221728"><span class="hs-identifier hs-var">compTime</span></a></span><span class="hs-special">,</span><span>
+</span><a href="#local-6989586621679221497"><span class="hs-identifier hs-var">compTime</span></a></span><span class="hs-special">,</span><span>
 </span><span id="line-34"></span><span>              </span><span class="annot"><span class="annottext">runTime :: Nanoseconds
 </span><a href="CodeGen.RunResult.html#runTime"><span class="hs-identifier hs-var">RR.runTime</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Nanoseconds
-</span><a href="#local-6989586621679221731"><span class="hs-identifier hs-var">runTime</span></a></span><span>
+</span><a href="#local-6989586621679221500"><span class="hs-identifier hs-var">runTime</span></a></span><span>
 </span><span id="line-35"></span><span>            </span><span class="hs-special">}</span><span>
-</span><span id="line-36"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679221738"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221738"><span class="hs-identifier hs-var">out</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679221739"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221739"><span class="hs-identifier hs-var">err</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679221740"><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679221740"><span class="hs-identifier hs-var">code</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-36"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679221507"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679221507"><span class="hs-identifier hs-var">out</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679221508"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679221508"><span class="hs-identifier hs-var">err</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679221509"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679221509"><span class="hs-identifier hs-var">code</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-37"></span><span>          </span><span class="annot"><a href="CodeGen.RunResult.html#RuntimeError"><span class="hs-identifier hs-type">RR.RuntimeError</span></a></span><span>
 </span><span id="line-38"></span><span>            </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">stdout :: Text
 </span><a href="CodeGen.RunResult.html#stdout"><span class="hs-identifier hs-var">RR.stdout</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Text
 forall a b. ConvertibleStrings a b =&gt; a -&gt; b
 </span><span class="hs-identifier hs-var">cs</span></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221738"><span class="hs-identifier hs-var">out</span></a></span><span class="hs-special">,</span><span>
+</span><a href="#local-6989586621679221507"><span class="hs-identifier hs-var">out</span></a></span><span class="hs-special">,</span><span>
 </span><span id="line-39"></span><span>              </span><span class="annot"><span class="annottext">stderr :: Text
 </span><a href="CodeGen.RunResult.html#stderr"><span class="hs-identifier hs-var">RR.stderr</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Text
 forall a b. ConvertibleStrings a b =&gt; a -&gt; b
 </span><span class="hs-identifier hs-var">cs</span></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221739"><span class="hs-identifier hs-var">err</span></a></span><span class="hs-special">,</span><span>
+</span><a href="#local-6989586621679221508"><span class="hs-identifier hs-var">err</span></a></span><span class="hs-special">,</span><span>
 </span><span id="line-40"></span><span>              </span><span class="annot"><span class="annottext">exitCode :: Int
 </span><a href="CodeGen.RunResult.html#exitCode"><span class="hs-identifier hs-var">RR.exitCode</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679221740"><span class="hs-identifier hs-var">code</span></a></span><span class="hs-special">,</span><span>
+</span><a href="#local-6989586621679221509"><span class="hs-identifier hs-var">code</span></a></span><span class="hs-special">,</span><span>
 </span><span id="line-41"></span><span>              </span><span class="annot"><span class="annottext">compTime :: Nanoseconds
 </span><a href="CodeGen.RunResult.html#compTime"><span class="hs-identifier hs-var">RR.compTime</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Nanoseconds
-</span><a href="#local-6989586621679221728"><span class="hs-identifier hs-var">compTime</span></a></span><span class="hs-special">,</span><span>
+</span><a href="#local-6989586621679221497"><span class="hs-identifier hs-var">compTime</span></a></span><span class="hs-special">,</span><span>
 </span><span id="line-42"></span><span>              </span><span class="annot"><span class="annottext">runTime :: Nanoseconds
 </span><a href="CodeGen.RunResult.html#runTime"><span class="hs-identifier hs-var">RR.runTime</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Nanoseconds
-</span><a href="#local-6989586621679221731"><span class="hs-identifier hs-var">runTime</span></a></span><span>
+</span><a href="#local-6989586621679221500"><span class="hs-identifier hs-var">runTime</span></a></span><span>
 </span><span id="line-43"></span><span>            </span><span class="hs-special">}</span><span>
-</span><span id="line-44"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span> </span><span id="local-6989586621679221744"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679221744"><span class="hs-identifier hs-var">compErrMsg</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-44"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span> </span><span id="local-6989586621679221513"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679221513"><span class="hs-identifier hs-var">compErrMsg</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-45"></span><span>      </span><span class="annot"><span class="annottext">RunResult -&gt; IO RunResult
 forall a. a -&gt; IO a
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
@@ -95,22 +95,22 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span id="line-46"></span><span>        </span><span class="annot"><a href="CodeGen.RunResult.html#CompilationError"><span class="hs-identifier hs-type">RR.CompilationError</span></a></span><span>
 </span><span id="line-47"></span><span>          </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">compErrMsg :: Text
 </span><a href="CodeGen.RunResult.html#compErrMsg"><span class="hs-identifier hs-var">RR.compErrMsg</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679221744"><span class="hs-identifier hs-var">compErrMsg</span></a></span><span class="hs-special">,</span><span>
+</span><a href="#local-6989586621679221513"><span class="hs-identifier hs-var">compErrMsg</span></a></span><span class="hs-special">,</span><span>
 </span><span id="line-48"></span><span>            </span><span class="annot"><span class="annottext">compTime :: Nanoseconds
 </span><a href="CodeGen.RunResult.html#compTime"><span class="hs-identifier hs-var">RR.compTime</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Nanoseconds
-</span><a href="#local-6989586621679221728"><span class="hs-identifier hs-var">compTime</span></a></span><span>
+</span><a href="#local-6989586621679221497"><span class="hs-identifier hs-var">compTime</span></a></span><span>
 </span><span id="line-49"></span><span>          </span><span class="hs-special">}</span><span>
 </span><span id="line-50"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-51"></span><span>    </span><span class="annot"><a href="#local-6989586621679221729"><span class="hs-identifier hs-type">outputFilePath</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span>
-</span><span id="line-52"></span><span>    </span><span id="local-6989586621679221729"><span class="annot"><span class="annottext">outputFilePath :: String
-</span><a href="#local-6989586621679221729"><span class="hs-identifier hs-var hs-var">outputFilePath</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span id="line-51"></span><span>    </span><span class="annot"><a href="#local-6989586621679221498"><span class="hs-identifier hs-type">outputFilePath</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span>
+</span><span id="line-52"></span><span>    </span><span id="local-6989586621679221498"><span class="annot"><span class="annottext">outputFilePath :: String
+</span><a href="#local-6989586621679221498"><span class="hs-identifier hs-var hs-var">outputFilePath</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;./program&quot;</span></span><span>
 </span><span id="line-53"></span><span>
-</span><span id="line-54"></span><span>    </span><span class="annot"><a href="#local-6989586621679221732"><span class="hs-identifier hs-type">runCompiledModule</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.TimedValue.html#TimedValue"><span class="hs-identifier hs-type">TimedValue</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-55"></span><span>    </span><span id="local-6989586621679221732"><span class="annot"><span class="annottext">runCompiledModule :: IO (TimedValue (Either (String, String, Int) String))
-</span><a href="#local-6989586621679221732"><span class="hs-identifier hs-var hs-var">runCompiledModule</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-56"></span><span>      </span><span id="local-6989586621679221748"><span class="annot"><span class="annottext">TimedValue (Either (String, String, Int) String)
-</span><a href="#local-6989586621679221748"><span class="hs-identifier hs-var">measuredResult</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO (Either (String, String, Int) String)
+</span><span id="line-54"></span><span>    </span><span class="annot"><a href="#local-6989586621679221501"><span class="hs-identifier hs-type">runCompiledModule</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.TimedValue.html#TimedValue"><span class="hs-identifier hs-type">TimedValue</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>    </span><span id="local-6989586621679221501"><span class="annot"><span class="annottext">runCompiledModule :: IO (TimedValue (Either (String, String, Int) String))
+</span><a href="#local-6989586621679221501"><span class="hs-identifier hs-var hs-var">runCompiledModule</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-56"></span><span>      </span><span id="local-6989586621679221517"><span class="annot"><span class="annottext">TimedValue (Either (String, String, Int) String)
+</span><a href="#local-6989586621679221517"><span class="hs-identifier hs-var">measuredResult</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO (Either (String, String, Int) String)
 -&gt; IO (TimedValue (Either (String, String, Int) String))
 forall a. IO a -&gt; IO (TimedValue a)
 </span><a href="CodeGen.TimedValue.html#measureTimedValue"><span class="hs-identifier hs-var">measureTimedValue</span></a></span><span> </span><span class="annot"><span class="annottext">(IO (Either (String, String, Int) String)
@@ -119,12 +119,12 @@ forall a. IO a -&gt; IO (TimedValue a)
 -&gt; IO (TimedValue (Either (String, String, Int) String))
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-57"></span><span>        </span><span class="hs-special">(</span><span id="local-6989586621679221749"><span class="annot"><span class="annottext">ExitCode
-</span><a href="#local-6989586621679221749"><span class="hs-identifier hs-var">exitCode</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679221750"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221750"><span class="hs-identifier hs-var">stdout</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679221751"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221751"><span class="hs-identifier hs-var">stderr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; String -&gt; IO (ExitCode, String, String)
+</span><span id="line-57"></span><span>        </span><span class="hs-special">(</span><span id="local-6989586621679221518"><span class="annot"><span class="annottext">ExitCode
+</span><a href="#local-6989586621679221518"><span class="hs-identifier hs-var">exitCode</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679221519"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679221519"><span class="hs-identifier hs-var">stdout</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679221520"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679221520"><span class="hs-identifier hs-var">stderr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; String -&gt; IO (ExitCode, String, String)
 </span><span class="hs-identifier hs-var">readProcessWithExitCode</span></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221729"><span class="hs-identifier hs-var">outputFilePath</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><a href="#local-6989586621679221498"><span class="hs-identifier hs-var">outputFilePath</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
 </span><span id="line-58"></span><span>        </span><span class="annot"><span class="annottext">Either (String, String, Int) String
 -&gt; IO (Either (String, String, Int) String)
 forall a. a -&gt; IO a
@@ -135,36 +135,36 @@ forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 -&gt; IO (Either (String, String, Int) String)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">ExitCode
-</span><a href="#local-6989586621679221749"><span class="hs-identifier hs-var">exitCode</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><a href="#local-6989586621679221518"><span class="hs-identifier hs-var">exitCode</span></a></span><span> </span><span class="hs-keyword">of</span><span>
 </span><span id="line-59"></span><span>          </span><span class="annot"><span class="annottext">ExitCode
 </span><span class="hs-identifier hs-var">ExitSuccess</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; Either (String, String, Int) String
 forall a b. b -&gt; Either a b
 </span><span class="hs-identifier hs-var">Right</span></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221750"><span class="hs-identifier hs-var">stdout</span></a></span><span>
-</span><span id="line-60"></span><span>          </span><span class="annot"><span class="hs-identifier hs-type">ExitFailure</span></span><span> </span><span id="local-6989586621679221754"><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679221754"><span class="hs-identifier hs-var">ec</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(String, String, Int) -&gt; Either (String, String, Int) String
+</span><a href="#local-6989586621679221519"><span class="hs-identifier hs-var">stdout</span></a></span><span>
+</span><span id="line-60"></span><span>          </span><span class="annot"><span class="hs-identifier hs-type">ExitFailure</span></span><span> </span><span id="local-6989586621679221523"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679221523"><span class="hs-identifier hs-var">ec</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(String, String, Int) -&gt; Either (String, String, Int) String
 forall a b. a -&gt; Either a b
 </span><span class="hs-identifier hs-var">Left</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221750"><span class="hs-identifier hs-var">stdout</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221751"><span class="hs-identifier hs-var">stderr</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679221754"><span class="hs-identifier hs-var">ec</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679221519"><span class="hs-identifier hs-var">stdout</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679221520"><span class="hs-identifier hs-var">stderr</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679221523"><span class="hs-identifier hs-var">ec</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-61"></span><span>
 </span><span id="line-62"></span><span>      </span><span class="annot"><span class="annottext">String -&gt; IO ()
 </span><span class="hs-identifier hs-var">removePathForcibly</span></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221729"><span class="hs-identifier hs-var">outputFilePath</span></a></span><span>
+</span><a href="#local-6989586621679221498"><span class="hs-identifier hs-var">outputFilePath</span></a></span><span>
 </span><span id="line-63"></span><span>
 </span><span id="line-64"></span><span>      </span><span class="annot"><span class="annottext">TimedValue (Either (String, String, Int) String)
 -&gt; IO (TimedValue (Either (String, String, Int) String))
 forall a. a -&gt; IO a
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">TimedValue (Either (String, String, Int) String)
-</span><a href="#local-6989586621679221748"><span class="hs-identifier hs-var">measuredResult</span></a></span><span>
+</span><a href="#local-6989586621679221517"><span class="hs-identifier hs-var">measuredResult</span></a></span><span>
 </span><span id="line-65"></span><span>
 </span><span id="line-66"></span><span class="annot"><a href="CodeGen.Llvm.Runner.html#compileToBinary"><span class="hs-identifier hs-type">compileToBinary</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.TimedValue.html#TimedValue"><span class="hs-identifier hs-type">TimedValue</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-67"></span><span id="compileToBinary"><span class="annot"><span class="annottext">compileToBinary :: Text -&gt; String -&gt; IO (TimedValue (Either Text ()))
-</span><a href="CodeGen.Llvm.Runner.html#compileToBinary"><span class="hs-identifier hs-var hs-var">compileToBinary</span></a></span></span><span> </span><span id="local-6989586621679221755"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679221755"><span class="hs-identifier hs-var">text</span></a></span></span><span> </span><span id="local-6989586621679221756"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221756"><span class="hs-identifier hs-var">outputFilePath</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">IO (Either Text ()) -&gt; IO (TimedValue (Either Text ()))
+</span><a href="CodeGen.Llvm.Runner.html#compileToBinary"><span class="hs-identifier hs-var hs-var">compileToBinary</span></a></span></span><span> </span><span id="local-6989586621679221524"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679221524"><span class="hs-identifier hs-var">text</span></a></span></span><span> </span><span id="local-6989586621679221525"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679221525"><span class="hs-identifier hs-var">outputFilePath</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">IO (Either Text ()) -&gt; IO (TimedValue (Either Text ()))
 forall a. IO a -&gt; IO (TimedValue a)
 </span><a href="CodeGen.TimedValue.html#measureTimedValue"><span class="hs-identifier hs-var">measureTimedValue</span></a></span><span> </span><span class="annot"><span class="annottext">(IO (Either Text ()) -&gt; IO (TimedValue (Either Text ())))
 -&gt; IO (Either Text ()) -&gt; IO (TimedValue (Either Text ()))
@@ -187,10 +187,10 @@ forall e a. Except e a -&gt; Either e a
 -&gt; Except Text (IO ()) -&gt; Either Text (IO ())
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-70"></span><span>      </span><span id="local-6989586621679221758"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679221758"><span class="hs-identifier hs-var">llvmIrText</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Except Text Text
+</span><span id="line-70"></span><span>      </span><span id="local-6989586621679221527"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679221527"><span class="hs-identifier hs-var">llvmIrText</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Except Text Text
 </span><a href="CodeGen.Llvm.Runner.html#compileToLlvmIr%27"><span class="hs-identifier hs-var">compileToLlvmIr'</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679221755"><span class="hs-identifier hs-var">text</span></a></span><span>
+</span><a href="#local-6989586621679221524"><span class="hs-identifier hs-var">text</span></a></span><span>
 </span><span id="line-71"></span><span>      </span><span class="annot"><span class="annottext">IO () -&gt; Except Text (IO ())
 forall a. a -&gt; ExceptT Text Identity a
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
@@ -204,44 +204,44 @@ forall a b c. IO a -&gt; (a -&gt; IO b) -&gt; (a -&gt; IO c) -&gt; IO c
 </span><span class="hs-string">&quot;build&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">String -&gt; IO ()
 </span><span class="hs-identifier hs-var">removePathForcibly</span></span><span> </span><span class="annot"><span class="annottext">((String -&gt; IO ()) -&gt; IO ()) -&gt; (String -&gt; IO ()) -&gt; IO ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679221760"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221760"><span class="hs-identifier hs-var">buildDir</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679221529"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679221529"><span class="hs-identifier hs-var">buildDir</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-73"></span><span>          </span><span class="annot"><span class="annottext">String -&gt; IO () -&gt; IO ()
 forall a. String -&gt; IO a -&gt; IO a
 </span><span class="hs-identifier hs-var">withCurrentDirectory</span></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221760"><span class="hs-identifier hs-var">buildDir</span></a></span><span> </span><span class="annot"><span class="annottext">(IO () -&gt; IO ()) -&gt; IO () -&gt; IO ()
+</span><a href="#local-6989586621679221529"><span class="hs-identifier hs-var">buildDir</span></a></span><span> </span><span class="annot"><span class="annottext">(IO () -&gt; IO ()) -&gt; IO () -&gt; IO ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-74"></span><span>            </span><span class="hs-special">(</span><span id="local-6989586621679221761"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221761"><span class="hs-identifier hs-var">llvm</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679221762"><span class="annot"><span class="annottext">Handle
-</span><a href="#local-6989586621679221762"><span class="hs-identifier hs-var">llvmHandle</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; IO (String, Handle)
+</span><span id="line-74"></span><span>            </span><span class="hs-special">(</span><span id="local-6989586621679221530"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679221530"><span class="hs-identifier hs-var">llvm</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679221531"><span class="annot"><span class="annottext">Handle
+</span><a href="#local-6989586621679221531"><span class="hs-identifier hs-var">llvmHandle</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; IO (String, Handle)
 </span><span class="hs-identifier hs-var">mkstemps</span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;module&quot;</span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;.ll&quot;</span></span><span>
 </span><span id="line-75"></span><span>            </span><span class="annot"><span class="annottext">Handle -&gt; Text -&gt; IO ()
 </span><span class="hs-identifier hs-var">Txt.hPutStrLn</span></span><span> </span><span class="annot"><span class="annottext">Handle
-</span><a href="#local-6989586621679221762"><span class="hs-identifier hs-var">llvmHandle</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679221758"><span class="hs-identifier hs-var">llvmIrText</span></a></span><span>
+</span><a href="#local-6989586621679221531"><span class="hs-identifier hs-var">llvmHandle</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679221527"><span class="hs-identifier hs-var">llvmIrText</span></a></span><span>
 </span><span id="line-76"></span><span>            </span><span class="annot"><span class="annottext">Handle -&gt; IO ()
 </span><span class="hs-identifier hs-var">hClose</span></span><span> </span><span class="annot"><span class="annottext">Handle
-</span><a href="#local-6989586621679221762"><span class="hs-identifier hs-var">llvmHandle</span></a></span><span>
+</span><a href="#local-6989586621679221531"><span class="hs-identifier hs-var">llvmHandle</span></a></span><span>
 </span><span id="line-77"></span><span>
-</span><span id="line-78"></span><span>            </span><span class="hs-special">(</span><span id="local-6989586621679221764"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221764"><span class="hs-identifier hs-var">runtime</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679221765"><span class="annot"><span class="annottext">Handle
-</span><a href="#local-6989586621679221765"><span class="hs-identifier hs-var">runtimeHandle</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; IO (String, Handle)
+</span><span id="line-78"></span><span>            </span><span class="hs-special">(</span><span id="local-6989586621679221533"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679221533"><span class="hs-identifier hs-var">runtime</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679221534"><span class="annot"><span class="annottext">Handle
+</span><a href="#local-6989586621679221534"><span class="hs-identifier hs-var">runtimeHandle</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; IO (String, Handle)
 </span><span class="hs-identifier hs-var">mkstemps</span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;runtime&quot;</span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;.c&quot;</span></span><span>
-</span><span id="line-79"></span><span>            </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679221766"><span class="annot"><span class="annottext">runtimeFileText :: Text
-</span><a href="#local-6989586621679221766"><span class="hs-identifier hs-var hs-var">runtimeFileText</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Text
+</span><span id="line-79"></span><span>            </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679221535"><span class="annot"><span class="annottext">runtimeFileText :: Text
+</span><a href="#local-6989586621679221535"><span class="hs-identifier hs-var hs-var">runtimeFileText</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Text
 </span><span class="hs-identifier hs-var">Txt.decodeUtf8</span></span><span> </span><span class="hs-special">$</span><span class="hs-special">(</span><span class="hs-identifier">makeRelativeToProject</span><span> </span><span class="hs-string">&quot;lib/CodeGen/Runtime/runtime.c&quot;</span><span> </span><span class="hs-operator">&gt;&gt;=</span><span> </span><span class="hs-identifier">embedFile</span><span class="hs-special">)</span><span>
 </span><span id="line-80"></span><span>            </span><span class="annot"><span class="annottext">Handle -&gt; Text -&gt; IO ()
 </span><span class="hs-identifier hs-var">Txt.hPutStrLn</span></span><span> </span><span class="annot"><span class="annottext">Handle
-</span><a href="#local-6989586621679221765"><span class="hs-identifier hs-var">runtimeHandle</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679221766"><span class="hs-identifier hs-var">runtimeFileText</span></a></span><span>
+</span><a href="#local-6989586621679221534"><span class="hs-identifier hs-var">runtimeHandle</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679221535"><span class="hs-identifier hs-var">runtimeFileText</span></a></span><span>
 </span><span id="line-81"></span><span>            </span><span class="annot"><span class="annottext">Handle -&gt; IO ()
 </span><span class="hs-identifier hs-var">hClose</span></span><span> </span><span class="annot"><span class="annottext">Handle
-</span><a href="#local-6989586621679221765"><span class="hs-identifier hs-var">runtimeHandle</span></a></span><span>
+</span><a href="#local-6989586621679221534"><span class="hs-identifier hs-var">runtimeHandle</span></a></span><span>
 </span><span id="line-82"></span><span>
 </span><span id="line-83"></span><span>            </span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; IO ()
 </span><span class="hs-identifier hs-var">callProcess</span></span><span> </span><span class="annot"><span class="annottext">String
@@ -249,19 +249,19 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-string">&quot;-Wno-override-module&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;-O3&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;-lm&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221761"><span class="hs-identifier hs-var">llvm</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221764"><span class="hs-identifier hs-var">runtime</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679221530"><span class="hs-identifier hs-var">llvm</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679221533"><span class="hs-identifier hs-var">runtime</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;-o&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;../&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 </span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221756"><span class="hs-identifier hs-var">outputFilePath</span></a></span><span class="hs-special">]</span><span>
+</span><a href="#local-6989586621679221525"><span class="hs-identifier hs-var">outputFilePath</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-84"></span><span>
 </span><span id="line-85"></span><span class="annot"><a href="CodeGen.Llvm.Runner.html#compileToLlvmIr"><span class="hs-identifier hs-type">compileToLlvmIr</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.TimedValue.html#TimedValue"><span class="hs-identifier hs-type">TimedValue</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-86"></span><span id="compileToLlvmIr"><span class="annot"><span class="annottext">compileToLlvmIr :: Text -&gt; String -&gt; IO (TimedValue (Either Text ()))
-</span><a href="CodeGen.Llvm.Runner.html#compileToLlvmIr"><span class="hs-identifier hs-var hs-var">compileToLlvmIr</span></a></span></span><span> </span><span id="local-6989586621679221770"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679221770"><span class="hs-identifier hs-var">text</span></a></span></span><span> </span><span id="local-6989586621679221771"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221771"><span class="hs-identifier hs-var">outputFilePath</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">IO (Either Text ()) -&gt; IO (TimedValue (Either Text ()))
+</span><a href="CodeGen.Llvm.Runner.html#compileToLlvmIr"><span class="hs-identifier hs-var hs-var">compileToLlvmIr</span></a></span></span><span> </span><span id="local-6989586621679221539"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679221539"><span class="hs-identifier hs-var">text</span></a></span></span><span> </span><span id="local-6989586621679221540"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679221540"><span class="hs-identifier hs-var">outputFilePath</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">IO (Either Text ()) -&gt; IO (TimedValue (Either Text ()))
 forall a. IO a -&gt; IO (TimedValue a)
 </span><a href="CodeGen.TimedValue.html#measureTimedValue"><span class="hs-identifier hs-var">measureTimedValue</span></a></span><span> </span><span class="annot"><span class="annottext">(IO (Either Text ()) -&gt; IO (TimedValue (Either Text ())))
 -&gt; IO (Either Text ()) -&gt; IO (TimedValue (Either Text ()))
@@ -284,10 +284,10 @@ forall e a. Except e a -&gt; Either e a
 -&gt; Except Text (IO ()) -&gt; Either Text (IO ())
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-89"></span><span>      </span><span id="local-6989586621679221772"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679221772"><span class="hs-identifier hs-var">llvmIrText</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Except Text Text
+</span><span id="line-89"></span><span>      </span><span id="local-6989586621679221541"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679221541"><span class="hs-identifier hs-var">llvmIrText</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Except Text Text
 </span><a href="CodeGen.Llvm.Runner.html#compileToLlvmIr%27"><span class="hs-identifier hs-var">compileToLlvmIr'</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679221770"><span class="hs-identifier hs-var">text</span></a></span><span>
+</span><a href="#local-6989586621679221539"><span class="hs-identifier hs-var">text</span></a></span><span>
 </span><span id="line-90"></span><span>      </span><span class="annot"><span class="annottext">IO () -&gt; Except Text (IO ())
 forall a. a -&gt; ExceptT Text Identity a
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
@@ -297,26 +297,26 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span id="line-91"></span><span>        </span><span class="annot"><span class="annottext">String -&gt; IOMode -&gt; (Handle -&gt; IO ()) -&gt; IO ()
 forall r. String -&gt; IOMode -&gt; (Handle -&gt; IO r) -&gt; IO r
 </span><span class="hs-identifier hs-var">withFile</span></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679221771"><span class="hs-identifier hs-var">outputFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">IOMode
+</span><a href="#local-6989586621679221540"><span class="hs-identifier hs-var">outputFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">IOMode
 </span><span class="hs-identifier hs-var">WriteMode</span></span><span> </span><span class="annot"><span class="annottext">((Handle -&gt; IO ()) -&gt; IO ()) -&gt; (Handle -&gt; IO ()) -&gt; IO ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679221773"><span class="annot"><span class="annottext">Handle
-</span><a href="#local-6989586621679221773"><span class="hs-identifier hs-var">handle</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679221542"><span class="annot"><span class="annottext">Handle
+</span><a href="#local-6989586621679221542"><span class="hs-identifier hs-var">handle</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
 </span><span id="line-92"></span><span>          </span><span class="annot"><span class="annottext">Handle -&gt; Text -&gt; IO ()
 </span><span class="hs-identifier hs-var">Txt.hPutStrLn</span></span><span> </span><span class="annot"><span class="annottext">Handle
-</span><a href="#local-6989586621679221773"><span class="hs-identifier hs-var">handle</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679221772"><span class="hs-identifier hs-var">llvmIrText</span></a></span><span>
+</span><a href="#local-6989586621679221542"><span class="hs-identifier hs-var">handle</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679221541"><span class="hs-identifier hs-var">llvmIrText</span></a></span><span>
 </span><span id="line-93"></span><span>
 </span><span id="line-94"></span><span class="annot"><span class="hs-comment">-- * Internal</span></span><span>
 </span><span id="line-95"></span><span>
 </span><span id="line-96"></span><span class="annot"><a href="CodeGen.Llvm.Runner.html#compileToLlvmIr%27"><span class="hs-identifier hs-type">compileToLlvmIr'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Except</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
 </span><span id="line-97"></span><span id="compileToLlvmIr%27"><span class="annot"><span class="annottext">compileToLlvmIr' :: Text -&gt; Except Text Text
-</span><a href="CodeGen.Llvm.Runner.html#compileToLlvmIr%27"><span class="hs-identifier hs-var hs-var">compileToLlvmIr'</span></a></span></span><span> </span><span id="local-6989586621679221774"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679221774"><span class="hs-identifier hs-var">text</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-98"></span><span>  </span><span id="local-6989586621679221775"><span class="annot"><span class="annottext">Module
-</span><a href="#local-6989586621679221775"><span class="hs-identifier hs-var">irModule</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Except Text Module
+</span><a href="CodeGen.Llvm.Runner.html#compileToLlvmIr%27"><span class="hs-identifier hs-var hs-var">compileToLlvmIr'</span></a></span></span><span> </span><span id="local-6989586621679221543"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679221543"><span class="hs-identifier hs-var">text</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-98"></span><span>  </span><span id="local-6989586621679221544"><span class="annot"><span class="annottext">Module
+</span><a href="#local-6989586621679221544"><span class="hs-identifier hs-var">irModule</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Except Text Module
 </span><a href="CodeGen.Module.html#compileToModule"><span class="hs-identifier hs-var">compileToModule</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679221774"><span class="hs-identifier hs-var">text</span></a></span><span>
+</span><a href="#local-6989586621679221543"><span class="hs-identifier hs-var">text</span></a></span><span>
 </span><span id="line-99"></span><span>  </span><span class="annot"><span class="annottext">Text -&gt; Except Text Text
 forall a. a -&gt; ExceptT Text Identity a
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
@@ -327,5 +327,5 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Module -&gt; Module
 </span><a href="CodeGen.Llvm.LlvmIrGen.html#genLlvmIrModule"><span class="hs-identifier hs-var">genLlvmIrModule</span></a></span><span> </span><span class="annot"><span class="annottext">Module
-</span><a href="#local-6989586621679221775"><span class="hs-identifier hs-var">irModule</span></a></span><span>
+</span><a href="#local-6989586621679221544"><span class="hs-identifier hs-var">irModule</span></a></span><span>
 </span><span id="line-100"></span></pre></body></html>

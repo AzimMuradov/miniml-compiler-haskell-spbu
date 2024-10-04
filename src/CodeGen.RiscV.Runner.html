@@ -10,9 +10,9 @@
 </span><span id="line-10"></span><span>
 </span><span id="line-11"></span><span class="annot"><a href="CodeGen.RiscV.Runner.html#compileToRiscVAsm"><span class="hs-identifier hs-type">compileToRiscVAsm</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.TimedValue.html#TimedValue"><span class="hs-identifier hs-type">TimedValue</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-12"></span><span id="compileToRiscVAsm"><span class="annot"><span class="annottext">compileToRiscVAsm :: Text -&gt; FilePath -&gt; IO (TimedValue (Either Text ()))
-</span><a href="CodeGen.RiscV.Runner.html#compileToRiscVAsm"><span class="hs-identifier hs-var hs-var">compileToRiscVAsm</span></a></span></span><span> </span><span id="local-6989586621679221022"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679221022"><span class="hs-identifier hs-var">text</span></a></span></span><span> </span><span id="local-6989586621679221023"><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679221023"><span class="hs-identifier hs-var">outputFilePath</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">IO (Either Text ()) -&gt; IO (TimedValue (Either Text ()))
+</span><a href="CodeGen.RiscV.Runner.html#compileToRiscVAsm"><span class="hs-identifier hs-var hs-var">compileToRiscVAsm</span></a></span></span><span> </span><span id="local-6989586621679220794"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679220794"><span class="hs-identifier hs-var">text</span></a></span></span><span> </span><span id="local-6989586621679220795"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679220795"><span class="hs-identifier hs-var">outputFilePath</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">IO (Either Text ()) -&gt; IO (TimedValue (Either Text ()))
 forall a. IO a -&gt; IO (TimedValue a)
 </span><a href="CodeGen.TimedValue.html#measureTimedValue"><span class="hs-identifier hs-var">measureTimedValue</span></a></span><span> </span><span class="annot"><span class="annottext">(IO (Either Text ()) -&gt; IO (TimedValue (Either Text ())))
 -&gt; IO (Either Text ()) -&gt; IO (TimedValue (Either Text ()))
@@ -35,14 +35,14 @@ forall e a. Except e a -&gt; Either e a
 -&gt; Except Text (IO ()) -&gt; Either Text (IO ())
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-15"></span><span>      </span><span id="local-6989586621679221025"><span class="annot"><span class="annottext">Module
-</span><a href="#local-6989586621679221025"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Except Text Module
+</span><span id="line-15"></span><span>      </span><span id="local-6989586621679220797"><span class="annot"><span class="annottext">Module
+</span><a href="#local-6989586621679220797"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Except Text Module
 </span><a href="CodeGen.Module.html#compileToModule"><span class="hs-identifier hs-var">compileToModule</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679221022"><span class="hs-identifier hs-var">text</span></a></span><span>
-</span><span id="line-16"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679221026"><span class="annot"><span class="annottext">riscVText :: Text
-</span><a href="#local-6989586621679221026"><span class="hs-identifier hs-var hs-var">riscVText</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Module -&gt; Text
+</span><a href="#local-6989586621679220794"><span class="hs-identifier hs-var">text</span></a></span><span>
+</span><span id="line-16"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679220798"><span class="annot"><span class="annottext">riscVText :: Text
+</span><a href="#local-6989586621679220798"><span class="hs-identifier hs-var hs-var">riscVText</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Module -&gt; Text
 </span><a href="CodeGen.RiscV.AsmGen.html#ppRiscVAsm"><span class="hs-identifier hs-var">ppRiscVAsm</span></a></span><span> </span><span class="annot"><span class="annottext">Module
-</span><a href="#local-6989586621679221025"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><a href="#local-6989586621679220797"><span class="hs-identifier hs-var">m</span></a></span><span>
 </span><span id="line-17"></span><span>      </span><span class="annot"><span class="annottext">IO () -&gt; Except Text (IO ())
 forall a. a -&gt; ExceptT Text Identity a
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
@@ -52,13 +52,13 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span id="line-18"></span><span>        </span><span class="annot"><span class="annottext">FilePath -&gt; IOMode -&gt; (Handle -&gt; IO ()) -&gt; IO ()
 forall r. FilePath -&gt; IOMode -&gt; (Handle -&gt; IO r) -&gt; IO r
 </span><span class="hs-identifier hs-var">withFile</span></span><span> </span><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679221023"><span class="hs-identifier hs-var">outputFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">IOMode
+</span><a href="#local-6989586621679220795"><span class="hs-identifier hs-var">outputFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">IOMode
 </span><span class="hs-identifier hs-var">WriteMode</span></span><span> </span><span class="annot"><span class="annottext">((Handle -&gt; IO ()) -&gt; IO ()) -&gt; (Handle -&gt; IO ()) -&gt; IO ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679221027"><span class="annot"><span class="annottext">Handle
-</span><a href="#local-6989586621679221027"><span class="hs-identifier hs-var">handle</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679220799"><span class="annot"><span class="annottext">Handle
+</span><a href="#local-6989586621679220799"><span class="hs-identifier hs-var">handle</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
 </span><span id="line-19"></span><span>          </span><span class="annot"><span class="annottext">Handle -&gt; Text -&gt; IO ()
 </span><span class="hs-identifier hs-var">Txt.hPutStrLn</span></span><span> </span><span class="annot"><span class="annottext">Handle
-</span><a href="#local-6989586621679221027"><span class="hs-identifier hs-var">handle</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679221026"><span class="hs-identifier hs-var">riscVText</span></a></span><span>
+</span><a href="#local-6989586621679220799"><span class="hs-identifier hs-var">handle</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679220798"><span class="hs-identifier hs-var">riscVText</span></a></span><span>
 </span><span id="line-20"></span></pre></body></html>
