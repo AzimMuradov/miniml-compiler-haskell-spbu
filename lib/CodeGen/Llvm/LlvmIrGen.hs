@@ -144,19 +144,17 @@ genComp = \case
           ArithOp PlusOp -> LLVM.add
           ArithOp MinusOp -> LLVM.sub
           ArithOp MulOp -> LLVM.mul
-          ArithOp DivOp ->
-            ( \lhs'' rhs'' -> do
-                divF <- findFun (Txt "miniml_div")
-                LLVM.call divF [lhs'', rhs'']
-            )
+          ArithOp DivOp -> \lhs'' rhs'' -> do
+            divF <- findFun (Txt "miniml_div")
+            LLVM.call divF [lhs'', rhs'']
           CompOp cOp ->
             let cOpF = case cOp of
-                  EqOp -> LLVM.icmp LLVM.EQ
-                  NeOp -> LLVM.icmp LLVM.NE
-                  LtOp -> LLVM.icmp LLVM.SLT
-                  LeOp -> LLVM.icmp LLVM.SLE
-                  GtOp -> LLVM.icmp LLVM.SGT
-                  GeOp -> LLVM.icmp LLVM.SGE
+                  EqOp -> LLVM.eq
+                  NeOp -> LLVM.ne
+                  LtOp -> LLVM.slt
+                  LeOp -> LLVM.sle
+                  GtOp -> LLVM.sgt
+                  GeOp -> LLVM.sge
              in (\a b -> cOpF a b >>= boolToInt)
     opF lhs' rhs'
   CompUnOp op x -> do
