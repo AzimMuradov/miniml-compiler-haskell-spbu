@@ -4,7 +4,7 @@
 </span><span id="line-4"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Trees.Common.html"><span class="hs-identifier">Trees.Common</span></a></span><span>
 </span><span id="line-5"></span><span>
 </span><span id="line-6"></span><span class="hs-keyword">newtype</span><span> </span><span id="Program"><span class="annot"><a href="Transformations.Anf.Anf.html#Program"><span class="hs-identifier hs-var">Program</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Program"><span class="annot"><a href="Transformations.Anf.Anf.html#Program"><span class="hs-identifier hs-var">Program</span></a></span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Transformations.Anf.Anf.html#GlobalDeclaration"><span class="hs-identifier hs-type">GlobalDeclaration</span></a></span><span class="hs-special">]</span><span>
-</span><span id="line-7"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679208110"><span id="local-6989586621679208117"><span id="local-6989586621679208121"><span class="annot"><span class="annottext">Int -&gt; Program -&gt; ShowS
+</span><span id="line-7"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679208124"><span id="local-6989586621679208131"><span id="local-6989586621679208135"><span class="annot"><span class="annottext">Int -&gt; Program -&gt; ShowS
 [Program] -&gt; ShowS
 Program -&gt; String
 (Int -&gt; Program -&gt; ShowS)
@@ -17,7 +17,7 @@ $cshow :: Program -&gt; String
 show :: Program -&gt; String
 $cshowList :: [Program] -&gt; ShowS
 showList :: [Program] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679208126"><span id="local-6989586621679208132"><span class="annot"><span class="annottext">Program -&gt; Program -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679208140"><span id="local-6989586621679208146"><span class="annot"><span class="annottext">Program -&gt; Program -&gt; Bool
 (Program -&gt; Program -&gt; Bool)
 -&gt; (Program -&gt; Program -&gt; Bool) -&gt; Eq Program
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -30,7 +30,7 @@ $c/= :: Program -&gt; Program -&gt; Bool
 </span><span id="line-9"></span><span class="hs-keyword">data</span><span> </span><span id="GlobalDeclaration"><span class="annot"><a href="Transformations.Anf.Anf.html#GlobalDeclaration"><span class="hs-identifier hs-var">GlobalDeclaration</span></a></span></span><span>
 </span><span id="line-10"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="GlobVarDecl"><span class="annot"><a href="Transformations.Anf.Anf.html#GlobVarDecl"><span class="hs-identifier hs-var">GlobVarDecl</span></a></span></span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier%27"><span class="hs-identifier hs-type">Identifier'</span></a></span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
 </span><span id="line-11"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="GlobFunDecl"><span class="annot"><a href="Transformations.Anf.Anf.html#GlobFunDecl"><span class="hs-identifier hs-var">GlobFunDecl</span></a></span></span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier%27"><span class="hs-identifier hs-type">Identifier'</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Trees.Common.html#Identifier%27"><span class="hs-identifier hs-type">Identifier'</span></a></span><span class="hs-special">]</span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
-</span><span id="line-12"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679208142"><span id="local-6989586621679208153"><span id="local-6989586621679208156"><span class="annot"><span class="annottext">Int -&gt; GlobalDeclaration -&gt; ShowS
+</span><span id="line-12"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679208156"><span id="local-6989586621679208167"><span id="local-6989586621679208170"><span class="annot"><span class="annottext">Int -&gt; GlobalDeclaration -&gt; ShowS
 [GlobalDeclaration] -&gt; ShowS
 GlobalDeclaration -&gt; String
 (Int -&gt; GlobalDeclaration -&gt; ShowS)
@@ -45,7 +45,7 @@ $cshow :: GlobalDeclaration -&gt; String
 show :: GlobalDeclaration -&gt; String
 $cshowList :: [GlobalDeclaration] -&gt; ShowS
 showList :: [GlobalDeclaration] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679208159"><span id="local-6989586621679208168"><span class="annot"><span class="annottext">GlobalDeclaration -&gt; GlobalDeclaration -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679208173"><span id="local-6989586621679208182"><span class="annot"><span class="annottext">GlobalDeclaration -&gt; GlobalDeclaration -&gt; Bool
 (GlobalDeclaration -&gt; GlobalDeclaration -&gt; Bool)
 -&gt; (GlobalDeclaration -&gt; GlobalDeclaration -&gt; Bool)
 -&gt; Eq GlobalDeclaration
@@ -60,7 +60,7 @@ $c/= :: GlobalDeclaration -&gt; GlobalDeclaration -&gt; Bool
 </span><span id="line-15"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="ExprAtom"><span class="annot"><a href="Transformations.Anf.Anf.html#ExprAtom"><span class="hs-identifier hs-var">ExprAtom</span></a></span></span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#AtomicExpression"><span class="hs-identifier hs-type">AtomicExpression</span></a></span><span>
 </span><span id="line-16"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ExprComp"><span class="annot"><a href="Transformations.Anf.Anf.html#ExprComp"><span class="hs-identifier hs-var">ExprComp</span></a></span></span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#ComplexExpression"><span class="hs-identifier hs-type">ComplexExpression</span></a></span><span>
 </span><span id="line-17"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ExprLetIn"><span class="annot"><a href="Transformations.Anf.Anf.html#ExprLetIn"><span class="hs-identifier hs-var">ExprLetIn</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Trees.Common.html#Identifier%27"><span class="hs-identifier hs-type">Identifier'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
-</span><span id="line-18"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679208174"><span id="local-6989586621679208188"><span id="local-6989586621679208191"><span class="annot"><span class="annottext">Int -&gt; Expression -&gt; ShowS
+</span><span id="line-18"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679208188"><span id="local-6989586621679208202"><span id="local-6989586621679208205"><span class="annot"><span class="annottext">Int -&gt; Expression -&gt; ShowS
 [Expression] -&gt; ShowS
 Expression -&gt; String
 (Int -&gt; Expression -&gt; ShowS)
@@ -75,7 +75,7 @@ $cshow :: Expression -&gt; String
 show :: Expression -&gt; String
 $cshowList :: [Expression] -&gt; ShowS
 showList :: [Expression] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679208194"><span id="local-6989586621679208205"><span class="annot"><span class="annottext">Expression -&gt; Expression -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679208208"><span id="local-6989586621679208219"><span class="annot"><span class="annottext">Expression -&gt; Expression -&gt; Bool
 (Expression -&gt; Expression -&gt; Bool)
 -&gt; (Expression -&gt; Expression -&gt; Bool) -&gt; Eq Expression
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -90,7 +90,7 @@ $c/= :: Expression -&gt; Expression -&gt; Bool
 </span><span id="line-22"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="AtomUnit"><span class="annot"><a href="Transformations.Anf.Anf.html#AtomUnit"><span class="hs-identifier hs-var">AtomUnit</span></a></span></span><span>
 </span><span id="line-23"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="AtomBool"><span class="annot"><a href="Transformations.Anf.Anf.html#AtomBool"><span class="hs-identifier hs-var">AtomBool</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
 </span><span id="line-24"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="AtomInt"><span class="annot"><a href="Transformations.Anf.Anf.html#AtomInt"><span class="hs-identifier hs-var">AtomInt</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int64</span></span><span>
-</span><span id="line-25"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679208212"><span id="local-6989586621679208222"><span id="local-6989586621679208225"><span class="annot"><span class="annottext">Int -&gt; AtomicExpression -&gt; ShowS
+</span><span id="line-25"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679208226"><span id="local-6989586621679208236"><span id="local-6989586621679208239"><span class="annot"><span class="annottext">Int -&gt; AtomicExpression -&gt; ShowS
 [AtomicExpression] -&gt; ShowS
 AtomicExpression -&gt; String
 (Int -&gt; AtomicExpression -&gt; ShowS)
@@ -105,7 +105,7 @@ $cshow :: AtomicExpression -&gt; String
 show :: AtomicExpression -&gt; String
 $cshowList :: [AtomicExpression] -&gt; ShowS
 showList :: [AtomicExpression] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679208228"><span id="local-6989586621679208235"><span class="annot"><span class="annottext">AtomicExpression -&gt; AtomicExpression -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679208242"><span id="local-6989586621679208249"><span class="annot"><span class="annottext">AtomicExpression -&gt; AtomicExpression -&gt; Bool
 (AtomicExpression -&gt; AtomicExpression -&gt; Bool)
 -&gt; (AtomicExpression -&gt; AtomicExpression -&gt; Bool)
 -&gt; Eq AtomicExpression
@@ -121,7 +121,7 @@ $c/= :: AtomicExpression -&gt; AtomicExpression -&gt; Bool
 </span><span id="line-29"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="CompIte"><span class="annot"><a href="Transformations.Anf.Anf.html#CompIte"><span class="hs-identifier hs-var">CompIte</span></a></span></span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#AtomicExpression"><span class="hs-identifier hs-type">AtomicExpression</span></a></span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#Expression"><span class="hs-identifier hs-type">Expression</span></a></span><span>
 </span><span id="line-30"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="CompBinOp"><span class="annot"><a href="Transformations.Anf.Anf.html#CompBinOp"><span class="hs-identifier hs-var">CompBinOp</span></a></span></span><span> </span><span class="annot"><a href="Trees.Common.html#BinaryOperator"><span class="hs-identifier hs-type">BinaryOperator</span></a></span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#AtomicExpression"><span class="hs-identifier hs-type">AtomicExpression</span></a></span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#AtomicExpression"><span class="hs-identifier hs-type">AtomicExpression</span></a></span><span>
 </span><span id="line-31"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="CompUnOp"><span class="annot"><a href="Transformations.Anf.Anf.html#CompUnOp"><span class="hs-identifier hs-var">CompUnOp</span></a></span></span><span> </span><span class="annot"><a href="Trees.Common.html#UnaryOperator"><span class="hs-identifier hs-type">UnaryOperator</span></a></span><span> </span><span class="annot"><a href="Transformations.Anf.Anf.html#AtomicExpression"><span class="hs-identifier hs-type">AtomicExpression</span></a></span><span>
-</span><span id="line-32"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679208242"><span id="local-6989586621679208260"><span id="local-6989586621679208263"><span class="annot"><span class="annottext">Int -&gt; ComplexExpression -&gt; ShowS
+</span><span id="line-32"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679208256"><span id="local-6989586621679208274"><span id="local-6989586621679208277"><span class="annot"><span class="annottext">Int -&gt; ComplexExpression -&gt; ShowS
 [ComplexExpression] -&gt; ShowS
 ComplexExpression -&gt; String
 (Int -&gt; ComplexExpression -&gt; ShowS)
@@ -136,7 +136,7 @@ $cshow :: ComplexExpression -&gt; String
 show :: ComplexExpression -&gt; String
 $cshowList :: [ComplexExpression] -&gt; ShowS
 showList :: [ComplexExpression] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679208266"><span id="local-6989586621679208280"><span class="annot"><span class="annottext">ComplexExpression -&gt; ComplexExpression -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679208280"><span id="local-6989586621679208294"><span class="annot"><span class="annottext">ComplexExpression -&gt; ComplexExpression -&gt; Bool
 (ComplexExpression -&gt; ComplexExpression -&gt; Bool)
 -&gt; (ComplexExpression -&gt; ComplexExpression -&gt; Bool)
 -&gt; Eq ComplexExpression

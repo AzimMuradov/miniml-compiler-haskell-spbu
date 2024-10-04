@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="local-6989586621679206903"><span id="local-6989586621679206904"><span id="local-6989586621679206905"><span id="local-6989586621679206906"><span id="local-6989586621679206907"><span id="local-6989586621679206908"><span id="local-6989586621679206909"><span id="local-6989586621679206910"></span></span></span></span></span></span></span></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Trees.Common</span><span> </span><span class="hs-keyword">where</span><span>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span id="local-6989586621679206917"><span id="local-6989586621679206918"><span id="local-6989586621679206919"><span id="local-6989586621679206920"><span id="local-6989586621679206921"><span id="local-6989586621679206922"><span id="local-6989586621679206923"><span id="local-6989586621679206924"></span></span></span></span></span></span></span></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Trees.Common</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-2"></span><span>
 </span><span id="line-3"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Int</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Int64</span></span><span class="hs-special">)</span><span>
 </span><span id="line-4"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
@@ -12,7 +12,7 @@
 </span><span id="line-12"></span><span class="hs-keyword">data</span><span> </span><span id="Identifier%27"><span class="annot"><a href="Trees.Common.html#Identifier%27"><span class="hs-identifier hs-var">Identifier'</span></a></span></span><span>
 </span><span id="line-13"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="Txt"><span class="annot"><a href="Trees.Common.html#Txt"><span class="hs-identifier hs-var">Txt</span></a></span></span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span>
 </span><span id="line-14"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Gen"><span class="annot"><a href="Trees.Common.html#Gen"><span class="hs-identifier hs-var">Gen</span></a></span></span><span> </span><span class="annot"><a href="Trees.Common.html#IdCnt"><span class="hs-identifier hs-type">IdCnt</span></a></span><span> </span><span class="annot"><a href="Trees.Common.html#Identifier"><span class="hs-identifier hs-type">Identifier</span></a></span><span>
-</span><span id="line-15"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679206916"><span id="local-6989586621679206926"><span id="local-6989586621679206930"><span class="annot"><span class="annottext">Int -&gt; Identifier' -&gt; ShowS
+</span><span id="line-15"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679206930"><span id="local-6989586621679206940"><span id="local-6989586621679206944"><span class="annot"><span class="annottext">Int -&gt; Identifier' -&gt; ShowS
 [Identifier'] -&gt; ShowS
 Identifier' -&gt; String
 (Int -&gt; Identifier' -&gt; ShowS)
@@ -27,7 +27,7 @@ $cshow :: Identifier' -&gt; String
 show :: Identifier' -&gt; String
 $cshowList :: [Identifier'] -&gt; ShowS
 showList :: [Identifier'] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679206934"><span id="local-6989586621679206941"><span class="annot"><span class="annottext">Identifier' -&gt; Identifier' -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679206948"><span id="local-6989586621679206955"><span class="annot"><span class="annottext">Identifier' -&gt; Identifier' -&gt; Bool
 (Identifier' -&gt; Identifier' -&gt; Bool)
 -&gt; (Identifier' -&gt; Identifier' -&gt; Bool) -&gt; Eq Identifier'
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -35,7 +35,7 @@ $c== :: Identifier' -&gt; Identifier' -&gt; Bool
 == :: Identifier' -&gt; Identifier' -&gt; Bool
 $c/= :: Identifier' -&gt; Identifier' -&gt; Bool
 /= :: Identifier' -&gt; Identifier' -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679206948"><span id="local-6989586621679206954"><span id="local-6989586621679206959"><span id="local-6989586621679206963"><span id="local-6989586621679206966"><span id="local-6989586621679206969"><span id="local-6989586621679206972"><span class="annot"><span class="annottext">Eq Identifier'
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679206962"><span id="local-6989586621679206968"><span id="local-6989586621679206973"><span id="local-6989586621679206977"><span id="local-6989586621679206980"><span id="local-6989586621679206983"><span id="local-6989586621679206986"><span class="annot"><span class="annottext">Eq Identifier'
 Eq Identifier'
 -&gt; (Identifier' -&gt; Identifier' -&gt; Ordering)
 -&gt; (Identifier' -&gt; Identifier' -&gt; Bool)
@@ -86,7 +86,7 @@ min :: Identifier' -&gt; Identifier' -&gt; Identifier'
 </span><span id="line-26"></span><span>    </span><span id="ArithOp"><span class="annot"><a href="Trees.Common.html#ArithOp"><span class="hs-identifier hs-var">ArithOp</span></a></span></span><span> </span><span class="annot"><a href="Trees.Common.html#ArithmeticOperator"><span class="hs-identifier hs-type">ArithmeticOperator</span></a></span><span>
 </span><span id="line-27"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | Comparison operator, see 'ComparisonOperator'.</span></span><span>
 </span><span id="line-28"></span><span>    </span><span id="CompOp"><span class="annot"><a href="Trees.Common.html#CompOp"><span class="hs-identifier hs-var">CompOp</span></a></span></span><span> </span><span class="annot"><a href="Trees.Common.html#ComparisonOperator"><span class="hs-identifier hs-type">ComparisonOperator</span></a></span><span>
-</span><span id="line-29"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679206979"><span id="local-6989586621679206990"><span id="local-6989586621679206994"><span class="annot"><span class="annottext">Int -&gt; BinaryOperator -&gt; ShowS
+</span><span id="line-29"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679206993"><span id="local-6989586621679207004"><span id="local-6989586621679207008"><span class="annot"><span class="annottext">Int -&gt; BinaryOperator -&gt; ShowS
 [BinaryOperator] -&gt; ShowS
 BinaryOperator -&gt; String
 (Int -&gt; BinaryOperator -&gt; ShowS)
@@ -101,7 +101,7 @@ $cshow :: BinaryOperator -&gt; String
 show :: BinaryOperator -&gt; String
 $cshowList :: [BinaryOperator] -&gt; ShowS
 showList :: [BinaryOperator] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679206997"><span id="local-6989586621679207005"><span class="annot"><span class="annottext">BinaryOperator -&gt; BinaryOperator -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207011"><span id="local-6989586621679207019"><span class="annot"><span class="annottext">BinaryOperator -&gt; BinaryOperator -&gt; Bool
 (BinaryOperator -&gt; BinaryOperator -&gt; Bool)
 -&gt; (BinaryOperator -&gt; BinaryOperator -&gt; Bool) -&gt; Eq BinaryOperator
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -115,7 +115,7 @@ $c/= :: BinaryOperator -&gt; BinaryOperator -&gt; Bool
 </span><span id="line-32"></span><span class="hs-keyword">data</span><span> </span><span id="UnaryOperator"><span class="annot"><a href="Trees.Common.html#UnaryOperator"><span class="hs-identifier hs-var">UnaryOperator</span></a></span></span><span>
 </span><span id="line-33"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-comment">-- | Unary minus operator (@-a@), works only for @int@.</span></span><span>
 </span><span id="line-34"></span><span>    </span><span id="UnMinusOp"><span class="annot"><a href="Trees.Common.html#UnMinusOp"><span class="hs-identifier hs-var">UnMinusOp</span></a></span></span><span>
-</span><span id="line-35"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679207010"><span id="local-6989586621679207012"><span id="local-6989586621679207016"><span class="annot"><span class="annottext">Int -&gt; UnaryOperator -&gt; ShowS
+</span><span id="line-35"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679207024"><span id="local-6989586621679207026"><span id="local-6989586621679207030"><span class="annot"><span class="annottext">Int -&gt; UnaryOperator -&gt; ShowS
 [UnaryOperator] -&gt; ShowS
 UnaryOperator -&gt; String
 (Int -&gt; UnaryOperator -&gt; ShowS)
@@ -130,7 +130,7 @@ $cshow :: UnaryOperator -&gt; String
 show :: UnaryOperator -&gt; String
 $cshowList :: [UnaryOperator] -&gt; ShowS
 showList :: [UnaryOperator] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207019"><span id="local-6989586621679207021"><span class="annot"><span class="annottext">UnaryOperator -&gt; UnaryOperator -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207033"><span id="local-6989586621679207035"><span class="annot"><span class="annottext">UnaryOperator -&gt; UnaryOperator -&gt; Bool
 (UnaryOperator -&gt; UnaryOperator -&gt; Bool)
 -&gt; (UnaryOperator -&gt; UnaryOperator -&gt; Bool) -&gt; Eq UnaryOperator
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -138,7 +138,7 @@ $c== :: UnaryOperator -&gt; UnaryOperator -&gt; Bool
 == :: UnaryOperator -&gt; UnaryOperator -&gt; Bool
 $c/= :: UnaryOperator -&gt; UnaryOperator -&gt; Bool
 /= :: UnaryOperator -&gt; UnaryOperator -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207025"><span id="local-6989586621679207032"><span id="local-6989586621679207038"><span id="local-6989586621679207046"><span id="local-6989586621679207048"><span id="local-6989586621679207052"><span id="local-6989586621679207056"><span id="local-6989586621679207060"><span class="annot"><span class="annottext">Int -&gt; UnaryOperator
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207039"><span id="local-6989586621679207046"><span id="local-6989586621679207052"><span id="local-6989586621679207060"><span id="local-6989586621679207062"><span id="local-6989586621679207066"><span id="local-6989586621679207070"><span id="local-6989586621679207074"><span class="annot"><span class="annottext">Int -&gt; UnaryOperator
 UnaryOperator -&gt; Int
 UnaryOperator -&gt; [UnaryOperator]
 UnaryOperator -&gt; UnaryOperator
@@ -180,7 +180,7 @@ $cenumFromTo :: UnaryOperator -&gt; UnaryOperator -&gt; [UnaryOperator]
 enumFromTo :: UnaryOperator -&gt; UnaryOperator -&gt; [UnaryOperator]
 $cenumFromThenTo :: UnaryOperator -&gt; UnaryOperator -&gt; UnaryOperator -&gt; [UnaryOperator]
 enumFromThenTo :: UnaryOperator -&gt; UnaryOperator -&gt; UnaryOperator -&gt; [UnaryOperator]
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207064"><span id="local-6989586621679207066"><span class="annot"><span class="annottext">UnaryOperator
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207078"><span id="local-6989586621679207080"><span class="annot"><span class="annottext">UnaryOperator
 UnaryOperator -&gt; UnaryOperator -&gt; Bounded UnaryOperator
 forall a. a -&gt; a -&gt; Bounded a
 $cminBound :: UnaryOperator
@@ -195,7 +195,7 @@ maxBound :: UnaryOperator
 </span><span id="line-40"></span><span>    </span><span id="AndOp"><span class="annot"><a href="Trees.Common.html#AndOp"><span class="hs-identifier hs-var">AndOp</span></a></span></span><span>
 </span><span id="line-41"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | Or operator (@a || b@).</span></span><span>
 </span><span id="line-42"></span><span>    </span><span id="OrOp"><span class="annot"><a href="Trees.Common.html#OrOp"><span class="hs-identifier hs-var">OrOp</span></a></span></span><span>
-</span><span id="line-43"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679207072"><span id="local-6989586621679207074"><span id="local-6989586621679207077"><span class="annot"><span class="annottext">Int -&gt; BooleanOperator -&gt; ShowS
+</span><span id="line-43"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679207086"><span id="local-6989586621679207088"><span id="local-6989586621679207091"><span class="annot"><span class="annottext">Int -&gt; BooleanOperator -&gt; ShowS
 [BooleanOperator] -&gt; ShowS
 BooleanOperator -&gt; String
 (Int -&gt; BooleanOperator -&gt; ShowS)
@@ -210,7 +210,7 @@ $cshow :: BooleanOperator -&gt; String
 show :: BooleanOperator -&gt; String
 $cshowList :: [BooleanOperator] -&gt; ShowS
 showList :: [BooleanOperator] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207080"><span id="local-6989586621679207082"><span class="annot"><span class="annottext">BooleanOperator -&gt; BooleanOperator -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207094"><span id="local-6989586621679207096"><span class="annot"><span class="annottext">BooleanOperator -&gt; BooleanOperator -&gt; Bool
 (BooleanOperator -&gt; BooleanOperator -&gt; Bool)
 -&gt; (BooleanOperator -&gt; BooleanOperator -&gt; Bool)
 -&gt; Eq BooleanOperator
@@ -219,7 +219,7 @@ $c== :: BooleanOperator -&gt; BooleanOperator -&gt; Bool
 == :: BooleanOperator -&gt; BooleanOperator -&gt; Bool
 $c/= :: BooleanOperator -&gt; BooleanOperator -&gt; Bool
 /= :: BooleanOperator -&gt; BooleanOperator -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207085"><span id="local-6989586621679207091"><span id="local-6989586621679207097"><span id="local-6989586621679207105"><span id="local-6989586621679207107"><span id="local-6989586621679207110"><span id="local-6989586621679207114"><span id="local-6989586621679207118"><span class="annot"><span class="annottext">Int -&gt; BooleanOperator
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207099"><span id="local-6989586621679207105"><span id="local-6989586621679207111"><span id="local-6989586621679207119"><span id="local-6989586621679207121"><span id="local-6989586621679207124"><span id="local-6989586621679207128"><span id="local-6989586621679207132"><span class="annot"><span class="annottext">Int -&gt; BooleanOperator
 BooleanOperator -&gt; Int
 BooleanOperator -&gt; [BooleanOperator]
 BooleanOperator -&gt; BooleanOperator
@@ -264,7 +264,7 @@ $cenumFromThenTo :: BooleanOperator
 -&gt; BooleanOperator -&gt; BooleanOperator -&gt; [BooleanOperator]
 enumFromThenTo :: BooleanOperator
 -&gt; BooleanOperator -&gt; BooleanOperator -&gt; [BooleanOperator]
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207121"><span id="local-6989586621679207123"><span class="annot"><span class="annottext">BooleanOperator
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207135"><span id="local-6989586621679207137"><span class="annot"><span class="annottext">BooleanOperator
 BooleanOperator -&gt; BooleanOperator -&gt; Bounded BooleanOperator
 forall a. a -&gt; a -&gt; Bounded a
 $cminBound :: BooleanOperator
@@ -283,7 +283,7 @@ maxBound :: BooleanOperator
 </span><span id="line-52"></span><span>    </span><span id="MulOp"><span class="annot"><a href="Trees.Common.html#MulOp"><span class="hs-identifier hs-var">MulOp</span></a></span></span><span>
 </span><span id="line-53"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | Division operator (@a / b@).</span></span><span>
 </span><span id="line-54"></span><span>    </span><span id="DivOp"><span class="annot"><a href="Trees.Common.html#DivOp"><span class="hs-identifier hs-var">DivOp</span></a></span></span><span>
-</span><span id="line-55"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679207130"><span id="local-6989586621679207132"><span id="local-6989586621679207135"><span class="annot"><span class="annottext">Int -&gt; ArithmeticOperator -&gt; ShowS
+</span><span id="line-55"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679207144"><span id="local-6989586621679207146"><span id="local-6989586621679207149"><span class="annot"><span class="annottext">Int -&gt; ArithmeticOperator -&gt; ShowS
 [ArithmeticOperator] -&gt; ShowS
 ArithmeticOperator -&gt; String
 (Int -&gt; ArithmeticOperator -&gt; ShowS)
@@ -298,7 +298,7 @@ $cshow :: ArithmeticOperator -&gt; String
 show :: ArithmeticOperator -&gt; String
 $cshowList :: [ArithmeticOperator] -&gt; ShowS
 showList :: [ArithmeticOperator] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207138"><span id="local-6989586621679207140"><span class="annot"><span class="annottext">ArithmeticOperator -&gt; ArithmeticOperator -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207152"><span id="local-6989586621679207154"><span class="annot"><span class="annottext">ArithmeticOperator -&gt; ArithmeticOperator -&gt; Bool
 (ArithmeticOperator -&gt; ArithmeticOperator -&gt; Bool)
 -&gt; (ArithmeticOperator -&gt; ArithmeticOperator -&gt; Bool)
 -&gt; Eq ArithmeticOperator
@@ -307,7 +307,7 @@ $c== :: ArithmeticOperator -&gt; ArithmeticOperator -&gt; Bool
 == :: ArithmeticOperator -&gt; ArithmeticOperator -&gt; Bool
 $c/= :: ArithmeticOperator -&gt; ArithmeticOperator -&gt; Bool
 /= :: ArithmeticOperator -&gt; ArithmeticOperator -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207143"><span id="local-6989586621679207149"><span id="local-6989586621679207155"><span id="local-6989586621679207163"><span id="local-6989586621679207165"><span id="local-6989586621679207168"><span id="local-6989586621679207172"><span id="local-6989586621679207176"><span class="annot"><span class="annottext">Int -&gt; ArithmeticOperator
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207157"><span id="local-6989586621679207163"><span id="local-6989586621679207169"><span id="local-6989586621679207177"><span id="local-6989586621679207179"><span id="local-6989586621679207182"><span id="local-6989586621679207186"><span id="local-6989586621679207190"><span class="annot"><span class="annottext">Int -&gt; ArithmeticOperator
 ArithmeticOperator -&gt; Int
 ArithmeticOperator -&gt; [ArithmeticOperator]
 ArithmeticOperator -&gt; ArithmeticOperator
@@ -356,7 +356,7 @@ $cenumFromThenTo :: ArithmeticOperator
 -&gt; ArithmeticOperator -&gt; ArithmeticOperator -&gt; [ArithmeticOperator]
 enumFromThenTo :: ArithmeticOperator
 -&gt; ArithmeticOperator -&gt; ArithmeticOperator -&gt; [ArithmeticOperator]
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207179"><span id="local-6989586621679207181"><span class="annot"><span class="annottext">ArithmeticOperator
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207193"><span id="local-6989586621679207195"><span class="annot"><span class="annottext">ArithmeticOperator
 ArithmeticOperator
 -&gt; ArithmeticOperator -&gt; Bounded ArithmeticOperator
 forall a. a -&gt; a -&gt; Bounded a
@@ -380,7 +380,7 @@ maxBound :: ArithmeticOperator
 </span><span id="line-68"></span><span>    </span><span id="GtOp"><span class="annot"><a href="Trees.Common.html#GtOp"><span class="hs-identifier hs-var">GtOp</span></a></span></span><span>
 </span><span id="line-69"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | Greater than or equal operator (@a &gt;= b@).</span></span><span>
 </span><span id="line-70"></span><span>    </span><span id="GeOp"><span class="annot"><a href="Trees.Common.html#GeOp"><span class="hs-identifier hs-var">GeOp</span></a></span></span><span>
-</span><span id="line-71"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679207190"><span id="local-6989586621679207192"><span id="local-6989586621679207195"><span class="annot"><span class="annottext">Int -&gt; ComparisonOperator -&gt; ShowS
+</span><span id="line-71"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679207204"><span id="local-6989586621679207206"><span id="local-6989586621679207209"><span class="annot"><span class="annottext">Int -&gt; ComparisonOperator -&gt; ShowS
 [ComparisonOperator] -&gt; ShowS
 ComparisonOperator -&gt; String
 (Int -&gt; ComparisonOperator -&gt; ShowS)
@@ -395,7 +395,7 @@ $cshow :: ComparisonOperator -&gt; String
 show :: ComparisonOperator -&gt; String
 $cshowList :: [ComparisonOperator] -&gt; ShowS
 showList :: [ComparisonOperator] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207198"><span id="local-6989586621679207200"><span class="annot"><span class="annottext">ComparisonOperator -&gt; ComparisonOperator -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207212"><span id="local-6989586621679207214"><span class="annot"><span class="annottext">ComparisonOperator -&gt; ComparisonOperator -&gt; Bool
 (ComparisonOperator -&gt; ComparisonOperator -&gt; Bool)
 -&gt; (ComparisonOperator -&gt; ComparisonOperator -&gt; Bool)
 -&gt; Eq ComparisonOperator
@@ -404,7 +404,7 @@ $c== :: ComparisonOperator -&gt; ComparisonOperator -&gt; Bool
 == :: ComparisonOperator -&gt; ComparisonOperator -&gt; Bool
 $c/= :: ComparisonOperator -&gt; ComparisonOperator -&gt; Bool
 /= :: ComparisonOperator -&gt; ComparisonOperator -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207203"><span id="local-6989586621679207209"><span id="local-6989586621679207215"><span id="local-6989586621679207223"><span id="local-6989586621679207225"><span id="local-6989586621679207228"><span id="local-6989586621679207232"><span id="local-6989586621679207236"><span class="annot"><span class="annottext">Int -&gt; ComparisonOperator
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207217"><span id="local-6989586621679207223"><span id="local-6989586621679207229"><span id="local-6989586621679207237"><span id="local-6989586621679207239"><span id="local-6989586621679207242"><span id="local-6989586621679207246"><span id="local-6989586621679207250"><span class="annot"><span class="annottext">Int -&gt; ComparisonOperator
 ComparisonOperator -&gt; Int
 ComparisonOperator -&gt; [ComparisonOperator]
 ComparisonOperator -&gt; ComparisonOperator
@@ -453,7 +453,7 @@ $cenumFromThenTo :: ComparisonOperator
 -&gt; ComparisonOperator -&gt; ComparisonOperator -&gt; [ComparisonOperator]
 enumFromThenTo :: ComparisonOperator
 -&gt; ComparisonOperator -&gt; ComparisonOperator -&gt; [ComparisonOperator]
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207239"><span id="local-6989586621679207241"><span class="annot"><span class="annottext">ComparisonOperator
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Enum</span></span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207253"><span id="local-6989586621679207255"><span class="annot"><span class="annottext">ComparisonOperator
 ComparisonOperator
 -&gt; ComparisonOperator -&gt; Bounded ComparisonOperator
 forall a. a -&gt; a -&gt; Bounded a
@@ -482,7 +482,7 @@ maxBound :: ComparisonOperator
 </span><span id="line-89"></span><span>    </span><span class="hs-comment">-- It contains the type of the first parameter and the result of the function</span><span>
 </span><span id="line-90"></span><span>    </span><span class="hs-comment">-- (e.g., @int -&gt; (int -&gt; bool -&gt; bool)@).</span><span>
 </span><span id="line-91"></span><span>    </span><span id="TFun"><span class="annot"><a href="Trees.Common.html#TFun"><span class="hs-identifier hs-var">TFun</span></a></span></span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span> </span><span class="annot"><a href="Trees.Common.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span>
-</span><span id="line-92"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679207249"><span id="local-6989586621679207255"><span id="local-6989586621679207258"><span class="annot"><span class="annottext">Int -&gt; Type -&gt; ShowS
+</span><span id="line-92"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679207263"><span id="local-6989586621679207269"><span id="local-6989586621679207272"><span class="annot"><span class="annottext">Int -&gt; Type -&gt; ShowS
 [Type] -&gt; ShowS
 Type -&gt; String
 (Int -&gt; Type -&gt; ShowS)
@@ -495,14 +495,14 @@ $cshow :: Type -&gt; String
 show :: Type -&gt; String
 $cshowList :: [Type] -&gt; ShowS
 showList :: [Type] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207261"><span id="local-6989586621679207266"><span class="annot"><span class="annottext">Type -&gt; Type -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207275"><span id="local-6989586621679207280"><span class="annot"><span class="annottext">Type -&gt; Type -&gt; Bool
 (Type -&gt; Type -&gt; Bool) -&gt; (Type -&gt; Type -&gt; Bool) -&gt; Eq Type
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c== :: Type -&gt; Type -&gt; Bool
 == :: Type -&gt; Type -&gt; Bool
 $c/= :: Type -&gt; Type -&gt; Bool
 /= :: Type -&gt; Type -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207271"><span id="local-6989586621679207276"><span id="local-6989586621679207279"><span id="local-6989586621679207282"><span id="local-6989586621679207285"><span id="local-6989586621679207288"><span id="local-6989586621679207291"><span class="annot"><span class="annottext">Eq Type
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207285"><span id="local-6989586621679207290"><span id="local-6989586621679207293"><span id="local-6989586621679207296"><span id="local-6989586621679207299"><span id="local-6989586621679207302"><span id="local-6989586621679207305"><span class="annot"><span class="annottext">Eq Type
 Eq Type
 -&gt; (Type -&gt; Type -&gt; Ordering)
 -&gt; (Type -&gt; Type -&gt; Bool)
@@ -554,7 +554,7 @@ min :: Type -&gt; Type -&gt; Type
 </span><span id="line-104"></span><span>    </span><span id="PrimValBool"><span class="annot"><a href="Trees.Common.html#PrimValBool"><span class="hs-identifier hs-var">PrimValBool</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
 </span><span id="line-105"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="hs-comment">-- | Int value (e.g., @0@, @4@, @15@, @23@).</span></span><span>
 </span><span id="line-106"></span><span>    </span><span id="PrimValInt"><span class="annot"><a href="Trees.Common.html#PrimValInt"><span class="hs-identifier hs-var">PrimValInt</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int64</span></span><span>
-</span><span id="line-107"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679207298"><span id="local-6989586621679207306"><span id="local-6989586621679207310"><span class="annot"><span class="annottext">Int -&gt; PrimitiveValue -&gt; ShowS
+</span><span id="line-107"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679207312"><span id="local-6989586621679207320"><span id="local-6989586621679207324"><span class="annot"><span class="annottext">Int -&gt; PrimitiveValue -&gt; ShowS
 [PrimitiveValue] -&gt; ShowS
 PrimitiveValue -&gt; String
 (Int -&gt; PrimitiveValue -&gt; ShowS)
@@ -569,7 +569,7 @@ $cshow :: PrimitiveValue -&gt; String
 show :: PrimitiveValue -&gt; String
 $cshowList :: [PrimitiveValue] -&gt; ShowS
 showList :: [PrimitiveValue] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207313"><span id="local-6989586621679207319"><span class="annot"><span class="annottext">PrimitiveValue -&gt; PrimitiveValue -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679207327"><span id="local-6989586621679207333"><span class="annot"><span class="annottext">PrimitiveValue -&gt; PrimitiveValue -&gt; Bool
 (PrimitiveValue -&gt; PrimitiveValue -&gt; Bool)
 -&gt; (PrimitiveValue -&gt; PrimitiveValue -&gt; Bool) -&gt; Eq PrimitiveValue
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
