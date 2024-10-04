@@ -11,12 +11,14 @@ module Utils
     processTillAnfGen,
     processTillLlvmIr,
     processTillLlvmRunOutput,
+    processTillAsm,
   )
 where
 
 import CodeGen.Llvm.LlvmIrGen (genLlvmIrModule, ppLlvmModule)
 import CodeGen.Llvm.Runner (run)
 import CodeGen.Module (Module (Module))
+import CodeGen.RiscV.AsmGen (ppRiscVAsm)
 import CodeGen.RunResult (RunResult (Success))
 import Data.Either (isRight)
 import Data.Maybe (fromJust)
@@ -69,6 +71,9 @@ processTillLlvmRunOutput :: Text -> String
 processTillLlvmRunOutput program =
   let Success out _ _ = unsafePerformIO $ run program
    in Txt.unpack out
+
+processTillAsm :: Text -> String
+processTillAsm program = Txt.unpack $ ppRiscVAsm $ Module (processTillAnfGen' program)
 
 -- Combinators
 

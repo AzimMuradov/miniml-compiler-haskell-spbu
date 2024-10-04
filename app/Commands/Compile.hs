@@ -4,6 +4,7 @@
 module Commands.Compile (compile) where
 
 import CodeGen.Llvm.Runner (compileToBinary, compileToLlvmIr)
+import CodeGen.RiscV.Runner (compileToRiscVAsm)
 import CodeGen.TimedValue (TimedValue (TimedValue))
 import Configuration.AppConfiguration (CompilationTarget (..), Compile (..), Debug (Yes), Input (..), Output (..))
 import Control.Monad (when)
@@ -26,6 +27,9 @@ compile (Compile input target output) debug = do
     TargetLlvmIr -> do
       let outputFilePath = outputToFilePath output moduleName "ll"
       compileToLlvmIr text outputFilePath
+    TargetRiscVAsm -> do
+      let outputFilePath = outputToFilePath output moduleName "s"
+      compileToRiscVAsm text outputFilePath
 
   when (debug == Yes) $ do
     putStrLn $ Printf.printf "Finished compiling in %0.5f sec" (ns2s compTime)

@@ -1,6 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Sample.Utils where
+module Sample.Utils
+  ( testPhases,
+    TestFileProvider,
+  )
+where
 
 import qualified Data.ByteString.Lazy.Char8 as LBSC8
 import qualified Data.Text.IO as TxtIO
@@ -11,6 +15,7 @@ import Test.Tasty.HUnit (testCase, (@?=))
 import Text.Pretty.Simple (pShowNoColor)
 import Utils
   ( processTillAnfGen,
+    processTillAsm,
     processTillLlvmIr,
     processTillLlvmRunOutput,
     processTillParser,
@@ -27,7 +32,8 @@ testPhases name testFileProvider =
       testTypeCheck testFileProvider,
       testAstToAnf testFileProvider,
       testLlvm testFileProvider,
-      testLlvmRun testFileProvider
+      testLlvmRun testFileProvider,
+      testAsm testFileProvider
     ]
 
 testParsing :: TestFileProvider -> TestTree
@@ -63,3 +69,10 @@ testLlvmRun testFileProvider =
     "LLVM run"
     (testFileProvider "out")
     (LBSC8.pack . processTillLlvmRunOutput <$> TxtIO.readFile (testFileProvider "ml"))
+
+testAsm :: TestFileProvider -> TestTree
+testAsm testFileProvider =
+  goldenVsString
+    "RISC-V ASM"
+    (testFileProvider "s")
+    (LBSC8.pack . processTillAsm <$> TxtIO.readFile (testFileProvider "ml"))

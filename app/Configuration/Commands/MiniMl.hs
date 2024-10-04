@@ -2,6 +2,7 @@ module Configuration.Commands.MiniMl (miniMl) where
 
 import Configuration.AppConfiguration (Debug (..), MiniMl (MiniMl))
 import Configuration.Commands.Compile (compile)
+import Configuration.Commands.PrintCRuntime (printCRuntime)
 import Configuration.Commands.Run (run)
 import Options.Applicative
 
@@ -20,7 +21,7 @@ miniMlParserInfo :: ParserInfo MiniMl
 miniMlParserInfo = info (miniMlParser <**> helper) miniMlInfoMod
 
 miniMlParser :: Parser MiniMl
-miniMlParser = MiniMl <$> hsubparser (run <> compile) <*> debugParser
+miniMlParser = MiniMl <$> hsubparser (run <> compile <> printCRuntime) <*> debugParser
 
 miniMlInfoMod :: InfoMod a
 miniMlInfoMod =
