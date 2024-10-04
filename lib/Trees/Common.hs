@@ -14,7 +14,7 @@ data Identifier'
   | Gen IdCnt Identifier
   deriving (Show, Eq, Ord)
 
-type IdCnt = Int
+type IdCnt = Integer
 
 -- ** Operators
 
