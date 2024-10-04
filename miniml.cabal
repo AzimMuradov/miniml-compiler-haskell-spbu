@@ -32,6 +32,8 @@ library
     CodeGen.Llvm.LlvmIrGen
     CodeGen.Llvm.Runner
     CodeGen.Module
+    CodeGen.RiscV.RiscVGen
+    CodeGen.RiscV.RiscVLib
     CodeGen.RunResult
     CodeGen.TimedValue
     MonadUtils
