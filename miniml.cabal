@@ -34,7 +34,9 @@ library
     CodeGen.Module
     CodeGen.RiscV.RiscVGen
     CodeGen.RiscV.RiscVLib
+    CodeGen.RiscV.Runner
     CodeGen.RunResult
+    CodeGen.Runtime.PrintRuntime
     CodeGen.TimedValue
     MonadUtils
     Parser.Ast
@@ -81,10 +83,12 @@ executable miniml
   main-is:          Main.hs
   other-modules:
     Commands.Compile
+    Commands.PrintCRuntime
     Commands.Run
     Configuration.AppConfiguration
     Configuration.Commands.Compile
     Configuration.Commands.MiniMl
+    Configuration.Commands.PrintCRuntime
     Configuration.Commands.Run
     Configuration.CommonParsers
     Utils
