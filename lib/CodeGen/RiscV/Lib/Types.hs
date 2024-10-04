@@ -1,10 +1,20 @@
+{-# LANGUAGE PatternSynonyms #-}
+
 module CodeGen.RiscV.Lib.Types where
 
-import Data.Char (isSpace)
+import Control.Arrow ((>>>))
+import Data.Char (toLower)
 import Data.Int (Int64)
-import Data.List (intercalate)
 import Data.Text (Text)
-import qualified Data.Text as Txt
+import Prettyprinter (Pretty (pretty), colon, comma, hsep, indent, layoutCompact, parens, punctuate, vsep, (<+>))
+import Prettyprinter.Render.Text (renderStrict)
+
+ppCodeLines :: [CodeLine] -> Text
+ppCodeLines =
+  map pretty
+    >>> vsep
+    >>> layoutCompact
+    >>> renderStrict
 
 data CodeLine
   = LabeledDirectiveCodeLine Label Directive
@@ -12,21 +22,21 @@ data CodeLine
   | InstructionCodeLine Instruction
   | DirectiveCodeLine Directive
 
-instance Show CodeLine where
-  show (LabeledDirectiveCodeLine l d) = spaceSep [show l, show d]
-  show (LabelCodeLine l) = show l
-  show (InstructionCodeLine i) = "    " ++ show i
-  show (DirectiveCodeLine d) = show d
+instance Pretty CodeLine where
+  pretty (LabeledDirectiveCodeLine l d) = pretty l <+> pretty d
+  pretty (LabelCodeLine l) = pretty l
+  pretty (InstructionCodeLine i) = indent 4 (pretty i)
+  pretty (DirectiveCodeLine d) = pretty d
 
 newtype Label = Label Text
 
-instance Show Label where
-  show (Label txt) = Txt.unpack txt ++ ":"
+instance Pretty Label where
+  pretty (Label txt) = pretty txt <> colon
 
 data Instruction = Instruction OpCode [Operand]
 
-instance Show Instruction where
-  show (Instruction opCode args) = spaceSep [show opCode, commaSep $ show <$> args]
+instance Pretty Instruction where
+  pretty (Instruction opCode args) = hsep $ pretty opCode : punctuate comma (pretty <$> args)
 
 data Directive
   = DirText
@@ -34,11 +44,11 @@ data Directive
   | DirDWord Int64
   | DirGlobl Text
 
-instance Show Directive where
-  show DirText = ".section .text"
-  show DirData = ".section .data"
-  show (DirDWord initVal) = spaceSep [".dword", show initVal]
-  show (DirGlobl name) = spaceSep [".globl", Txt.unpack name]
+instance Pretty Directive where
+  pretty DirText = pretty ".section .text"
+  pretty DirData = pretty ".section .data"
+  pretty (DirDWord initVal) = pretty ".dword" <+> pretty initVal
+  pretty (DirGlobl name) = pretty ".globl" <+> pretty name
 
 data OpCode
   = Add
@@ -60,42 +70,26 @@ data OpCode
   | Jal
   | Beqz
   | J
+  deriving (Show)
 
-instance Show OpCode where
-  show Add = "add"
-  show Sub = "sub"
-  show Mul = "mul"
-  show And = "and"
-  show Or = "or"
-  show Not = "not"
-  show Seqz = "seqz"
-  show Snez = "snez"
-  show Slt = "slt"
-  show Ld = "ld"
-  show Sd = "sd"
-  show Addi = "addi"
-  show Li = "li"
-  show La = "la"
-  show Neg = "neg"
-  show Ret = "ret"
-  show Jal = "jal"
-  show Beqz = "beqz"
-  show J = "j"
+instance Pretty OpCode where
+  pretty opCode = pretty $ toLower <$> show opCode
 
 data Operand
   = Immediate Int64
   | Register Register
-  | Memory Offset
   | RegisterWithOffset Register Offset
   | Symbol Text
   deriving (Eq, Ord)
 
-instance Show Operand where
-  show (Immediate i) = show i
-  show (Register r) = show r
-  show (Memory o) = show (dword * o) ++ "(sp)"
-  show (RegisterWithOffset r o) = show (dword * o) ++ "(" ++ show r ++ ")"
-  show (Symbol t) = Txt.unpack t
+pattern Memory :: Offset -> Operand
+pattern Memory offset = RegisterWithOffset Sp offset
+
+instance Pretty Operand where
+  pretty (Immediate i) = pretty i
+  pretty (Register r) = pretty r
+  pretty (RegisterWithOffset r o) = pretty (dword * o) <> parens (pretty r)
+  pretty (Symbol t) = pretty t
 
 type Offset = Int64
 
@@ -132,50 +126,10 @@ data Register
   | T4 -- t4 == x29
   | T5 -- t5 == x30
   | T6 -- t6 == x31
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Show)
 
-instance Show Register where
-  show Zero = "zero"
-  show Ra = "ra"
-  show Sp = "sp"
-  show Gp = "gp"
-  show Tp = "tp"
-  show T0 = "t0"
-  show T1 = "t1"
-  show T2 = "t2"
-  show S0 = "s0"
-  show S1 = "s1"
-  show A0 = "a0"
-  show A1 = "a1"
-  show A2 = "a2"
-  show A3 = "a3"
-  show A4 = "a4"
-  show A5 = "a5"
-  show A6 = "a6"
-  show A7 = "a7"
-  show S2 = "s2"
-  show S3 = "s3"
-  show S4 = "s4"
-  show S5 = "s5"
-  show S6 = "s6"
-  show S7 = "s7"
-  show S8 = "s8"
-  show S9 = "s9"
-  show S10 = "s10"
-  show S11 = "s11"
-  show T3 = "t3"
-  show T4 = "t4"
-  show T5 = "t5"
-  show T6 = "t6"
+instance Pretty Register where
+  pretty opCode = pretty $ toLower <$> show opCode
 
 dword :: Int64
 dword = 8
-
-commaSep :: [String] -> String
-commaSep = intercalate ", " . filterOutBlankStrings
-
-spaceSep :: [String] -> String
-spaceSep = unwords . filterOutBlankStrings
-
-filterOutBlankStrings :: [String] -> [String]
-filterOutBlankStrings = filter (not . all isSpace)

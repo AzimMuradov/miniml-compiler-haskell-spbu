@@ -73,7 +73,7 @@ processTillLlvmRunOutput program =
    in Txt.unpack out
 
 processTillAsm :: Text -> String
-processTillAsm program = ppRiscVAsm $ Module (processTillAnfGen' program)
+processTillAsm program = Txt.unpack $ ppRiscVAsm $ Module (processTillAnfGen' program)
 
 -- Combinators
 

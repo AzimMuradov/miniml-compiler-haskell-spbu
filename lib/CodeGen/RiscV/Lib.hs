@@ -3,6 +3,7 @@
 module CodeGen.RiscV.Lib
   ( compileT,
     compile,
+    ppCodeLines,
     mainFunction,
     function,
     globalVar,

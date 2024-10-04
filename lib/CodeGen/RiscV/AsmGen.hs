@@ -10,6 +10,7 @@ import qualified CodeGen.RiscV.Lib as Asm
 import Control.Monad.State (MonadState, State, evalState, gets, modify)
 import Data.Map (Map)
 import qualified Data.Map as Map
+import Data.Text (Text)
 import qualified Data.Text as Txt
 import Foreign (fromBool)
 import MonadUtils (locally)
@@ -17,8 +18,8 @@ import qualified StdLib
 import Transformations.Anf.Anf
 import Trees.Common
 
-ppRiscVAsm :: Module -> String
-ppRiscVAsm m = unlines $ show <$> genModule m
+ppRiscVAsm :: Module -> Text
+ppRiscVAsm m = Asm.ppCodeLines $ genModule m
 
 -- The Code
 

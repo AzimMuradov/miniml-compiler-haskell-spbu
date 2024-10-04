@@ -5,7 +5,6 @@ import CodeGen.RiscV.AsmGen (ppRiscVAsm)
 import CodeGen.TimedValue (TimedValue, measureTimedValue)
 import Control.Monad.Except (runExcept)
 import Data.Text (Text)
-import qualified Data.Text as Txt
 import qualified Data.Text.IO as Txt
 import System.IO (IOMode (WriteMode), withFile)
 
@@ -14,7 +13,7 @@ compileToRiscVAsm text outputFilePath = measureTimedValue $
   sequenceA $
     runExcept $ do
       m <- compileToModule text
-      let riscVText = Txt.pack $ ppRiscVAsm m
+      let riscVText = ppRiscVAsm m
       return $
         withFile outputFilePath WriteMode $ \handle -> do
-          Txt.hPutStr handle riscVText
+          Txt.hPutStrLn handle riscVText
