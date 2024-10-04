@@ -51,25 +51,24 @@ instance Pretty Directive where
   pretty (DirGlobl name) = pretty ".globl" <+> pretty name
 
 data OpCode
-  = Add
+  = And
+  | Or
+  | Add
   | Sub
   | Mul
-  | And
-  | Or
-  | Not
+  | Neg
   | Seqz
   | Snez
   | Slt
-  | Ld
   | Sd
-  | Addi
+  | Ld
   | Li
   | La
-  | Neg
-  | Ret
-  | Jal
+  | Addi
   | Beqz
   | J
+  | Call
+  | Ret
   deriving (Show)
 
 instance Pretty OpCode where

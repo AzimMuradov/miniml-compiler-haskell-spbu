@@ -30,19 +30,19 @@ else_0:
     la a0, loop_2
     ld a1, 72(sp)
     sd ra, 88(sp)
-    jal miniml_fun_to_paf
+    call miniml_fun_to_paf
     ld ra, 88(sp)
     sd a0, 80(sp)
     ld a0, 80(sp)
     ld a1, 64(sp)
     sd ra, 104(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 104(sp)
     sd a0, 96(sp)
     ld a0, 96(sp)
     ld a1, 24(sp)
     sd ra, 120(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 120(sp)
     sd a0, 112(sp)
     ld t0, 16(sp)
@@ -52,7 +52,7 @@ else_0:
     ld a0, 112(sp)
     ld a1, 128(sp)
     sd ra, 144(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 144(sp)
     sd a0, 136(sp)
     ld t0, 136(sp)
@@ -69,13 +69,13 @@ fib_6:
     la a0, loop_2
     ld a1, 16(sp)
     sd ra, 32(sp)
-    jal miniml_fun_to_paf
+    call miniml_fun_to_paf
     ld ra, 32(sp)
     sd a0, 24(sp)
     ld a0, 24(sp)
     ld a1, 8(sp)
     sd ra, 48(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 48(sp)
     sd a0, 40(sp)
     li t0, 0
@@ -83,7 +83,7 @@ fib_6:
     ld a0, 40(sp)
     ld a1, 56(sp)
     sd ra, 72(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 72(sp)
     sd a0, 64(sp)
     li t0, 1
@@ -91,7 +91,7 @@ fib_6:
     ld a0, 64(sp)
     ld a1, 80(sp)
     sd ra, 96(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 96(sp)
     sd a0, 88(sp)
     ld a0, 88(sp)
@@ -105,7 +105,7 @@ _start:
     la a0, fib_6
     ld a1, 8(sp)
     sd ra, 24(sp)
-    jal miniml_fun_to_paf
+    call miniml_fun_to_paf
     ld ra, 24(sp)
     sd a0, 16(sp)
     li t0, 10
@@ -113,7 +113,7 @@ _start:
     ld a0, 16(sp)
     ld a1, 32(sp)
     sd ra, 48(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 48(sp)
     sd a0, 40(sp)
     li t0, 1
@@ -121,13 +121,13 @@ _start:
     la a0, print_int
     ld a1, 56(sp)
     sd ra, 72(sp)
-    jal miniml_fun_to_paf
+    call miniml_fun_to_paf
     ld ra, 72(sp)
     sd a0, 64(sp)
     ld a0, 64(sp)
     ld a1, 40(sp)
     sd ra, 88(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 88(sp)
     sd a0, 80(sp)
     la t0, simp_7
@@ -136,4 +136,4 @@ _start:
     li a0, 0
     addi sp, sp, 88
     li a0, 0
-    jal exit
+    call exit

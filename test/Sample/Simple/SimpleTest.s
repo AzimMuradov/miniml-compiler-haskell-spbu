@@ -15,7 +15,7 @@ k_4:
     ld a0, 8(sp)
     ld a1, 16(sp)
     sd ra, 32(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 32(sp)
     sd a0, 24(sp)
     ld a0, 24(sp)
@@ -29,7 +29,7 @@ _start:
     la a0, k_4
     ld a1, 8(sp)
     sd ra, 24(sp)
-    jal miniml_fun_to_paf
+    call miniml_fun_to_paf
     ld ra, 24(sp)
     sd a0, 16(sp)
     li t0, 1
@@ -37,13 +37,13 @@ _start:
     la a0, id_2
     ld a1, 32(sp)
     sd ra, 48(sp)
-    jal miniml_fun_to_paf
+    call miniml_fun_to_paf
     ld ra, 48(sp)
     sd a0, 40(sp)
     ld a0, 16(sp)
     ld a1, 40(sp)
     sd ra, 64(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 64(sp)
     sd a0, 56(sp)
     li t0, 1
@@ -51,13 +51,13 @@ _start:
     la a0, print_int
     ld a1, 72(sp)
     sd ra, 88(sp)
-    jal miniml_fun_to_paf
+    call miniml_fun_to_paf
     ld ra, 88(sp)
     sd a0, 80(sp)
     ld a0, 80(sp)
     ld a1, 56(sp)
     sd ra, 104(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 104(sp)
     sd a0, 96(sp)
     la t0, simp_5
@@ -66,4 +66,4 @@ _start:
     li a0, 0
     addi sp, sp, 104
     li a0, 0
-    jal exit
+    call exit

@@ -21,13 +21,13 @@ else_0:
     la a0, loop_2
     ld a1, 48(sp)
     sd ra, 64(sp)
-    jal miniml_fun_to_paf
+    call miniml_fun_to_paf
     ld ra, 64(sp)
     sd a0, 56(sp)
     ld a0, 56(sp)
     ld a1, 8(sp)
     sd ra, 80(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 80(sp)
     sd a0, 72(sp)
     li t0, 1
@@ -39,7 +39,7 @@ else_0:
     ld a0, 72(sp)
     ld a1, 96(sp)
     sd ra, 112(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 112(sp)
     sd a0, 104(sp)
     ld t0, 24(sp)
@@ -49,7 +49,7 @@ else_0:
     ld a0, 104(sp)
     ld a1, 120(sp)
     sd ra, 136(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 136(sp)
     sd a0, 128(sp)
     ld t0, 128(sp)
@@ -66,13 +66,13 @@ factorial_5:
     la a0, loop_2
     ld a1, 16(sp)
     sd ra, 32(sp)
-    jal miniml_fun_to_paf
+    call miniml_fun_to_paf
     ld ra, 32(sp)
     sd a0, 24(sp)
     ld a0, 24(sp)
     ld a1, 8(sp)
     sd ra, 48(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 48(sp)
     sd a0, 40(sp)
     li t0, 1
@@ -80,7 +80,7 @@ factorial_5:
     ld a0, 40(sp)
     ld a1, 56(sp)
     sd ra, 72(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 72(sp)
     sd a0, 64(sp)
     li t0, 1
@@ -88,7 +88,7 @@ factorial_5:
     ld a0, 64(sp)
     ld a1, 80(sp)
     sd ra, 96(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 96(sp)
     sd a0, 88(sp)
     ld a0, 88(sp)
@@ -102,7 +102,7 @@ _start:
     la a0, factorial_5
     ld a1, 8(sp)
     sd ra, 24(sp)
-    jal miniml_fun_to_paf
+    call miniml_fun_to_paf
     ld ra, 24(sp)
     sd a0, 16(sp)
     li t0, 5
@@ -110,7 +110,7 @@ _start:
     ld a0, 16(sp)
     ld a1, 32(sp)
     sd ra, 48(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 48(sp)
     sd a0, 40(sp)
     li t0, 1
@@ -118,13 +118,13 @@ _start:
     la a0, print_int
     ld a1, 56(sp)
     sd ra, 72(sp)
-    jal miniml_fun_to_paf
+    call miniml_fun_to_paf
     ld ra, 72(sp)
     sd a0, 64(sp)
     ld a0, 64(sp)
     ld a1, 40(sp)
     sd ra, 88(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 88(sp)
     sd a0, 80(sp)
     la t0, simp_6
@@ -133,4 +133,4 @@ _start:
     li a0, 0
     addi sp, sp, 88
     li a0, 0
-    jal exit
+    call exit

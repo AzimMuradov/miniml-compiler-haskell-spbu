@@ -73,7 +73,7 @@ mainFunction body = do
 
   let ret =
         [ instructionCodeLine Li [Register A0, Immediate 0],
-          instructionCodeLine Jal [Symbol "exit"]
+          instructionCodeLine Call [Symbol "exit"]
         ]
 
   let funCode = [globalDir, funLabel, spPush] ++ (concat . reverse $ ([loadRetVal, spPop] ++ ret) : cls)
@@ -193,7 +193,7 @@ call fun args = do
   pushFunctionCodeLines $
     loadArguments
       ++ [ instructionCodeLine Sd [Register Ra, raMem],
-           instructionCodeLine Jal [fun],
+           instructionCodeLine Call [fun],
            instructionCodeLine Ld [Register Ra, raMem],
            instructionCodeLine Sd [retVal, retValMem]
          ]

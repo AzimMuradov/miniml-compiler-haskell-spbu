@@ -30,13 +30,13 @@ else_0:
     la a0, factorial_1
     ld a1, 64(sp)
     sd ra, 80(sp)
-    jal miniml_fun_to_paf
+    call miniml_fun_to_paf
     ld ra, 80(sp)
     sd a0, 72(sp)
     ld a0, 72(sp)
     ld a1, 56(sp)
     sd ra, 96(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 96(sp)
     sd a0, 88(sp)
     ld t0, 8(sp)
@@ -57,7 +57,7 @@ _start:
     la a0, factorial_1
     ld a1, 8(sp)
     sd ra, 24(sp)
-    jal miniml_fun_to_paf
+    call miniml_fun_to_paf
     ld ra, 24(sp)
     sd a0, 16(sp)
     li t0, 5
@@ -65,7 +65,7 @@ _start:
     ld a0, 16(sp)
     ld a1, 32(sp)
     sd ra, 48(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 48(sp)
     sd a0, 40(sp)
     li t0, 1
@@ -73,13 +73,13 @@ _start:
     la a0, print_int
     ld a1, 56(sp)
     sd ra, 72(sp)
-    jal miniml_fun_to_paf
+    call miniml_fun_to_paf
     ld ra, 72(sp)
     sd a0, 64(sp)
     ld a0, 64(sp)
     ld a1, 40(sp)
     sd ra, 88(sp)
-    jal miniml_apply
+    call miniml_apply
     ld ra, 88(sp)
     sd a0, 80(sp)
     la t0, simp_3
@@ -88,4 +88,4 @@ _start:
     li a0, 0
     addi sp, sp, 88
     li a0, 0
-    jal exit
+    call exit
