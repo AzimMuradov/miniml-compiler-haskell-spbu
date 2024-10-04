@@ -34,18 +34,19 @@ data FunDeclaration = FunDecl Common.Identifier' [Common.Identifier'] Lfr.Expres
 -- ** Lambda Lifters
 
 llGDecl :: Ast.Declaration -> LlState [Lfr.GlobalDeclaration]
-llGDecl = \case
-  Ast.DeclVar ident value -> do
-    var <- ll1 (Lfr.VarDecl ident) value
-    genFuns <- gets genFunDecls
-    modify $ \env -> env {genFunDecls = []}
-    return $ reverse (Lfr.GlobVarDecl var : (convertFunDecl <$> genFuns))
-  Ast.DeclFun ident _ (Ast.Fun params body) -> do
-    fun <- ll1 (FunDecl ident (NE.toList params)) body
-    genFuns <- gets genFunDecls
-    modify $ \env -> env {genFunDecls = []}
-    return $ convertFunDecl <$> reverse (fun : genFuns)
+llGDecl decl = do
+  decl' <- case decl of
+    Ast.DeclVar ident value ->
+      ll1 (Lfr.GlobVarDecl . Lfr.VarDecl ident) value
+    Ast.DeclFun ident _ (Ast.Fun params body) ->
+      ll1 (Lfr.GlobFunDecl ident (NE.toList params)) body
+  genDecls <- collectGenFunDecls
+  return $ reverse (decl' : genDecls)
   where
+    collectGenFunDecls = do
+      genDecls <- gets genFunDecls
+      modify $ \env -> env {genFunDecls = []}
+      return (convertFunDecl <$> genDecls)
     convertFunDecl (FunDecl i ps b) = Lfr.GlobFunDecl i ps b
 
 llExpr :: Ast.Expression -> LlState Lfr.Expression
