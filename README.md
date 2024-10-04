@@ -21,7 +21,7 @@ MiniML is a minimal dialect of ML (Meta Language).
 - Anonymous functions (`fun a b -> a + b`)
 - Functions and recursive functions declarations, let-bindings (`let f x = x * x`, `let rec f x = x * f x`, `let x = 42`)
 - Top-level expressions
-- Type annotations (`let int_eq (a : int) (b : int) = a = b`)
+- Type annotations (w/o type vars) (`let int_eq (a : int) (b : int) = a = b`)
 - Let expressions (`let f x = x * x in ...`, `let rec f x = x * f x in ...`, `let x = 42 in ...`)
 - Currying
 - Conditionals (`if x > 15 then x * 16 else x / 23`)
@@ -107,11 +107,10 @@ Global options:
 
 ## Developer Documentation
 
-- [Implementation details](docs/dev/impl.md)
-- [Development workflow](docs/dev/flow.md)
-
-### Build Requirements
+**Build Requirements**
 
 - **GHC**: 9.4.8
 - **Cabal**: 3.8
-- **LLVM**: 17
+- **LLVM**: >=16
+
+[Implementation details](docs/dev/impl.md)
