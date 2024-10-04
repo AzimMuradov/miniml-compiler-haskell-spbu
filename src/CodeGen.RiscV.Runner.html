@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">CodeGen.RiscV.Runner</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Runner.html#compileToRiscVAsm"><span class="hs-identifier">compileToRiscVAsm</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="CodeGen.Module.html"><span class="hs-identifier">CodeGen.Module</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.Module.html#compileToModule"><span class="hs-identifier">compileToModule</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-4"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="CodeGen.RiscV.AsmGen.html"><span class="hs-identifier">CodeGen.RiscV.AsmGen</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.AsmGen.html#ppRiscVAsm"><span class="hs-identifier">ppRiscVAsm</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="CodeGen.TimedValue.html"><span class="hs-identifier">CodeGen.TimedValue</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.TimedValue.html#TimedValue"><span class="hs-identifier">TimedValue</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="CodeGen.TimedValue.html#measureTimedValue"><span class="hs-identifier">measureTimedValue</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.Except</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">runExcept</span></span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.IO</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Txt</span></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">System.IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">IOMode</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">WriteMode</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">withFile</span></span><span class="hs-special">)</span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="annot"><a href="CodeGen.RiscV.Runner.html#compileToRiscVAsm"><span class="hs-identifier hs-type">compileToRiscVAsm</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.TimedValue.html#TimedValue"><span class="hs-identifier hs-type">TimedValue</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span id="compileToRiscVAsm"><span class="annot"><span class="annottext">compileToRiscVAsm :: Text -&gt; FilePath -&gt; IO (TimedValue (Either Text ()))
+</span><a href="CodeGen.RiscV.Runner.html#compileToRiscVAsm"><span class="hs-identifier hs-var hs-var">compileToRiscVAsm</span></a></span></span><span> </span><span id="local-6989586621679221022"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679221022"><span class="hs-identifier hs-var">text</span></a></span></span><span> </span><span id="local-6989586621679221023"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679221023"><span class="hs-identifier hs-var">outputFilePath</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">IO (Either Text ()) -&gt; IO (TimedValue (Either Text ()))
+forall a. IO a -&gt; IO (TimedValue a)
+</span><a href="CodeGen.TimedValue.html#measureTimedValue"><span class="hs-identifier hs-var">measureTimedValue</span></a></span><span> </span><span class="annot"><span class="annottext">(IO (Either Text ()) -&gt; IO (TimedValue (Either Text ())))
+-&gt; IO (Either Text ()) -&gt; IO (TimedValue (Either Text ()))
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-13"></span><span>  </span><span class="annot"><span class="annottext">Either Text (IO ()) -&gt; IO (Either Text ())
+forall (t :: * -&gt; *) (f :: * -&gt; *) a.
+(Traversable t, Applicative f) =&gt;
+t (f a) -&gt; f (t a)
+forall (f :: * -&gt; *) a.
+Applicative f =&gt;
+Either Text (f a) -&gt; f (Either Text a)
+</span><span class="hs-identifier hs-var">sequenceA</span></span><span> </span><span class="annot"><span class="annottext">(Either Text (IO ()) -&gt; IO (Either Text ()))
+-&gt; Either Text (IO ()) -&gt; IO (Either Text ())
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-14"></span><span>    </span><span class="annot"><span class="annottext">Except Text (IO ()) -&gt; Either Text (IO ())
+forall e a. Except e a -&gt; Either e a
+</span><span class="hs-identifier hs-var">runExcept</span></span><span> </span><span class="annot"><span class="annottext">(Except Text (IO ()) -&gt; Either Text (IO ()))
+-&gt; Except Text (IO ()) -&gt; Either Text (IO ())
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-15"></span><span>      </span><span id="local-6989586621679221025"><span class="annot"><span class="annottext">Module
+</span><a href="#local-6989586621679221025"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Except Text Module
+</span><a href="CodeGen.Module.html#compileToModule"><span class="hs-identifier hs-var">compileToModule</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679221022"><span class="hs-identifier hs-var">text</span></a></span><span>
+</span><span id="line-16"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679221026"><span class="annot"><span class="annottext">riscVText :: Text
+</span><a href="#local-6989586621679221026"><span class="hs-identifier hs-var hs-var">riscVText</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Module -&gt; Text
+</span><a href="CodeGen.RiscV.AsmGen.html#ppRiscVAsm"><span class="hs-identifier hs-var">ppRiscVAsm</span></a></span><span> </span><span class="annot"><span class="annottext">Module
+</span><a href="#local-6989586621679221025"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><span id="line-17"></span><span>      </span><span class="annot"><span class="annottext">IO () -&gt; Except Text (IO ())
+forall a. a -&gt; ExceptT Text Identity a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(IO () -&gt; Except Text (IO ())) -&gt; IO () -&gt; Except Text (IO ())
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-18"></span><span>        </span><span class="annot"><span class="annottext">FilePath -&gt; IOMode -&gt; (Handle -&gt; IO ()) -&gt; IO ()
+forall r. FilePath -&gt; IOMode -&gt; (Handle -&gt; IO r) -&gt; IO r
+</span><span class="hs-identifier hs-var">withFile</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679221023"><span class="hs-identifier hs-var">outputFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">IOMode
+</span><span class="hs-identifier hs-var">WriteMode</span></span><span> </span><span class="annot"><span class="annottext">((Handle -&gt; IO ()) -&gt; IO ()) -&gt; (Handle -&gt; IO ()) -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679221027"><span class="annot"><span class="annottext">Handle
+</span><a href="#local-6989586621679221027"><span class="hs-identifier hs-var">handle</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-19"></span><span>          </span><span class="annot"><span class="annottext">Handle -&gt; Text -&gt; IO ()
+</span><span class="hs-identifier hs-var">Txt.hPutStrLn</span></span><span> </span><span class="annot"><span class="annottext">Handle
+</span><a href="#local-6989586621679221027"><span class="hs-identifier hs-var">handle</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679221026"><span class="hs-identifier hs-var">riscVText</span></a></span><span>
+</span><span id="line-20"></span></pre></body></html>

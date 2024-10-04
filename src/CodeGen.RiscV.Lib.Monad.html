@@ -1,0 +1,294 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE DefaultSignatures #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE DerivingVia #-}</span><span>
+</span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE FlexibleInstances #-}</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE MultiParamTypeClasses #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE TypeOperators #-}</span><span>
+</span><span id="line-6"></span><span class="hs-pragma">{-# LANGUAGE UndecidableInstances #-}</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">CodeGen.RiscV.Lib.Monad</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html"><span class="hs-identifier">CodeGen.RiscV.Lib.Types</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#CodeLine"><span class="hs-identifier">CodeLine</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.Fix</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">MonadFix</span></span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.Identity</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Identity</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.State</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">MonadState</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">StateT</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">get</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">modify</span></span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.Trans</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">MonadTrans</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Int</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Int64</span></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">newtype</span><span> </span><span id="AsmBuilderT"><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#AsmBuilderT"><span class="hs-identifier hs-var">AsmBuilderT</span></a></span></span><span> </span><span id="local-6989586621679214862"><span class="annot"><a href="#local-6989586621679214862"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span id="local-6989586621679214863"><span class="annot"><a href="#local-6989586621679214863"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="AsmBuilderT"><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#AsmBuilderT"><span class="hs-identifier hs-var">AsmBuilderT</span></a></span></span><span> </span><span class="hs-special">{</span><span id="unAsmBuilderT"><span class="annot"><span class="annottext">forall (m :: * -&gt; *) a. AsmBuilderT m a -&gt; StateT BuilderState m a
+</span><a href="CodeGen.RiscV.Lib.Monad.html#unAsmBuilderT"><span class="hs-identifier hs-var hs-var">unAsmBuilderT</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StateT</span></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#BuilderState"><span class="hs-identifier hs-type">BuilderState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214862"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214863"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679214981"><span id="local-6989586621679214986"><span class="annot"><span class="annottext">(forall a b. (a -&gt; b) -&gt; AsmBuilderT m a -&gt; AsmBuilderT m b)
+-&gt; (forall a b. a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m a)
+-&gt; Functor (AsmBuilderT m)
+forall a b. a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m a
+forall a b. (a -&gt; b) -&gt; AsmBuilderT m a -&gt; AsmBuilderT m b
+forall (m :: * -&gt; *) a b.
+Functor m =&gt;
+a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m a
+forall (m :: * -&gt; *) a b.
+Functor m =&gt;
+(a -&gt; b) -&gt; AsmBuilderT m a -&gt; AsmBuilderT m b
+forall (f :: * -&gt; *).
+(forall a b. (a -&gt; b) -&gt; f a -&gt; f b)
+-&gt; (forall a b. a -&gt; f b -&gt; f a) -&gt; Functor f
+$cfmap :: forall (m :: * -&gt; *) a b.
+Functor m =&gt;
+(a -&gt; b) -&gt; AsmBuilderT m a -&gt; AsmBuilderT m b
+fmap :: forall a b. (a -&gt; b) -&gt; AsmBuilderT m a -&gt; AsmBuilderT m b
+$c&lt;$ :: forall (m :: * -&gt; *) a b.
+Functor m =&gt;
+a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m a
+&lt;$ :: forall a b. a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Functor</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679214996"><span id="local-6989586621679215001"><span id="local-6989586621679215005"><span id="local-6989586621679215009"><span id="local-6989586621679215013"><span class="annot"><span class="annottext">Functor (AsmBuilderT m)
+Functor (AsmBuilderT m)
+-&gt; (forall a. a -&gt; AsmBuilderT m a)
+-&gt; (forall a b.
+    AsmBuilderT m (a -&gt; b) -&gt; AsmBuilderT m a -&gt; AsmBuilderT m b)
+-&gt; (forall a b c.
+    (a -&gt; b -&gt; c)
+    -&gt; AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m c)
+-&gt; (forall a b.
+    AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m b)
+-&gt; (forall a b.
+    AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m a)
+-&gt; Applicative (AsmBuilderT m)
+forall a. a -&gt; AsmBuilderT m a
+forall a b. AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m a
+forall a b. AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m b
+forall a b.
+AsmBuilderT m (a -&gt; b) -&gt; AsmBuilderT m a -&gt; AsmBuilderT m b
+forall a b c.
+(a -&gt; b -&gt; c)
+-&gt; AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m c
+forall {m :: * -&gt; *}. Monad m =&gt; Functor (AsmBuilderT m)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; AsmBuilderT m a
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m a
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m b
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+AsmBuilderT m (a -&gt; b) -&gt; AsmBuilderT m a -&gt; AsmBuilderT m b
+forall (m :: * -&gt; *) a b c.
+Monad m =&gt;
+(a -&gt; b -&gt; c)
+-&gt; AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m c
+forall (f :: * -&gt; *).
+Functor f
+-&gt; (forall a. a -&gt; f a)
+-&gt; (forall a b. f (a -&gt; b) -&gt; f a -&gt; f b)
+-&gt; (forall a b c. (a -&gt; b -&gt; c) -&gt; f a -&gt; f b -&gt; f c)
+-&gt; (forall a b. f a -&gt; f b -&gt; f b)
+-&gt; (forall a b. f a -&gt; f b -&gt; f a)
+-&gt; Applicative f
+$cpure :: forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; AsmBuilderT m a
+pure :: forall a. a -&gt; AsmBuilderT m a
+$c&lt;*&gt; :: forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+AsmBuilderT m (a -&gt; b) -&gt; AsmBuilderT m a -&gt; AsmBuilderT m b
+&lt;*&gt; :: forall a b.
+AsmBuilderT m (a -&gt; b) -&gt; AsmBuilderT m a -&gt; AsmBuilderT m b
+$cliftA2 :: forall (m :: * -&gt; *) a b c.
+Monad m =&gt;
+(a -&gt; b -&gt; c)
+-&gt; AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m c
+liftA2 :: forall a b c.
+(a -&gt; b -&gt; c)
+-&gt; AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m c
+$c*&gt; :: forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m b
+*&gt; :: forall a b. AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m b
+$c&lt;* :: forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m a
+&lt;* :: forall a b. AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Applicative</span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679215025"><span id="local-6989586621679215030"><span id="local-6989586621679215034"><span class="annot"><span class="annottext">Applicative (AsmBuilderT m)
+Applicative (AsmBuilderT m)
+-&gt; (forall a b.
+    AsmBuilderT m a -&gt; (a -&gt; AsmBuilderT m b) -&gt; AsmBuilderT m b)
+-&gt; (forall a b.
+    AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m b)
+-&gt; (forall a. a -&gt; AsmBuilderT m a)
+-&gt; Monad (AsmBuilderT m)
+forall a. a -&gt; AsmBuilderT m a
+forall a b. AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m b
+forall a b.
+AsmBuilderT m a -&gt; (a -&gt; AsmBuilderT m b) -&gt; AsmBuilderT m b
+forall (m :: * -&gt; *). Monad m =&gt; Applicative (AsmBuilderT m)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; AsmBuilderT m a
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m b
+forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+AsmBuilderT m a -&gt; (a -&gt; AsmBuilderT m b) -&gt; AsmBuilderT m b
+forall (m :: * -&gt; *).
+Applicative m
+-&gt; (forall a b. m a -&gt; (a -&gt; m b) -&gt; m b)
+-&gt; (forall a b. m a -&gt; m b -&gt; m b)
+-&gt; (forall a. a -&gt; m a)
+-&gt; Monad m
+$c&gt;&gt;= :: forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+AsmBuilderT m a -&gt; (a -&gt; AsmBuilderT m b) -&gt; AsmBuilderT m b
+&gt;&gt;= :: forall a b.
+AsmBuilderT m a -&gt; (a -&gt; AsmBuilderT m b) -&gt; AsmBuilderT m b
+$c&gt;&gt; :: forall (m :: * -&gt; *) a b.
+Monad m =&gt;
+AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m b
+&gt;&gt; :: forall a b. AsmBuilderT m a -&gt; AsmBuilderT m b -&gt; AsmBuilderT m b
+$creturn :: forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; AsmBuilderT m a
+return :: forall a. a -&gt; AsmBuilderT m a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Monad</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679215044"><span class="annot"><span class="annottext">Monad (AsmBuilderT m)
+Monad (AsmBuilderT m)
+-&gt; (forall a. (a -&gt; AsmBuilderT m a) -&gt; AsmBuilderT m a)
+-&gt; MonadFix (AsmBuilderT m)
+forall a. (a -&gt; AsmBuilderT m a) -&gt; AsmBuilderT m a
+forall (m :: * -&gt; *).
+Monad m -&gt; (forall a. (a -&gt; m a) -&gt; m a) -&gt; MonadFix m
+forall {m :: * -&gt; *}. MonadFix m =&gt; Monad (AsmBuilderT m)
+forall (m :: * -&gt; *) a.
+MonadFix m =&gt;
+(a -&gt; AsmBuilderT m a) -&gt; AsmBuilderT m a
+$cmfix :: forall (m :: * -&gt; *) a.
+MonadFix m =&gt;
+(a -&gt; AsmBuilderT m a) -&gt; AsmBuilderT m a
+mfix :: forall a. (a -&gt; AsmBuilderT m a) -&gt; AsmBuilderT m a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var">MonadFix</span></span></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">via</span><span> </span><span class="annot"><span class="hs-identifier hs-type">StateT</span></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#BuilderState"><span class="hs-identifier hs-type">BuilderState</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214862"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">data</span><span> </span><span id="BuilderState"><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#BuilderState"><span class="hs-identifier hs-var">BuilderState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="BS"><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#BS"><span class="hs-identifier hs-var">BS</span></a></span></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="programBS"><span class="annot"><span class="annottext">BuilderState -&gt; ProgramBuilderState
+</span><a href="CodeGen.RiscV.Lib.Monad.html#programBS"><span class="hs-identifier hs-var hs-var">programBS</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#ProgramBuilderState"><span class="hs-identifier hs-type">ProgramBuilderState</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-22"></span><span>    </span><span id="functionBS"><span class="annot"><span class="annottext">BuilderState -&gt; FunctionBuilderState
+</span><a href="CodeGen.RiscV.Lib.Monad.html#functionBS"><span class="hs-identifier hs-var hs-var">functionBS</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#FunctionBuilderState"><span class="hs-identifier hs-type">FunctionBuilderState</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-23"></span><span>    </span><span id="idCnt"><span class="annot"><span class="annottext">BuilderState -&gt; Integer
+</span><a href="CodeGen.RiscV.Lib.Monad.html#idCnt"><span class="hs-identifier hs-var hs-var">idCnt</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-25"></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">data</span><span> </span><span id="ProgramBuilderState"><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#ProgramBuilderState"><span class="hs-identifier hs-var">ProgramBuilderState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="PBS"><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#PBS"><span class="hs-identifier hs-var">PBS</span></a></span></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="sectionText"><span class="annot"><span class="annottext">ProgramBuilderState -&gt; [[CodeLine]]
+</span><a href="CodeGen.RiscV.Lib.Monad.html#sectionText"><span class="hs-identifier hs-var hs-var">sectionText</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#CodeLine"><span class="hs-identifier hs-type">CodeLine</span></a></span><span class="hs-special">]</span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-28"></span><span>    </span><span id="sectionData"><span class="annot"><span class="annottext">ProgramBuilderState -&gt; [CodeLine]
+</span><a href="CodeGen.RiscV.Lib.Monad.html#sectionData"><span class="hs-identifier hs-var hs-var">sectionData</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#CodeLine"><span class="hs-identifier hs-type">CodeLine</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">data</span><span> </span><span id="FunctionBuilderState"><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#FunctionBuilderState"><span class="hs-identifier hs-var">FunctionBuilderState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="FBS"><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#FBS"><span class="hs-identifier hs-var">FBS</span></a></span></span><span>
+</span><span id="line-32"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="functionCodeLines"><span class="annot"><span class="annottext">FunctionBuilderState -&gt; [[CodeLine]]
+</span><a href="CodeGen.RiscV.Lib.Monad.html#functionCodeLines"><span class="hs-identifier hs-var hs-var">functionCodeLines</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#CodeLine"><span class="hs-identifier hs-type">CodeLine</span></a></span><span class="hs-special">]</span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-33"></span><span>    </span><span id="stackPointerOffset"><span class="annot"><span class="annottext">FunctionBuilderState -&gt; Int64
+</span><a href="CodeGen.RiscV.Lib.Monad.html#stackPointerOffset"><span class="hs-identifier hs-var hs-var">stackPointerOffset</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int64</span></span><span> </span><span class="hs-comment">-- In double words</span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#emptyBS"><span class="hs-identifier hs-type">emptyBS</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#BuilderState"><span class="hs-identifier hs-type">BuilderState</span></a></span><span>
+</span><span id="line-37"></span><span id="emptyBS"><span class="annot"><span class="annottext">emptyBS :: BuilderState
+</span><a href="CodeGen.RiscV.Lib.Monad.html#emptyBS"><span class="hs-identifier hs-var hs-var">emptyBS</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ProgramBuilderState
+-&gt; FunctionBuilderState -&gt; Integer -&gt; BuilderState
+</span><a href="CodeGen.RiscV.Lib.Monad.html#BS"><span class="hs-identifier hs-var">BS</span></a></span><span> </span><span class="annot"><span class="annottext">ProgramBuilderState
+</span><a href="CodeGen.RiscV.Lib.Monad.html#emptyPBS"><span class="hs-identifier hs-var">emptyPBS</span></a></span><span> </span><span class="annot"><span class="annottext">FunctionBuilderState
+</span><a href="CodeGen.RiscV.Lib.Monad.html#emptyFBS"><span class="hs-identifier hs-var">emptyFBS</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#emptyPBS"><span class="hs-identifier hs-type">emptyPBS</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#ProgramBuilderState"><span class="hs-identifier hs-type">ProgramBuilderState</span></a></span><span>
+</span><span id="line-40"></span><span id="emptyPBS"><span class="annot"><span class="annottext">emptyPBS :: ProgramBuilderState
+</span><a href="CodeGen.RiscV.Lib.Monad.html#emptyPBS"><span class="hs-identifier hs-var hs-var">emptyPBS</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[[CodeLine]] -&gt; [CodeLine] -&gt; ProgramBuilderState
+</span><a href="CodeGen.RiscV.Lib.Monad.html#PBS"><span class="hs-identifier hs-var">PBS</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#emptyFBS"><span class="hs-identifier hs-type">emptyFBS</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#FunctionBuilderState"><span class="hs-identifier hs-type">FunctionBuilderState</span></a></span><span>
+</span><span id="line-43"></span><span id="emptyFBS"><span class="annot"><span class="annottext">emptyFBS :: FunctionBuilderState
+</span><a href="CodeGen.RiscV.Lib.Monad.html#emptyFBS"><span class="hs-identifier hs-var hs-var">emptyFBS</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[[CodeLine]] -&gt; Int64 -&gt; FunctionBuilderState
+</span><a href="CodeGen.RiscV.Lib.Monad.html#FBS"><span class="hs-identifier hs-var">FBS</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">Int64
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679214939"><span id="local-6989586621679214940"><span id="local-6989586621679215069"><span id="local-6989586621679215073"><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadState</span></span><span> </span><span class="annot"><a href="#local-6989586621679214939"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214940"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadState</span></span><span> </span><span class="annot"><a href="#local-6989586621679214939"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#AsmBuilderT"><span class="hs-identifier hs-type">AsmBuilderT</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214940"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span></span></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-46"></span><span>  </span><span id="local-6989586621679215082"><span class="annot"><span class="annottext">state :: forall a. (s -&gt; (a, s)) -&gt; AsmBuilderT m a
+</span><a href="#local-6989586621679215082"><span class="hs-identifier hs-var hs-var hs-var hs-var">state</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">m a -&gt; AsmBuilderT m a
+forall (m :: * -&gt; *) a. Monad m =&gt; m a -&gt; AsmBuilderT m a
+forall (t :: (* -&gt; *) -&gt; * -&gt; *) (m :: * -&gt; *) a.
+(MonadTrans t, Monad m) =&gt;
+m a -&gt; t m a
+</span><span class="hs-identifier hs-var">lift</span></span><span> </span><span class="annot"><span class="annottext">(m a -&gt; AsmBuilderT m a)
+-&gt; ((s -&gt; (a, s)) -&gt; m a) -&gt; (s -&gt; (a, s)) -&gt; AsmBuilderT m a
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(s -&gt; (a, s)) -&gt; m a
+forall a. (s -&gt; (a, s)) -&gt; m a
+forall s (m :: * -&gt; *) a. MonadState s m =&gt; (s -&gt; (a, s)) -&gt; m a
+</span><span class="hs-identifier hs-var">state</span></span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadTrans</span></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#AsmBuilderT"><span class="hs-identifier hs-type">AsmBuilderT</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-49"></span><span>  </span><span id="local-6989586621679215092"><span class="annot"><span class="annottext">lift :: forall (m :: * -&gt; *) a. Monad m =&gt; m a -&gt; AsmBuilderT m a
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">lift</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StateT BuilderState m a -&gt; AsmBuilderT m a
+forall (m :: * -&gt; *) a. StateT BuilderState m a -&gt; AsmBuilderT m a
+</span><a href="CodeGen.RiscV.Lib.Monad.html#AsmBuilderT"><span class="hs-identifier hs-var">AsmBuilderT</span></a></span><span> </span><span class="annot"><span class="annottext">(StateT BuilderState m a -&gt; AsmBuilderT m a)
+-&gt; (m a -&gt; StateT BuilderState m a) -&gt; m a -&gt; AsmBuilderT m a
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">m a -&gt; StateT BuilderState m a
+forall (m :: * -&gt; *) a. Monad m =&gt; m a -&gt; StateT BuilderState m a
+forall (t :: (* -&gt; *) -&gt; * -&gt; *) (m :: * -&gt; *) a.
+(MonadTrans t, Monad m) =&gt;
+m a -&gt; t m a
+</span><span class="hs-identifier hs-var">lift</span></span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span class="hs-keyword">type</span><span> </span><span id="AsmBuilder"><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#AsmBuilder"><span class="hs-identifier hs-var">AsmBuilder</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#AsmBuilderT"><span class="hs-identifier hs-type">AsmBuilderT</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Identity</span></span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span class="hs-keyword">class</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679214952"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span id="MonadAsmBuilder"><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#MonadAsmBuilder"><span class="hs-identifier hs-var">MonadAsmBuilder</span></a></span></span><span> </span><span id="local-6989586621679214952"><span class="annot"><a href="#local-6989586621679214952"><span class="hs-identifier hs-type">m</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-54"></span><span>  </span><span id="getAsmBuilderState"><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#getAsmBuilderState"><span class="hs-identifier hs-type">getAsmBuilderState</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679214952"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#BuilderState"><span class="hs-identifier hs-type">BuilderState</span></a></span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span>  </span><span id="modifyAsmBuilderState"><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#modifyAsmBuilderState"><span class="hs-identifier hs-type">modifyAsmBuilderState</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#BuilderState"><span class="hs-identifier hs-type">BuilderState</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#BuilderState"><span class="hs-identifier hs-type">BuilderState</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679214952"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-57"></span><span>
+</span><span id="line-58"></span><span>  </span><span class="hs-keyword">default</span><span> </span><span id="getAsmBuilderState"><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#getAsmBuilderState"><span class="hs-identifier hs-type">getAsmBuilderState</span></a></span></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-59"></span><span>    </span><span id="local-6989586621679214954"><span id="local-6989586621679214955"><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadTrans</span></span><span> </span><span class="annot"><a href="#local-6989586621679214954"><span class="hs-identifier hs-type">t</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#MonadAsmBuilder"><span class="hs-identifier hs-type">MonadAsmBuilder</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214955"><span class="hs-identifier hs-type">m1</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679214952"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><span class="hs-operator hs-type">~</span></span><span> </span><span class="annot"><a href="#local-6989586621679214954"><span class="hs-identifier hs-type">t</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214955"><span class="hs-identifier hs-type">m1</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-60"></span><span>    </span><span class="annot"><a href="#local-6989586621679214952"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#BuilderState"><span class="hs-identifier hs-type">BuilderState</span></a></span></span></span><span>
+</span><span id="line-61"></span><span>  </span><span id="local-6989586621679215098"><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#getAsmBuilderState"><span class="hs-identifier hs-var hs-var">getAsmBuilderState</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">m1 BuilderState -&gt; t m1 BuilderState
+forall (m :: * -&gt; *) a. Monad m =&gt; m a -&gt; t m a
+forall (t :: (* -&gt; *) -&gt; * -&gt; *) (m :: * -&gt; *) a.
+(MonadTrans t, Monad m) =&gt;
+m a -&gt; t m a
+</span><span class="hs-identifier hs-var">lift</span></span><span> </span><span class="annot"><span class="annottext">m1 BuilderState
+forall (m :: * -&gt; *). MonadAsmBuilder m =&gt; m BuilderState
+</span><a href="CodeGen.RiscV.Lib.Monad.html#getAsmBuilderState"><span class="hs-identifier hs-var">getAsmBuilderState</span></a></span></span><span>
+</span><span id="line-62"></span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-keyword">default</span><span> </span><span id="modifyAsmBuilderState"><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#modifyAsmBuilderState"><span class="hs-identifier hs-type">modifyAsmBuilderState</span></a></span></span><span> </span><span class="hs-glyph">::</span><span>
+</span><span id="line-64"></span><span>    </span><span id="local-6989586621679214958"><span id="local-6989586621679214959"><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">MonadTrans</span></span><span> </span><span class="annot"><a href="#local-6989586621679214958"><span class="hs-identifier hs-type">t</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#MonadAsmBuilder"><span class="hs-identifier hs-type">MonadAsmBuilder</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214959"><span class="hs-identifier hs-type">m1</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679214952"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><span class="hs-operator hs-type">~</span></span><span> </span><span class="annot"><a href="#local-6989586621679214958"><span class="hs-identifier hs-type">t</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214959"><span class="hs-identifier hs-type">m1</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span>
+</span><span id="line-65"></span><span>    </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#BuilderState"><span class="hs-identifier hs-type">BuilderState</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#BuilderState"><span class="hs-identifier hs-type">BuilderState</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-66"></span><span>    </span><span class="annot"><a href="#local-6989586621679214952"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-67"></span><span>  </span><span id="local-6989586621679215107"><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#modifyAsmBuilderState"><span class="hs-identifier hs-var hs-var">modifyAsmBuilderState</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">m1 () -&gt; m ()
+m1 () -&gt; t m1 ()
+forall (m :: * -&gt; *) a. Monad m =&gt; m a -&gt; t m a
+forall (t :: (* -&gt; *) -&gt; * -&gt; *) (m :: * -&gt; *) a.
+(MonadTrans t, Monad m) =&gt;
+m a -&gt; t m a
+</span><span class="hs-identifier hs-var">lift</span></span><span> </span><span class="annot"><span class="annottext">(m1 () -&gt; m ())
+-&gt; ((BuilderState -&gt; BuilderState) -&gt; m1 ())
+-&gt; (BuilderState -&gt; BuilderState)
+-&gt; m ()
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(BuilderState -&gt; BuilderState) -&gt; m1 ()
+forall (m :: * -&gt; *).
+MonadAsmBuilder m =&gt;
+(BuilderState -&gt; BuilderState) -&gt; m ()
+</span><a href="CodeGen.RiscV.Lib.Monad.html#modifyAsmBuilderState"><span class="hs-identifier hs-var">modifyAsmBuilderState</span></a></span></span><span>
+</span><span id="line-68"></span><span>
+</span><span id="line-69"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679214963"><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Monad</span></span><span> </span><span class="annot"><a href="#local-6989586621679214963"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#MonadAsmBuilder"><span class="hs-identifier hs-type">MonadAsmBuilder</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#AsmBuilderT"><span class="hs-identifier hs-type">AsmBuilderT</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214963"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-70"></span><span>  </span><span id="local-6989586621679215125"><span class="annot"><span class="annottext">getAsmBuilderState :: AsmBuilderT m BuilderState
+</span><a href="CodeGen.RiscV.Lib.Monad.html#getAsmBuilderState"><span class="hs-identifier hs-var hs-var hs-var hs-var">getAsmBuilderState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StateT BuilderState m BuilderState -&gt; AsmBuilderT m BuilderState
+forall (m :: * -&gt; *) a. StateT BuilderState m a -&gt; AsmBuilderT m a
+</span><a href="CodeGen.RiscV.Lib.Monad.html#AsmBuilderT"><span class="hs-identifier hs-var">AsmBuilderT</span></a></span><span> </span><span class="annot"><span class="annottext">StateT BuilderState m BuilderState
+forall s (m :: * -&gt; *). MonadState s m =&gt; m s
+</span><span class="hs-identifier hs-var">get</span></span><span>
+</span><span id="line-71"></span><span>
+</span><span id="line-72"></span><span>  </span><span id="local-6989586621679215127"><span class="annot"><span class="annottext">modifyAsmBuilderState :: (BuilderState -&gt; BuilderState) -&gt; AsmBuilderT m ()
+</span><a href="CodeGen.RiscV.Lib.Monad.html#modifyAsmBuilderState"><span class="hs-identifier hs-var hs-var hs-var hs-var">modifyAsmBuilderState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">StateT BuilderState m () -&gt; AsmBuilderT m ()
+forall (m :: * -&gt; *) a. StateT BuilderState m a -&gt; AsmBuilderT m a
+</span><a href="CodeGen.RiscV.Lib.Monad.html#AsmBuilderT"><span class="hs-identifier hs-var">AsmBuilderT</span></a></span><span> </span><span class="annot"><span class="annottext">(StateT BuilderState m () -&gt; AsmBuilderT m ())
+-&gt; ((BuilderState -&gt; BuilderState) -&gt; StateT BuilderState m ())
+-&gt; (BuilderState -&gt; BuilderState)
+-&gt; AsmBuilderT m ()
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(BuilderState -&gt; BuilderState) -&gt; StateT BuilderState m ()
+forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
+</span><span class="hs-identifier hs-var">modify</span></span><span>
+</span><span id="line-73"></span><span>
+</span><span id="line-74"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679214970"><span id="local-6989586621679214971"><span id="local-6989586621679215133"><span id="local-6989586621679215140"><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#MonadAsmBuilder"><span class="hs-identifier hs-type">MonadAsmBuilder</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214970"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Monad.html#MonadAsmBuilder"><span class="hs-identifier hs-type">MonadAsmBuilder</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">StateT</span></span><span> </span><span class="annot"><a href="#local-6989586621679214971"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679214970"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">)</span></span></span></span></span><span>
+</span><span id="line-75"></span></pre></body></html>

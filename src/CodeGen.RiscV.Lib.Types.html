@@ -1,0 +1,437 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE PatternSynonyms #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">CodeGen.RiscV.Lib.Types</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-4"></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Arrow</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-operator">(&gt;&gt;&gt;)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Char</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">toLower</span></span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Int</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Int64</span></span><span class="hs-special">)</span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Prettyprinter</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Pretty</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">pretty</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">colon</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">comma</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">hsep</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">indent</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">layoutCompact</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">parens</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">punctuate</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">vsep</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-operator">(&lt;+&gt;)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Prettyprinter.Render.Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">renderStrict</span></span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span>
+</span><span id="line-12"></span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#ppCodeLines"><span class="hs-identifier hs-type">ppCodeLines</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#CodeLine"><span class="hs-identifier hs-type">CodeLine</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-13"></span><span id="ppCodeLines"><span class="annot"><span class="annottext">ppCodeLines :: [CodeLine] -&gt; Text
+</span><a href="CodeGen.RiscV.Lib.Types.html#ppCodeLines"><span class="hs-identifier hs-var hs-var">ppCodeLines</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-14"></span><span>  </span><span class="annot"><span class="annottext">(CodeLine -&gt; Doc Any) -&gt; [CodeLine] -&gt; [Doc Any]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">CodeLine -&gt; Doc Any
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+forall ann. CodeLine -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span>
+</span><span id="line-15"></span><span>    </span><span class="annot"><span class="annottext">([CodeLine] -&gt; [Doc Any])
+-&gt; ([Doc Any] -&gt; Text) -&gt; [CodeLine] -&gt; Text
+forall {k} (cat :: k -&gt; k -&gt; *) (a :: k) (b :: k) (c :: k).
+Category cat =&gt;
+cat a b -&gt; cat b c -&gt; cat a c
+</span><span class="hs-operator hs-var">&gt;&gt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">[Doc Any] -&gt; Doc Any
+forall ann. [Doc ann] -&gt; Doc ann
+</span><span class="hs-identifier hs-var">vsep</span></span><span>
+</span><span id="line-16"></span><span>    </span><span class="annot"><span class="annottext">([Doc Any] -&gt; Doc Any) -&gt; (Doc Any -&gt; Text) -&gt; [Doc Any] -&gt; Text
+forall {k} (cat :: k -&gt; k -&gt; *) (a :: k) (b :: k) (c :: k).
+Category cat =&gt;
+cat a b -&gt; cat b c -&gt; cat a c
+</span><span class="hs-operator hs-var">&gt;&gt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Doc Any -&gt; SimpleDocStream Any
+forall ann1 ann2. Doc ann1 -&gt; SimpleDocStream ann2
+</span><span class="hs-identifier hs-var">layoutCompact</span></span><span>
+</span><span id="line-17"></span><span>    </span><span class="annot"><span class="annottext">(Doc Any -&gt; SimpleDocStream Any)
+-&gt; (SimpleDocStream Any -&gt; Text) -&gt; Doc Any -&gt; Text
+forall {k} (cat :: k -&gt; k -&gt; *) (a :: k) (b :: k) (c :: k).
+Category cat =&gt;
+cat a b -&gt; cat b c -&gt; cat a c
+</span><span class="hs-operator hs-var">&gt;&gt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">SimpleDocStream Any -&gt; Text
+forall ann. SimpleDocStream ann -&gt; Text
+</span><span class="hs-identifier hs-var">renderStrict</span></span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">data</span><span> </span><span id="CodeLine"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#CodeLine"><span class="hs-identifier hs-var">CodeLine</span></a></span></span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="LabeledDirectiveCodeLine"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#LabeledDirectiveCodeLine"><span class="hs-identifier hs-var">LabeledDirectiveCodeLine</span></a></span></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Label"><span class="hs-identifier hs-type">Label</span></a></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Directive"><span class="hs-identifier hs-type">Directive</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="LabelCodeLine"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#LabelCodeLine"><span class="hs-identifier hs-var">LabelCodeLine</span></a></span></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Label"><span class="hs-identifier hs-type">Label</span></a></span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="InstructionCodeLine"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#InstructionCodeLine"><span class="hs-identifier hs-var">InstructionCodeLine</span></a></span></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Instruction"><span class="hs-identifier hs-type">Instruction</span></a></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="DirectiveCodeLine"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#DirectiveCodeLine"><span class="hs-identifier hs-var">DirectiveCodeLine</span></a></span></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Directive"><span class="hs-identifier hs-type">Directive</span></a></span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679214606"><span class="annot"><span class="hs-identifier hs-type">Pretty</span></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#CodeLine"><span class="hs-identifier hs-type">CodeLine</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-26"></span><span>  </span><span id="local-6989586621679214617"><span class="annot"><span class="annottext">pretty :: forall ann. CodeLine -&gt; Doc ann
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">pretty</span></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#LabeledDirectiveCodeLine"><span class="hs-identifier hs-type">LabeledDirectiveCodeLine</span></a></span><span> </span><span id="local-6989586621679214618"><span class="annot"><span class="annottext">Label
+</span><a href="#local-6989586621679214618"><span class="hs-identifier hs-var">l</span></a></span></span><span> </span><span id="local-6989586621679214619"><span class="annot"><span class="annottext">Directive
+</span><a href="#local-6989586621679214619"><span class="hs-identifier hs-var">d</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Label -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+forall ann. Label -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">Label
+</span><a href="#local-6989586621679214618"><span class="hs-identifier hs-var">l</span></a></span><span> </span><span class="annot"><span class="annottext">Doc ann -&gt; Doc ann -&gt; Doc ann
+forall ann. Doc ann -&gt; Doc ann -&gt; Doc ann
+</span><span class="hs-operator hs-var">&lt;+&gt;</span></span><span> </span><span class="annot"><span class="annottext">Directive -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+forall ann. Directive -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">Directive
+</span><a href="#local-6989586621679214619"><span class="hs-identifier hs-var">d</span></a></span><span>
+</span><span id="line-27"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#LabelCodeLine"><span class="hs-identifier hs-type">LabelCodeLine</span></a></span><span> </span><span id="local-6989586621679214620"><span class="annot"><span class="annottext">Label
+</span><a href="#local-6989586621679214620"><span class="hs-identifier hs-var">l</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Label -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+forall ann. Label -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">Label
+</span><a href="#local-6989586621679214620"><span class="hs-identifier hs-var">l</span></a></span><span>
+</span><span id="line-28"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#InstructionCodeLine"><span class="hs-identifier hs-type">InstructionCodeLine</span></a></span><span> </span><span id="local-6989586621679214621"><span class="annot"><span class="annottext">Instruction
+</span><a href="#local-6989586621679214621"><span class="hs-identifier hs-var">i</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Doc ann -&gt; Doc ann
+forall ann. Int -&gt; Doc ann -&gt; Doc ann
+</span><span class="hs-identifier hs-var">indent</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">4</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Instruction -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+forall ann. Instruction -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">Instruction
+</span><a href="#local-6989586621679214621"><span class="hs-identifier hs-var">i</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#DirectiveCodeLine"><span class="hs-identifier hs-type">DirectiveCodeLine</span></a></span><span> </span><span id="local-6989586621679214622"><span class="annot"><span class="annottext">Directive
+</span><a href="#local-6989586621679214622"><span class="hs-identifier hs-var">d</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Directive -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+forall ann. Directive -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">Directive
+</span><a href="#local-6989586621679214622"><span class="hs-identifier hs-var">d</span></a></span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">newtype</span><span> </span><span id="Label"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Label"><span class="hs-identifier hs-var">Label</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Label"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Label"><span class="hs-identifier hs-var">Label</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-32"></span><span>
+</span><span id="line-33"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679214626"><span class="annot"><span class="hs-identifier hs-type">Pretty</span></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Label"><span class="hs-identifier hs-type">Label</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-34"></span><span>  </span><span id="local-6989586621679214632"><span class="annot"><span class="annottext">pretty :: forall ann. Label -&gt; Doc ann
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">pretty</span></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Label"><span class="hs-identifier hs-type">Label</span></a></span><span> </span><span id="local-6989586621679214633"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679214633"><span class="hs-identifier hs-var">txt</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Doc ann
+forall ann. Text -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679214633"><span class="hs-identifier hs-var">txt</span></a></span><span> </span><span class="annot"><span class="annottext">Doc ann -&gt; Doc ann -&gt; Doc ann
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Doc ann
+forall ann. Doc ann
+</span><span class="hs-identifier hs-var">colon</span></span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">data</span><span> </span><span id="Instruction"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Instruction"><span class="hs-identifier hs-var">Instruction</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Instruction"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Instruction"><span class="hs-identifier hs-var">Instruction</span></a></span></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#OpCode"><span class="hs-identifier hs-type">OpCode</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Operand"><span class="hs-identifier hs-type">Operand</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679214637"><span class="annot"><span class="hs-identifier hs-type">Pretty</span></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Instruction"><span class="hs-identifier hs-type">Instruction</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-39"></span><span>  </span><span id="local-6989586621679214645"><span class="annot"><span class="annottext">pretty :: forall ann. Instruction -&gt; Doc ann
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">pretty</span></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Instruction"><span class="hs-identifier hs-type">Instruction</span></a></span><span> </span><span id="local-6989586621679214646"><span class="annot"><span class="annottext">OpCode
+</span><a href="#local-6989586621679214646"><span class="hs-identifier hs-var">opCode</span></a></span></span><span> </span><span id="local-6989586621679214647"><span class="annot"><span class="annottext">[Operand]
+</span><a href="#local-6989586621679214647"><span class="hs-identifier hs-var">args</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Doc ann] -&gt; Doc ann
+forall ann. [Doc ann] -&gt; Doc ann
+</span><span class="hs-identifier hs-var">hsep</span></span><span> </span><span class="annot"><span class="annottext">([Doc ann] -&gt; Doc ann) -&gt; [Doc ann] -&gt; Doc ann
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">OpCode -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+forall ann. OpCode -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">OpCode
+</span><a href="#local-6989586621679214646"><span class="hs-identifier hs-var">opCode</span></a></span><span> </span><span class="annot"><span class="annottext">Doc ann -&gt; [Doc ann] -&gt; [Doc ann]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">Doc ann -&gt; [Doc ann] -&gt; [Doc ann]
+forall ann. Doc ann -&gt; [Doc ann] -&gt; [Doc ann]
+</span><span class="hs-identifier hs-var">punctuate</span></span><span> </span><span class="annot"><span class="annottext">Doc ann
+forall ann. Doc ann
+</span><span class="hs-identifier hs-var">comma</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Operand -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+forall ann. Operand -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">(Operand -&gt; Doc ann) -&gt; [Operand] -&gt; [Doc ann]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[Operand]
+</span><a href="#local-6989586621679214647"><span class="hs-identifier hs-var">args</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span class="hs-keyword">data</span><span> </span><span id="Directive"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Directive"><span class="hs-identifier hs-var">Directive</span></a></span></span><span>
+</span><span id="line-42"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="DirText"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#DirText"><span class="hs-identifier hs-var">DirText</span></a></span></span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="DirData"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#DirData"><span class="hs-identifier hs-var">DirData</span></a></span></span><span>
+</span><span id="line-44"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="DirDWord"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#DirDWord"><span class="hs-identifier hs-var">DirDWord</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int64</span></span><span>
+</span><span id="line-45"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="DirGlobl"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#DirGlobl"><span class="hs-identifier hs-var">DirGlobl</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679214655"><span class="annot"><span class="hs-identifier hs-type">Pretty</span></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Directive"><span class="hs-identifier hs-type">Directive</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-48"></span><span>  </span><span id="local-6989586621679214667"><span class="annot"><span class="annottext">pretty :: forall ann. Directive -&gt; Doc ann
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">pretty</span></span></span><span> </span><span class="annot"><span class="annottext">Directive
+</span><a href="CodeGen.RiscV.Lib.Types.html#DirText"><span class="hs-identifier hs-var">DirText</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Doc ann
+forall ann. String -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;.section .text&quot;</span></span><span>
+</span><span id="line-49"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">Directive
+</span><a href="CodeGen.RiscV.Lib.Types.html#DirData"><span class="hs-identifier hs-var">DirData</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Doc ann
+forall ann. String -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;.section .data&quot;</span></span><span>
+</span><span id="line-50"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#DirDWord"><span class="hs-identifier hs-type">DirDWord</span></a></span><span> </span><span id="local-6989586621679214668"><span class="annot"><span class="annottext">Int64
+</span><a href="#local-6989586621679214668"><span class="hs-identifier hs-var">initVal</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Doc ann
+forall ann. String -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;.dword&quot;</span></span><span> </span><span class="annot"><span class="annottext">Doc ann -&gt; Doc ann -&gt; Doc ann
+forall ann. Doc ann -&gt; Doc ann -&gt; Doc ann
+</span><span class="hs-operator hs-var">&lt;+&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; Doc ann
+forall ann. Int64 -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">Int64
+</span><a href="#local-6989586621679214668"><span class="hs-identifier hs-var">initVal</span></a></span><span>
+</span><span id="line-51"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#DirGlobl"><span class="hs-identifier hs-type">DirGlobl</span></a></span><span> </span><span id="local-6989586621679214669"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679214669"><span class="hs-identifier hs-var">name</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Doc ann
+forall ann. String -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;.globl&quot;</span></span><span> </span><span class="annot"><span class="annottext">Doc ann -&gt; Doc ann -&gt; Doc ann
+forall ann. Doc ann -&gt; Doc ann -&gt; Doc ann
+</span><span class="hs-operator hs-var">&lt;+&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Doc ann
+forall ann. Text -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679214669"><span class="hs-identifier hs-var">name</span></a></span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span class="hs-keyword">data</span><span> </span><span id="OpCode"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#OpCode"><span class="hs-identifier hs-var">OpCode</span></a></span></span><span>
+</span><span id="line-54"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="And"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#And"><span class="hs-identifier hs-var">And</span></a></span></span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Or"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Or"><span class="hs-identifier hs-var">Or</span></a></span></span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Add"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Add"><span class="hs-identifier hs-var">Add</span></a></span></span><span>
+</span><span id="line-57"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Sub"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Sub"><span class="hs-identifier hs-var">Sub</span></a></span></span><span>
+</span><span id="line-58"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Mul"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Mul"><span class="hs-identifier hs-var">Mul</span></a></span></span><span>
+</span><span id="line-59"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Neg"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Neg"><span class="hs-identifier hs-var">Neg</span></a></span></span><span>
+</span><span id="line-60"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Seqz"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Seqz"><span class="hs-identifier hs-var">Seqz</span></a></span></span><span>
+</span><span id="line-61"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Snez"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Snez"><span class="hs-identifier hs-var">Snez</span></a></span></span><span>
+</span><span id="line-62"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Slt"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Slt"><span class="hs-identifier hs-var">Slt</span></a></span></span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Sd"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Sd"><span class="hs-identifier hs-var">Sd</span></a></span></span><span>
+</span><span id="line-64"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Ld"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Ld"><span class="hs-identifier hs-var">Ld</span></a></span></span><span>
+</span><span id="line-65"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Li"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Li"><span class="hs-identifier hs-var">Li</span></a></span></span><span>
+</span><span id="line-66"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="La"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#La"><span class="hs-identifier hs-var">La</span></a></span></span><span>
+</span><span id="line-67"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Addi"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Addi"><span class="hs-identifier hs-var">Addi</span></a></span></span><span>
+</span><span id="line-68"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Beqz"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Beqz"><span class="hs-identifier hs-var">Beqz</span></a></span></span><span>
+</span><span id="line-69"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="J"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#J"><span class="hs-identifier hs-var">J</span></a></span></span><span>
+</span><span id="line-70"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Call"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Call"><span class="hs-identifier hs-var">Call</span></a></span></span><span>
+</span><span id="line-71"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Ret"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Ret"><span class="hs-identifier hs-var">Ret</span></a></span></span><span>
+</span><span id="line-72"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679214689"><span id="local-6989586621679214691"><span id="local-6989586621679214695"><span class="annot"><span class="annottext">Int -&gt; OpCode -&gt; ShowS
+[OpCode] -&gt; ShowS
+OpCode -&gt; String
+(Int -&gt; OpCode -&gt; ShowS)
+-&gt; (OpCode -&gt; String) -&gt; ([OpCode] -&gt; ShowS) -&gt; Show OpCode
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; OpCode -&gt; ShowS
+showsPrec :: Int -&gt; OpCode -&gt; ShowS
+$cshow :: OpCode -&gt; String
+show :: OpCode -&gt; String
+$cshowList :: [OpCode] -&gt; ShowS
+showList :: [OpCode] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span>
+</span><span id="line-74"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679214700"><span class="annot"><span class="hs-identifier hs-type">Pretty</span></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#OpCode"><span class="hs-identifier hs-type">OpCode</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-75"></span><span>  </span><span id="local-6989586621679214706"><span class="annot"><span class="annottext">pretty :: forall ann. OpCode -&gt; Doc ann
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">pretty</span></span></span><span> </span><span id="local-6989586621679214707"><span class="annot"><span class="annottext">OpCode
+</span><a href="#local-6989586621679214707"><span class="hs-identifier hs-var">opCode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Doc ann
+forall ann. String -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Doc ann) -&gt; String -&gt; Doc ann
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><span class="hs-identifier hs-var">toLower</span></span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Char) -&gt; ShowS
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">OpCode -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">OpCode
+</span><a href="#local-6989586621679214707"><span class="hs-identifier hs-var">opCode</span></a></span><span>
+</span><span id="line-76"></span><span>
+</span><span id="line-77"></span><span class="hs-keyword">data</span><span> </span><span id="Operand"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Operand"><span class="hs-identifier hs-var">Operand</span></a></span></span><span>
+</span><span id="line-78"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="Immediate"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Immediate"><span class="hs-identifier hs-var">Immediate</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int64</span></span><span>
+</span><span id="line-79"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Register"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Register"><span class="hs-identifier hs-var">Register</span></a></span></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Register"><span class="hs-identifier hs-type">Register</span></a></span><span>
+</span><span id="line-80"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="RegisterWithOffset"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#RegisterWithOffset"><span class="hs-identifier hs-var">RegisterWithOffset</span></a></span></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Register"><span class="hs-identifier hs-type">Register</span></a></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Offset"><span class="hs-identifier hs-type">Offset</span></a></span><span>
+</span><span id="line-81"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Symbol"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Symbol"><span class="hs-identifier hs-var">Symbol</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-82"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679214715"><span id="local-6989586621679214725"><span class="annot"><span class="annottext">Operand -&gt; Operand -&gt; Bool
+(Operand -&gt; Operand -&gt; Bool)
+-&gt; (Operand -&gt; Operand -&gt; Bool) -&gt; Eq Operand
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: Operand -&gt; Operand -&gt; Bool
+== :: Operand -&gt; Operand -&gt; Bool
+$c/= :: Operand -&gt; Operand -&gt; Bool
+/= :: Operand -&gt; Operand -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679214732"><span id="local-6989586621679214742"><span id="local-6989586621679214746"><span id="local-6989586621679214749"><span id="local-6989586621679214752"><span id="local-6989586621679214755"><span id="local-6989586621679214758"><span class="annot"><span class="annottext">Eq Operand
+Eq Operand
+-&gt; (Operand -&gt; Operand -&gt; Ordering)
+-&gt; (Operand -&gt; Operand -&gt; Bool)
+-&gt; (Operand -&gt; Operand -&gt; Bool)
+-&gt; (Operand -&gt; Operand -&gt; Bool)
+-&gt; (Operand -&gt; Operand -&gt; Bool)
+-&gt; (Operand -&gt; Operand -&gt; Operand)
+-&gt; (Operand -&gt; Operand -&gt; Operand)
+-&gt; Ord Operand
+Operand -&gt; Operand -&gt; Bool
+Operand -&gt; Operand -&gt; Ordering
+Operand -&gt; Operand -&gt; Operand
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: Operand -&gt; Operand -&gt; Ordering
+compare :: Operand -&gt; Operand -&gt; Ordering
+$c&lt; :: Operand -&gt; Operand -&gt; Bool
+&lt; :: Operand -&gt; Operand -&gt; Bool
+$c&lt;= :: Operand -&gt; Operand -&gt; Bool
+&lt;= :: Operand -&gt; Operand -&gt; Bool
+$c&gt; :: Operand -&gt; Operand -&gt; Bool
+&gt; :: Operand -&gt; Operand -&gt; Bool
+$c&gt;= :: Operand -&gt; Operand -&gt; Bool
+&gt;= :: Operand -&gt; Operand -&gt; Bool
+$cmax :: Operand -&gt; Operand -&gt; Operand
+max :: Operand -&gt; Operand -&gt; Operand
+$cmin :: Operand -&gt; Operand -&gt; Operand
+min :: Operand -&gt; Operand -&gt; Operand
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Memory"><span class="hs-identifier hs-type">Memory</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Offset"><span class="hs-identifier hs-type">Offset</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Operand"><span class="hs-identifier hs-type">Operand</span></a></span><span>
+</span><span id="line-85"></span><span class="hs-keyword">pattern</span><span> </span><span id="Memory"><span id="%24mMemory"><span id="%24bMemory"><span class="annot"><span class="annottext">$mMemory :: forall {r}. Operand -&gt; (Int64 -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+$bMemory :: Int64 -&gt; Operand
+</span><a href="CodeGen.RiscV.Lib.Types.html#Memory"><span class="hs-identifier hs-var hs-var hs-var">Memory</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679214764"><span class="hs-identifier hs-type">offset</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#RegisterWithOffset"><span class="hs-identifier hs-type">RegisterWithOffset</span></a></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Sp"><span class="hs-identifier hs-type">Sp</span></a></span><span> </span><span id="local-6989586621679214764"><span class="annot"><a href="#local-6989586621679214764"><span class="hs-identifier hs-var">offset</span></a></span></span><span>
+</span><span id="line-86"></span><span>
+</span><span id="line-87"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679214768"><span class="annot"><span class="hs-identifier hs-type">Pretty</span></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Operand"><span class="hs-identifier hs-type">Operand</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-88"></span><span>  </span><span id="local-6989586621679214778"><span class="annot"><span class="annottext">pretty :: forall ann. Operand -&gt; Doc ann
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">pretty</span></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Immediate"><span class="hs-identifier hs-type">Immediate</span></a></span><span> </span><span id="local-6989586621679214779"><span class="annot"><span class="annottext">Int64
+</span><a href="#local-6989586621679214779"><span class="hs-identifier hs-var">i</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; Doc ann
+forall ann. Int64 -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">Int64
+</span><a href="#local-6989586621679214779"><span class="hs-identifier hs-var">i</span></a></span><span>
+</span><span id="line-89"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Register"><span class="hs-identifier hs-type">Register</span></a></span><span> </span><span id="local-6989586621679214780"><span class="annot"><span class="annottext">Register
+</span><a href="#local-6989586621679214780"><span class="hs-identifier hs-var">r</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Register -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+forall ann. Register -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">Register
+</span><a href="#local-6989586621679214780"><span class="hs-identifier hs-var">r</span></a></span><span>
+</span><span id="line-90"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#RegisterWithOffset"><span class="hs-identifier hs-type">RegisterWithOffset</span></a></span><span> </span><span id="local-6989586621679214781"><span class="annot"><span class="annottext">Register
+</span><a href="#local-6989586621679214781"><span class="hs-identifier hs-var">r</span></a></span></span><span> </span><span id="local-6989586621679214782"><span class="annot"><span class="annottext">Int64
+</span><a href="#local-6989586621679214782"><span class="hs-identifier hs-var">o</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; Doc ann
+forall ann. Int64 -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int64
+</span><a href="CodeGen.RiscV.Lib.Types.html#dword"><span class="hs-identifier hs-var">dword</span></a></span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; Int64 -&gt; Int64
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">Int64
+</span><a href="#local-6989586621679214782"><span class="hs-identifier hs-var">o</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Doc ann -&gt; Doc ann -&gt; Doc ann
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Doc ann -&gt; Doc ann
+forall ann. Doc ann -&gt; Doc ann
+</span><span class="hs-identifier hs-var">parens</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Register -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+forall ann. Register -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">Register
+</span><a href="#local-6989586621679214781"><span class="hs-identifier hs-var">r</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-91"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Symbol"><span class="hs-identifier hs-type">Symbol</span></a></span><span> </span><span id="local-6989586621679214785"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679214785"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Doc ann
+forall ann. Text -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679214785"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-92"></span><span>
+</span><span id="line-93"></span><span class="hs-keyword">type</span><span> </span><span id="Offset"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Offset"><span class="hs-identifier hs-var">Offset</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int64</span></span><span>
+</span><span id="line-94"></span><span>
+</span><span id="line-95"></span><span class="hs-keyword">data</span><span> </span><span id="Register"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Register"><span class="hs-identifier hs-var">Register</span></a></span></span><span>
+</span><span id="line-96"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="Zero"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Zero"><span class="hs-identifier hs-var">Zero</span></a></span></span><span> </span><span class="hs-comment">-- zero == x0</span><span>
+</span><span id="line-97"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Ra"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Ra"><span class="hs-identifier hs-var">Ra</span></a></span></span><span> </span><span class="hs-comment">-- ra == x1</span><span>
+</span><span id="line-98"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Sp"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Sp"><span class="hs-identifier hs-var">Sp</span></a></span></span><span> </span><span class="hs-comment">-- sp == x2</span><span>
+</span><span id="line-99"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Gp"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Gp"><span class="hs-identifier hs-var">Gp</span></a></span></span><span> </span><span class="hs-comment">-- gp == x3</span><span>
+</span><span id="line-100"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Tp"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Tp"><span class="hs-identifier hs-var">Tp</span></a></span></span><span> </span><span class="hs-comment">-- tp == x4</span><span>
+</span><span id="line-101"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="T0"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#T0"><span class="hs-identifier hs-var">T0</span></a></span></span><span> </span><span class="hs-comment">-- t0 == x5</span><span>
+</span><span id="line-102"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="T1"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#T1"><span class="hs-identifier hs-var">T1</span></a></span></span><span> </span><span class="hs-comment">-- t1 == x6</span><span>
+</span><span id="line-103"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="T2"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#T2"><span class="hs-identifier hs-var">T2</span></a></span></span><span> </span><span class="hs-comment">-- t2 == x7</span><span>
+</span><span id="line-104"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="S0"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#S0"><span class="hs-identifier hs-var">S0</span></a></span></span><span> </span><span class="hs-comment">-- s0 == x8</span><span>
+</span><span id="line-105"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="S1"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#S1"><span class="hs-identifier hs-var">S1</span></a></span></span><span> </span><span class="hs-comment">-- s1 == x9</span><span>
+</span><span id="line-106"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="A0"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#A0"><span class="hs-identifier hs-var">A0</span></a></span></span><span> </span><span class="hs-comment">-- a0 == x10</span><span>
+</span><span id="line-107"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="A1"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#A1"><span class="hs-identifier hs-var">A1</span></a></span></span><span> </span><span class="hs-comment">-- a1 == x11</span><span>
+</span><span id="line-108"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="A2"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#A2"><span class="hs-identifier hs-var">A2</span></a></span></span><span> </span><span class="hs-comment">-- a2 == x12</span><span>
+</span><span id="line-109"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="A3"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#A3"><span class="hs-identifier hs-var">A3</span></a></span></span><span> </span><span class="hs-comment">-- a3 == x13</span><span>
+</span><span id="line-110"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="A4"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#A4"><span class="hs-identifier hs-var">A4</span></a></span></span><span> </span><span class="hs-comment">-- a4 == x14</span><span>
+</span><span id="line-111"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="A5"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#A5"><span class="hs-identifier hs-var">A5</span></a></span></span><span> </span><span class="hs-comment">-- a5 == x15</span><span>
+</span><span id="line-112"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="A6"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#A6"><span class="hs-identifier hs-var">A6</span></a></span></span><span> </span><span class="hs-comment">-- a6 == x16</span><span>
+</span><span id="line-113"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="A7"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#A7"><span class="hs-identifier hs-var">A7</span></a></span></span><span> </span><span class="hs-comment">-- a7 == x17</span><span>
+</span><span id="line-114"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="S2"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#S2"><span class="hs-identifier hs-var">S2</span></a></span></span><span> </span><span class="hs-comment">-- s2 == x18</span><span>
+</span><span id="line-115"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="S3"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#S3"><span class="hs-identifier hs-var">S3</span></a></span></span><span> </span><span class="hs-comment">-- s3 == x19</span><span>
+</span><span id="line-116"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="S4"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#S4"><span class="hs-identifier hs-var">S4</span></a></span></span><span> </span><span class="hs-comment">-- s4 == x20</span><span>
+</span><span id="line-117"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="S5"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#S5"><span class="hs-identifier hs-var">S5</span></a></span></span><span> </span><span class="hs-comment">-- s5 == x21</span><span>
+</span><span id="line-118"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="S6"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#S6"><span class="hs-identifier hs-var">S6</span></a></span></span><span> </span><span class="hs-comment">-- s6 == x22</span><span>
+</span><span id="line-119"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="S7"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#S7"><span class="hs-identifier hs-var">S7</span></a></span></span><span> </span><span class="hs-comment">-- s7 == x23</span><span>
+</span><span id="line-120"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="S8"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#S8"><span class="hs-identifier hs-var">S8</span></a></span></span><span> </span><span class="hs-comment">-- s8 == x24</span><span>
+</span><span id="line-121"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="S9"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#S9"><span class="hs-identifier hs-var">S9</span></a></span></span><span> </span><span class="hs-comment">-- s9 == x25</span><span>
+</span><span id="line-122"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="S10"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#S10"><span class="hs-identifier hs-var">S10</span></a></span></span><span> </span><span class="hs-comment">-- s10 == x26</span><span>
+</span><span id="line-123"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="S11"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#S11"><span class="hs-identifier hs-var">S11</span></a></span></span><span> </span><span class="hs-comment">-- s11 == x27</span><span>
+</span><span id="line-124"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="T3"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#T3"><span class="hs-identifier hs-var">T3</span></a></span></span><span> </span><span class="hs-comment">-- t3 == x28</span><span>
+</span><span id="line-125"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="T4"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#T4"><span class="hs-identifier hs-var">T4</span></a></span></span><span> </span><span class="hs-comment">-- t4 == x29</span><span>
+</span><span id="line-126"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="T5"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#T5"><span class="hs-identifier hs-var">T5</span></a></span></span><span> </span><span class="hs-comment">-- t5 == x30</span><span>
+</span><span id="line-127"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="T6"><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#T6"><span class="hs-identifier hs-var">T6</span></a></span></span><span> </span><span class="hs-comment">-- t6 == x31</span><span>
+</span><span id="line-128"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679214818"><span id="local-6989586621679214820"><span class="annot"><span class="annottext">Register -&gt; Register -&gt; Bool
+(Register -&gt; Register -&gt; Bool)
+-&gt; (Register -&gt; Register -&gt; Bool) -&gt; Eq Register
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: Register -&gt; Register -&gt; Bool
+== :: Register -&gt; Register -&gt; Bool
+$c/= :: Register -&gt; Register -&gt; Bool
+/= :: Register -&gt; Register -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679214825"><span id="local-6989586621679214827"><span id="local-6989586621679214829"><span id="local-6989586621679214832"><span id="local-6989586621679214835"><span id="local-6989586621679214838"><span id="local-6989586621679214841"><span class="annot"><span class="annottext">Eq Register
+Eq Register
+-&gt; (Register -&gt; Register -&gt; Ordering)
+-&gt; (Register -&gt; Register -&gt; Bool)
+-&gt; (Register -&gt; Register -&gt; Bool)
+-&gt; (Register -&gt; Register -&gt; Bool)
+-&gt; (Register -&gt; Register -&gt; Bool)
+-&gt; (Register -&gt; Register -&gt; Register)
+-&gt; (Register -&gt; Register -&gt; Register)
+-&gt; Ord Register
+Register -&gt; Register -&gt; Bool
+Register -&gt; Register -&gt; Ordering
+Register -&gt; Register -&gt; Register
+forall a.
+Eq a
+-&gt; (a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: Register -&gt; Register -&gt; Ordering
+compare :: Register -&gt; Register -&gt; Ordering
+$c&lt; :: Register -&gt; Register -&gt; Bool
+&lt; :: Register -&gt; Register -&gt; Bool
+$c&lt;= :: Register -&gt; Register -&gt; Bool
+&lt;= :: Register -&gt; Register -&gt; Bool
+$c&gt; :: Register -&gt; Register -&gt; Bool
+&gt; :: Register -&gt; Register -&gt; Bool
+$c&gt;= :: Register -&gt; Register -&gt; Bool
+&gt;= :: Register -&gt; Register -&gt; Bool
+$cmax :: Register -&gt; Register -&gt; Register
+max :: Register -&gt; Register -&gt; Register
+$cmin :: Register -&gt; Register -&gt; Register
+min :: Register -&gt; Register -&gt; Register
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679214844"><span id="local-6989586621679214846"><span id="local-6989586621679214850"><span class="annot"><span class="annottext">Int -&gt; Register -&gt; ShowS
+[Register] -&gt; ShowS
+Register -&gt; String
+(Int -&gt; Register -&gt; ShowS)
+-&gt; (Register -&gt; String) -&gt; ([Register] -&gt; ShowS) -&gt; Show Register
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; Register -&gt; ShowS
+showsPrec :: Int -&gt; Register -&gt; ShowS
+$cshow :: Register -&gt; String
+show :: Register -&gt; String
+$cshowList :: [Register] -&gt; ShowS
+showList :: [Register] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-129"></span><span>
+</span><span id="line-130"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679214854"><span class="annot"><span class="hs-identifier hs-type">Pretty</span></span><span> </span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#Register"><span class="hs-identifier hs-type">Register</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-131"></span><span>  </span><span id="local-6989586621679214860"><span class="annot"><span class="annottext">pretty :: forall ann. Register -&gt; Doc ann
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">pretty</span></span></span><span> </span><span id="local-6989586621679214861"><span class="annot"><span class="annottext">Register
+</span><a href="#local-6989586621679214861"><span class="hs-identifier hs-var">opCode</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Doc ann
+forall ann. String -&gt; Doc ann
+forall a ann. Pretty a =&gt; a -&gt; Doc ann
+</span><span class="hs-identifier hs-var">pretty</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Doc ann) -&gt; String -&gt; Doc ann
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Char
+</span><span class="hs-identifier hs-var">toLower</span></span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Char) -&gt; ShowS
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Register -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Register
+</span><a href="#local-6989586621679214861"><span class="hs-identifier hs-var">opCode</span></a></span><span>
+</span><span id="line-132"></span><span>
+</span><span id="line-133"></span><span class="annot"><a href="CodeGen.RiscV.Lib.Types.html#dword"><span class="hs-identifier hs-type">dword</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int64</span></span><span>
+</span><span id="line-134"></span><span id="dword"><span class="annot"><span class="annottext">dword :: Int64
+</span><a href="CodeGen.RiscV.Lib.Types.html#dword"><span class="hs-identifier hs-var hs-var">dword</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int64
+</span><span class="hs-number">8</span></span><span>
+</span><span id="line-135"></span></pre></body></html>
