@@ -32,8 +32,10 @@ library
     CodeGen.Llvm.LlvmIrGen
     CodeGen.Llvm.Runner
     CodeGen.Module
-    CodeGen.RiscV.RiscVGen
-    CodeGen.RiscV.RiscVLib
+    CodeGen.RiscV.AsmGen
+    CodeGen.RiscV.Lib
+    CodeGen.RiscV.Lib.Monad
+    CodeGen.RiscV.Lib.Types
     CodeGen.RiscV.Runner
     CodeGen.RunResult
     CodeGen.Runtime.PrintRuntime

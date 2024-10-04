@@ -1,7 +1,7 @@
 module CodeGen.RiscV.Runner (compileToRiscVAsm) where
 
 import CodeGen.Module (compileToModule)
-import CodeGen.RiscV.RiscVGen (ppRiscVAsm)
+import CodeGen.RiscV.AsmGen (ppRiscVAsm)
 import CodeGen.TimedValue (TimedValue, measureTimedValue)
 import Control.Monad.Except (runExcept)
 import Data.Text (Text)

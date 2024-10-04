@@ -3,10 +3,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecursiveDo #-}
 
-module CodeGen.RiscV.RiscVGen (ppRiscVAsm) where
+module CodeGen.RiscV.AsmGen (ppRiscVAsm) where
 
 import CodeGen.Module (Module (..))
-import qualified CodeGen.RiscV.RiscVLib as Asm
+import qualified CodeGen.RiscV.Lib as Asm
 import Control.Monad.State (MonadState, State, evalState, gets, modify)
 import Data.Map (Map)
 import qualified Data.Map as Map

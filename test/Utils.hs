@@ -18,7 +18,7 @@ where
 import CodeGen.Llvm.LlvmIrGen (genLlvmIrModule, ppLlvmModule)
 import CodeGen.Llvm.Runner (run)
 import CodeGen.Module (Module (Module))
-import CodeGen.RiscV.RiscVGen (ppRiscVAsm)
+import CodeGen.RiscV.AsmGen (ppRiscVAsm)
 import CodeGen.RunResult (RunResult (Success))
 import Data.Either (isRight)
 import Data.Maybe (fromJust)
