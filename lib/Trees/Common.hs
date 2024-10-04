@@ -102,6 +102,6 @@ data PrimitiveValue
     PrimValUnit
   | -- | Boolean value (@true@, @false@).
     PrimValBool Bool
-  | -- | Int value (e.g., @0@, @4@, @15@, @23@).
+  | -- | Int value (e.g., @0@, @4@, @8@, @-15@).
     PrimValInt Int64
   deriving (Show, Eq)
