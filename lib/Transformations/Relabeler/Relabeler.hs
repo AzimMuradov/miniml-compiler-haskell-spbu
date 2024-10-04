@@ -14,7 +14,7 @@ import qualified Trees.Common as Ast
 
 -- | Relabel identifiers in the AST so that each declaration creates an identifier with a unique name.
 --
--- It helps to avoid naming errors in the future.
+-- It helps to avoid naming errors in the future compilation phases.
 relabelAst :: Ast.Program -> Ast.Program
 relabelAst (Ast.Program decls cnt) =
   let (decls', Env _ cnt') = runState (mapM relabelDecl decls) (Env [] cnt)
