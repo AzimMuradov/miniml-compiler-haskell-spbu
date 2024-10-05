@@ -7,6 +7,7 @@ on:
 
 jobs:
   docs:
+    name: "docs (os: ${{ matrix.os }}, ghc: ${{ matrix.ghc }}, cabal: ${{ matrix.cabal }}, llvm: ${{ matrix.llvm }})"
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -14,30 +15,35 @@ jobs:
         os: [ubuntu-24.04]
         ghc: ["9.4.8"]
         cabal: ["3.8"]
+        llvm: ["18"]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Set up Haskell
         uses: haskell-actions/setup@v2
+        id: setup-hs
         with:
           ghc-version: ${{ matrix.ghc }}
           cabal-version: ${{ matrix.cabal }}
+      - name: Configure the build
+        # The last step generates "dist-newstyle/cache/plan.json" for the cache key
+        run: |
+          cabal configure --disable-tests --disable-benchmarks --enable-documentation
+          cabal build all --dry-run
       - name: Cache Cabal
         uses: actions/cache@v4
         env:
-          cache-name: cache-cabal
+          key-prefix: docs-cache-cabal-os-${{ runner.os }}-ghc-${{ steps.setup-hs.outputs.ghc-version }}-cabal-${{ steps.setup-hs.outputs.cabal-version }}-llvm-${{ matrix.llvm }}
         with:
-          path: ~/.cabal
-          key: ${{ runner.os }}-docs-${{ env.cache-name }}-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project') }}
-          restore-keys: ${{ runner.os }}-docs-${{ env.cache-name }}-
+          path: ${{ steps.setup-hs.outputs.cabal-store }}
+          key: ${{ env.key-prefix }}-plan-${{ hashFiles('**/plan.json') }}
+          restore-keys: ${{ env.key-prefix }}-
       - name: Install LLVM
-        run: sudo apt install -y llvm-17 llvm-17-dev
+        run: sudo apt install -y llvm-${{ matrix.llvm }} llvm-${{ matrix.llvm }}-dev
       - name: Build docs
         run: >
           cabal haddock
-          --haddock-options="--ignore-all-exports"
-          --enable-documentation
           --haddock-html-location='https://hackage.haskell.org/package/$pkg-$version/docs'
           --haddock-hyperlink-source
           --haddock-options=--quickjump
