@@ -23,6 +23,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Set up Haskell
         uses: haskell-actions/setup@v2
+        id: setup-hs
         with:
           ghc-version: ${{ matrix.ghc }}
           cabal-version: ${{ matrix.cabal }}
@@ -34,9 +35,9 @@ jobs:
       - name: Cache Cabal
         uses: actions/cache@v4
         env:
-          key-prefix: build-cache-cabal-os-${{ runner.os }}-ghc-${{ steps.setup.outputs.ghc-version }}-cabal-${{ steps.setup.outputs.cabal-version }}-llvm-${{ matrix.llvm }}
+          key-prefix: build-cache-cabal-os-${{ runner.os }}-ghc-${{ steps.setup-hs.outputs.ghc-version }}-cabal-${{ steps.setup-hs.outputs.cabal-version }}-llvm-${{ matrix.llvm }}
         with:
-          path: ${{ steps.setup.outputs.cabal-store }}
+          path: ${{ steps.setup-hs.outputs.cabal-store }}
           key: ${{ env.key-prefix }}-plan-${{ hashFiles('**/plan.json') }}
           restore-keys: ${{ env.key-prefix }}-
       - name: Set up HLint
