@@ -70,6 +70,7 @@ Available options:
 Available commands:
   run                      Run MiniML program
   compile                  Compile MiniML program to the provided target
+  print-c-runtime          Print C runtime
 ```
 
 ```
@@ -96,9 +97,25 @@ Usage: miniml compile [FILE] [-t|--target TARGET] [-o|--output OUTPUT]
 
 Available options:
   FILE                     Program file path (optional)
-  -t,--target TARGET       Compilation target (binary|llvm-ir) (default: binary)
+  -t,--target TARGET       Compilation target (binary|llvm-ir|risc-v-asm)
+                           (default: binary)
   -o,--output OUTPUT       Output file path (default: filename taken from the
                            MiniML program)
+  -h,--help                Show this help text
+
+Global options:
+  -d,--debug               Execute in debug mode
+```
+
+```
+Print C runtime
+
+Usage: miniml print-c-runtime [-o|--output OUTPUT]
+
+  Print C runtime
+
+Available options:
+  -o,--output OUTPUT       Output file path (default: runtime.c)
   -h,--help                Show this help text
 
 Global options:
