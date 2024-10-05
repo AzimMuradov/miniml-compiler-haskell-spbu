@@ -25,20 +25,24 @@ jobs:
         with:
           ghc-version: ${{ matrix.ghc }}
           cabal-version: ${{ matrix.cabal }}
+      - name: Configure the build
+        # The last step generates "dist-newstyle/cache/plan.json" for the cache key
+        run: |
+          cabal configure --disable-tests --disable-benchmarks --enable-documentation
+          cabal build all --dry-run
       - name: Cache Cabal
         uses: actions/cache@v4
         env:
-          cache-name: cache-cabal
+          key-prefix: docs-cache-cabal-os-${{ runner.os }}-ghc-${{ steps.setup.outputs.ghc-version }}-cabal-${{ steps.setup.outputs.cabal-version }}-llvm-${{ matrix.llvm }}
         with:
-          path: ~/.cabal
-          key: ${{ runner.os }}-docs-${{ env.cache-name }}-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project') }}
-          restore-keys: ${{ runner.os }}-docs-${{ env.cache-name }}-
+          path: ${{ steps.setup.outputs.cabal-store }}
+          key: ${{ env.key-prefix }}-plan-${{ hashFiles('**/plan.json') }}
+          restore-keys: ${{ env.key-prefix }}-
       - name: Install LLVM
         run: sudo apt install -y llvm-${{ matrix.llvm }} llvm-${{ matrix.llvm }}-dev
       - name: Build docs
         run: >
           cabal haddock
-          --enable-documentation
           --haddock-html-location='https://hackage.haskell.org/package/$pkg-$version/docs'
           --haddock-hyperlink-source
           --haddock-options=--quickjump

@@ -111,6 +111,6 @@ Global options:
 
 - **GHC**: 9.4.8
 - **Cabal**: 3.8
-- **LLVM**: >=16
+- **LLVM**: 16-18
 
 [Implementation details](docs/dev/impl.md)

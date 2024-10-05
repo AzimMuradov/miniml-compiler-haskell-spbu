@@ -16,7 +16,7 @@ jobs:
         os: [ubuntu-24.04]
         ghc: ["9.4.8"]
         cabal: ["3.8"]
-        llvm: ["15", "16", "17", "18"]
+        llvm: ["16", "17", "18"]
 
     steps:
       - name: Checkout code
@@ -26,14 +26,19 @@ jobs:
         with:
           ghc-version: ${{ matrix.ghc }}
           cabal-version: ${{ matrix.cabal }}
+      - name: Configure the build
+        # The last step generates "dist-newstyle/cache/plan.json" for the cache key
+        run: |
+          cabal configure --enable-tests --enable-benchmarks --disable-documentation
+          cabal build all --dry-run
       - name: Cache Cabal
         uses: actions/cache@v4
         env:
-          cache-name: cache-cabal
+          key-prefix: build-cache-cabal-os-${{ runner.os }}-ghc-${{ steps.setup.outputs.ghc-version }}-cabal-${{ steps.setup.outputs.cabal-version }}-llvm-${{ matrix.llvm }}
         with:
-          path: ~/.cabal
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project') }}
-          restore-keys: ${{ runner.os }}-build-${{ env.cache-name }}-
+          path: ${{ steps.setup.outputs.cabal-store }}
+          key: ${{ env.key-prefix }}-plan-${{ hashFiles('**/plan.json') }}
+          restore-keys: ${{ env.key-prefix }}-
       - name: Set up HLint
         uses: haskell-actions/hlint-setup@v2
       - name: Run HLint
