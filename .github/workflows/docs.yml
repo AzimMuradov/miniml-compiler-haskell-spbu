@@ -7,6 +7,7 @@ on:
 
 jobs:
   docs:
+    name: "docs (os: ${{ matrix.os }}, ghc: ${{ matrix.ghc }}, cabal: ${{ matrix.cabal }}, llvm: ${{ matrix.llvm }})"
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -14,6 +15,7 @@ jobs:
         os: [ubuntu-24.04]
         ghc: ["9.4.8"]
         cabal: ["3.8"]
+        llvm: ["18"]
 
     steps:
       - name: Checkout code
@@ -32,11 +34,10 @@ jobs:
           key: ${{ runner.os }}-docs-${{ env.cache-name }}-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project') }}
           restore-keys: ${{ runner.os }}-docs-${{ env.cache-name }}-
       - name: Install LLVM
-        run: sudo apt install -y llvm-17 llvm-17-dev
+        run: sudo apt install -y llvm-${{ matrix.llvm }} llvm-${{ matrix.llvm }}-dev
       - name: Build docs
         run: >
           cabal haddock
-          --haddock-options="--ignore-all-exports"
           --enable-documentation
           --haddock-html-location='https://hackage.haskell.org/package/$pkg-$version/docs'
           --haddock-hyperlink-source
